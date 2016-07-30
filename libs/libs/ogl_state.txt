@@ -1,0 +1,58 @@
+   OGL_STATE: OpenGL State
+================================================================================
+   This is a state tracking class, which also provides some stock shaders and
+   functions.
+
+	State tracking:
+	There is a matrix stack for modelview- and projection-matrix, and a state
+	for	eight light sources. Just like in OpenGL 1.x
+
+	Stock Shaders:
+	There are shaders for texturing, phong shading and distance field alpha
+	handling.
+
+___Usage_______________________________________________________________________
+
+   You need to specify an OpenGL header in as OFL_GL_HEADER. for example:
+
+	#define OFL_GL_HEADER <glad/glad.h>
+	#define OFL_GL_HEADER <glew.h>
+
+
+	This module also uses GLM ... sorry I was too lazy to implement all
+	these functions, and its not feasible anyway.
+
+
+___API_________________________________________________________________________
+
+	Matrix-Stacks:
+	There are two stacks. PROJECITON and MODEL_VIEW. You can change which is
+	modified using the matrixMode(...) method.
+	with pushMatrix() and popMatrix() you can either push a copy of the top-most
+	matrix onto the stack or pop the top-most matrix from the stack.
+	All other matrix modifying methods effect the top-most(current)
+	matrix of the selected stack:
+
+	void loadIdentity();	sets the matrix as identity
+	void translate(..);		translates the current matrix
+	void rotate(...);		rotates the current matrix
+	void scale(...);		scales the current matrix
+	void lookAt(...);		multiplys the current matrix with a lookAt-matix
+	void ortho(...);		multiplys the current matrix with a ortho-matix
+	void frustum(...);		multiplys the current matrix with a frustum-matix
+	void perspective(...);	multiplys the current matrix with a persp.-matix
+
+	Lights:
+	You can set Light parameters using the setLight*(...) methods.
+
+	Stock-shaders:
+	You can select different stock shaders by calling enable() or disable() for
+	different features.
+	The features are:
+	- Texturing: Basic color mapping
+	- Lighting: Basic per fragment lighting
+	- DFAlpha: Iterpreting the Alpha channel as distance field.
+	- NonStockShader: Use the set non stock shader. If this feature is
+	Enabled all uniforms and attributes will still be set, but your shader
+	will be used.
+

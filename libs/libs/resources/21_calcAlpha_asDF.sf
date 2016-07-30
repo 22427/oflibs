@@ -1,0 +1,4 @@
+float calcAlpha(vec4 baseColor)
+{
+	return step(0.5,baseColor.a);
+}
