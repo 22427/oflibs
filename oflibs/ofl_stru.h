@@ -15,7 +15,7 @@
 #include <cmath>
 
 
-namespace stru
+namespace ofl
 {
 
 /**
@@ -239,7 +239,7 @@ static inline std::string without_extension(const std::string& p)
 #endif //USING_OFL_STRU_H
 #ifdef OFL_IMPLEMENTATION
 
-namespace stru
+namespace ofl
 {
 Tokenizer::Tokenizer(const std::string& base)
 {

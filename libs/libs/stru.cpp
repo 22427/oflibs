@@ -1,6 +1,6 @@
 #include "stru.h"
 
-namespace stru
+namespace ofl
 {
 Tokenizer::Tokenizer(const std::string& base)
 {

@@ -42,6 +42,8 @@ ___API__________________________________________________________________________
 
 #include <iostream>
 
+namespace ofl
+{
 /**
  * @brief The Socket class is a simple socket abstraction layer, providing
  * socket functionality for Windows and Unix-Systems alike.
@@ -337,6 +339,7 @@ public:
 		return	this->recv(buffer, len);
 	}
 };
+}
 
 #endif //USING_OFL_SOCKET_H
 #ifndef USING_OFL_STRU_H
@@ -353,7 +356,7 @@ public:
 #include <cmath>
 
 
-namespace stru
+namespace ofl
 {
 
 /**
@@ -887,6 +890,7 @@ public:
 #include <map>
 #include <thread>
 
+namespace ofl {
 
 class Target
 {
@@ -1001,6 +1005,7 @@ public:
 
 };
 
+}
 
 #endif //USING_OFL_TRACK_H
 #ifndef USING_OFL_VMATH_H
@@ -1009,7 +1014,7 @@ public:
 #endif //USING_OFL_VMATH_H
 #ifdef OFL_IMPLEMENTATION
 
-namespace stru
+namespace ofl
 {
 Tokenizer::Tokenizer(const std::string& base)
 {
@@ -1097,6 +1102,7 @@ void Tokenizer::reset(const std::string& base)
 std::string Tokenizer::whitespaces = " \t\n\v\f\r";
 }
 
+using namespace ofl;
 Target3DOF::Target3DOF(unsigned int id, unsigned int frame_no, const vec4 &pos)
 	:Target(id, frame_no)
 {
@@ -1163,10 +1169,10 @@ void TrackingData::unlock_all()
 
 
 
-std::vector<float> readARTBlob(stru::Tokenizer& tkn)
+std::vector<float> readARTBlob(ofl::Tokenizer& tkn)
 {
 	std::vector<float> res;
-	stru::Tokenizer t(tkn.getToken(']'));
+	ofl::Tokenizer t(tkn.getToken(']'));
 	t.skipOverAll("["+t.whitespaces);
 
 	std::string seperators = ","+t.whitespaces;
@@ -1193,7 +1199,7 @@ mat4 mat4_from_array(const std::vector<float> &vec)
 	return res;
 }
 
-Target6DOF read6d(stru::Tokenizer &tkn, int frame_no)
+Target6DOF read6d(ofl::Tokenizer &tkn, int frame_no)
 {
 	std::vector<float> head = readARTBlob(tkn);
 	std::vector<float> pos_eul = readARTBlob(tkn);
@@ -1206,7 +1212,7 @@ Target6DOF read6d(stru::Tokenizer &tkn, int frame_no)
 
 }
 
-Target3DOF  read3d(stru::Tokenizer &tkn, int frame_no)
+Target3DOF  read3d(ofl::Tokenizer &tkn, int frame_no)
 {
 	std::vector<float> head = readARTBlob(tkn);
 	std::vector<float> pos = readARTBlob(tkn);
@@ -1216,7 +1222,7 @@ Target3DOF  read3d(stru::Tokenizer &tkn, int frame_no)
 			vec4(pos[0],pos[1],pos[2]));
 }
 
-TargetFlystick  read6df(stru::Tokenizer &tkn, int frame_no)
+TargetFlystick  read6df(ofl::Tokenizer &tkn, int frame_no)
 {
 	std::vector<float> head = readARTBlob(tkn);
 	std::vector<float> pos_eul = readARTBlob(tkn);
@@ -1253,7 +1259,7 @@ void TrackingData::loop()
 
 		while(std::getline(strm,l))
 		{
-			stru::Tokenizer line(l);
+			ofl::Tokenizer line(l);
 			std::string lt = line.getToken(' ');
 			int cnt = 0;
 			line.getTokenAs(cnt," ");
@@ -1873,7 +1879,7 @@ vec4 read_from_string(std::string& str)
 			loc = loc_end;
 		}
 		std::string elem = str.substr(0,loc);
-		stru::trim(elem);
+		ofl::trim(elem);
 		res[i] = atof(elem.c_str());
 		str = str.substr(loc+1);
 		if(loc == loc_end)

@@ -12,10 +12,10 @@
 
 #include "vd.h"
 
-namespace vdman
+namespace ofl
 {
 
-class VertexDataManufacturer : public vd::VertexDataTools
+class VertexDataManufacturer : public ofl::VertexDataTools
 {
 
 private:
@@ -40,13 +40,13 @@ private:
 	/**
 	 * @brief m_input_primitive The primitive mode chosen by begin(..).
 	 */
-	vd::Primitive m_input_primitive;
+	ofl::Primitive m_input_primitive;
 
 private:
 	/** Datastructures supporting the begin/end/finish operations.*/
 	// A map to check if given vertex already exists and where it is.
-	std::map<vd::Vertex, unsigned int> vertex_ids;
-	vd::VertexData* current_mesh;
+	std::map<ofl::Vertex, unsigned int> vertex_ids;
+	ofl::VertexData* current_mesh;
 
 	// A primitive buffer to deal with quads.
 	std::vector<unsigned int> primitive_buffer;
@@ -88,7 +88,7 @@ public:
 		... will return the two triangles with four vertices.
 	 * @param primitive
 	 */
-	void begin(vd::Primitive primitive);
+	void begin(ofl::Primitive primitive);
 
 
 
@@ -100,7 +100,7 @@ public:
 	 * again. Note: You will have to free the geometry by yourself
 	 * @return A Vertex data struct containing the vertex information.
 	 */
-	vd::VertexData* finish();
+	ofl::VertexData* finish();
 
 
 	/**
@@ -165,7 +165,7 @@ public:
 			const float& w = 1.0f);
 	void vertex(const float * vertex);
 
-	void vertex(const vd::Vertex& vertex);
+	void vertex(const ofl::Vertex& vertex);
 
 
 	/**
@@ -189,7 +189,7 @@ public:
 	 * @param d depth of the box
 	 * @return
 	 */
-	vd::VertexData* createBox(
+	ofl::VertexData* createBox(
 			float w = 1.0f,
 			float h = 1.0f,
 			float d = 1.0f);
@@ -210,7 +210,7 @@ public:
 	 * @return
 	 */
 
-	vd::VertexData* createPlane(
+	ofl::VertexData* createPlane(
 			float w = 1.0f,
 			float h = 1.0f,
 			unsigned int tess_w = 1,
@@ -221,7 +221,7 @@ public:
 	 * @brief createCoordinateSystem Will create a colorfull coordinate system
 	 * @return The coordinate system
 	 */
-	vd::VertexData* createCoordinateSystem();
+	ofl::VertexData* createCoordinateSystem();
 
 
 	/**
@@ -244,7 +244,7 @@ public:
 	 * @param stacks
 	 * @return
 	 */
-	vd::VertexData* createUVSphere(
+	ofl::VertexData* createUVSphere(
 			float radius = 1,
 			unsigned int slices = 32,
 			unsigned int stacks = 16);
@@ -271,7 +271,7 @@ public:
 	 * @param stacks segments along the length of the cylinder
 	 * @return
 	 */
-	vd::VertexData* createCylinder(
+	ofl::VertexData* createCylinder(
 			float radius = 1,
 			float height = 1,
 			unsigned int slices = 32,
@@ -299,7 +299,7 @@ public:
 	 * @param stacks segments along the length of the cone
 	 * @return
 	 */
-	vd::VertexData* createCone(
+	ofl::VertexData* createCone(
 			float baseRadius = 1,
 			float topRadius = 0,
 			float height = 1,
@@ -325,7 +325,7 @@ public:
 	 * @param loops loops between inner and outer radius
 	 * @return
 	 */
-	vd::VertexData* createDisk(
+	ofl::VertexData* createDisk(
 			float innerRadius = 0,
 			float outerRadius = 1,
 			unsigned int slices = 32,

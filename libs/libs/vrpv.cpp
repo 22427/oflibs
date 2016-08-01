@@ -1,6 +1,6 @@
 #include "vrpv.h"
 
-namespace vrpv {
+namespace ofl {
 
 
 ////// Screen //////////////////////////////////////////////////////////////////
@@ -100,7 +100,7 @@ bool ScreenArrangement::loadScreens(const std::string &path)
 	std::string line;
 	while(std::getline(file,line))
 	{
-		stru::trim(line);
+		ofl::trim(line);
 		if(line.empty()|| line.at(0)=='#') continue;
 
 		vec4 bl,br,tl;

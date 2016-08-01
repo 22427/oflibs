@@ -9,6 +9,7 @@
 #include "socket.h"
 #include "stru.h"
 
+namespace ofl {
 
 class Target
 {
@@ -123,3 +124,4 @@ public:
 
 };
 
+}

@@ -1,7 +1,7 @@
 #pragma once
 #include "vmath.h"
 
-namespace vd
+namespace ofl
 {
 enum Primitive
 {
@@ -130,9 +130,9 @@ protected:
 	VertexData* readOBJ(const std::string& path);
 	VertexData* readPLY(const std::string& path);
 
-	bool writeVD(const VertexData* vd, const std::string& path);
-	bool writeOBJ(const VertexData* vd, const std::string& path);
-	bool writePLY(const VertexData* vd, const std::string& path);
+	bool writeVD(const VertexData* ofl, const std::string& path);
+	bool writeOBJ(const VertexData* ofl, const std::string& path);
+	bool writePLY(const VertexData* ofl, const std::string& path);
 public:
 	enum Format
 	{
@@ -141,10 +141,10 @@ public:
 		VD,
 		FROM_PATH
 	};
-	bool writeToFile(const VertexData* vd,const std::string& path, Format f=FROM_PATH);
+	bool writeToFile(const VertexData* ofl,const std::string& path, Format f=FROM_PATH);
 	VertexData* readFromFile(const std::string& path, Format f = FROM_PATH);
 
-	void calculateNormals(VertexData* vd);
-	void calculateTangents(VertexData* vd);
+	void calculateNormals(VertexData* ofl);
+	void calculateTangents(VertexData* ofl);
 };
 }

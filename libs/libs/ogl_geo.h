@@ -9,7 +9,7 @@
 
 
 #include "vd.h"
-namespace ogl
+namespace ofl
 {
 
 #ifndef ALOC_POSITION
@@ -48,14 +48,14 @@ public:
 	 * @param vd The vertex data.
 	 * @param destroy_vd If set true vd will be freed.
 	 */
-	Geometry(vd::VertexData* vd, bool destroy_vd = false);
+	Geometry(ofl::VertexData* ofl, bool destroy_vd = false);
 	Geometry();
 
 	/**
 	 * @brief uploadData updates all the data storen with data from vp
 	 * @param vp Source of the new data.
 	 */
-	void uploadData(vd::VertexData* vp);
+	void uploadData(ofl::VertexData* vp);
 
 	/** Destroys the structure and releases all memory allocated on the GPU-
 	 * and CPUside.
@@ -93,8 +93,8 @@ public:
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
 			glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-			const size_t vertex_size = sizeof(vd::Vertex);
-			const vd::Vertex v;
+			const size_t vertex_size = sizeof(ofl::Vertex);
+			const ofl::Vertex v;
 
 
 #define addr_diff(a,b) ((void*)((char*)a-(char*) b))

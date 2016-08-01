@@ -37,7 +37,7 @@ ___API_________________________________________________________________________
 #include <cmath>
 
 
-namespace stru
+namespace ofl
 {
 
 /**
@@ -561,7 +561,7 @@ public:
 
 
 
-namespace vd
+namespace ofl
 {
 enum Primitive
 {
@@ -690,9 +690,9 @@ protected:
 	VertexData* readOBJ(const std::string& path);
 	VertexData* readPLY(const std::string& path);
 
-	bool writeVD(const VertexData* vd, const std::string& path);
-	bool writeOBJ(const VertexData* vd, const std::string& path);
-	bool writePLY(const VertexData* vd, const std::string& path);
+	bool writeVD(const VertexData* ofl, const std::string& path);
+	bool writeOBJ(const VertexData* ofl, const std::string& path);
+	bool writePLY(const VertexData* ofl, const std::string& path);
 public:
 	enum Format
 	{
@@ -701,11 +701,11 @@ public:
 		VD,
 		FROM_PATH
 	};
-	bool writeToFile(const VertexData* vd,const std::string& path, Format f=FROM_PATH);
+	bool writeToFile(const VertexData* ofl,const std::string& path, Format f=FROM_PATH);
 	VertexData* readFromFile(const std::string& path, Format f = FROM_PATH);
 
-	void calculateNormals(VertexData* vd);
-	void calculateTangents(VertexData* vd);
+	void calculateNormals(VertexData* ofl);
+	void calculateTangents(VertexData* ofl);
 };
 }
 
@@ -717,7 +717,7 @@ public:
 
 
 
-namespace ogl
+namespace ofl
 {
 
 #ifndef ALOC_POSITION
@@ -756,14 +756,14 @@ public:
 	 * @param vd The vertex data.
 	 * @param destroy_vd If set true vd will be freed.
 	 */
-	Geometry(vd::VertexData* vd, bool destroy_vd = false);
+	Geometry(ofl::VertexData* ofl, bool destroy_vd = false);
 	Geometry();
 
 	/**
 	 * @brief uploadData updates all the data storen with data from vp
 	 * @param vp Source of the new data.
 	 */
-	void uploadData(vd::VertexData* vp);
+	void uploadData(ofl::VertexData* vp);
 
 	/** Destroys the structure and releases all memory allocated on the GPU-
 	 * and CPUside.
@@ -801,8 +801,8 @@ public:
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
 			glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-			const size_t vertex_size = sizeof(vd::Vertex);
-			const vd::Vertex v;
+			const size_t vertex_size = sizeof(ofl::Vertex);
+			const ofl::Vertex v;
 
 
 #define addr_diff(a,b) ((void*)((char*)a-(char*) b))
@@ -853,10 +853,10 @@ public:
 #endif //USING_OFL_VMATH_H
 #ifdef OFL_IMPLEMENTATION
 
-namespace ogl
+namespace ofl
 {
 
-Geometry::Geometry(vd::VertexData* vd, bool destroy_vd)
+Geometry::Geometry(VertexData* vd, bool destroy_vd)
 {
 
 	m_vbo = m_vao = m_ibo = 0;
@@ -880,12 +880,12 @@ Geometry::Geometry()
 	glGenBuffers(1, &m_vbo);
 }
 
-void Geometry::uploadData(vd::VertexData *vd)
+void Geometry::uploadData(VertexData *vd)
 {
 	if (m_vao)
 		glBindVertexArray(m_vao);
 
-	const size_t vertex_size = sizeof(vd::Vertex);
+	const size_t vertex_size = sizeof(Vertex);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, vd->indices().size() *
@@ -898,7 +898,7 @@ void Geometry::uploadData(vd::VertexData *vd)
 				 vd->data().data(),
 				 GL_STATIC_DRAW);
 
-	const vd::Vertex v = vd->data()[0];
+	const Vertex v = vd->data()[0];
 
 
 
@@ -943,7 +943,7 @@ Geometry::~Geometry()
 
 }
 
-namespace stru
+namespace ofl
 {
 Tokenizer::Tokenizer(const std::string& base)
 {
@@ -1034,8 +1034,8 @@ std::string Tokenizer::whitespaces = " \t\n\v\f\r";
 #include <fstream>
 #include <map>
 
-using namespace stru;
-namespace vd {
+using namespace ofl;
+namespace ofl {
 
 bool Vertex::operator ==(const Vertex &o)
 {
@@ -1448,7 +1448,7 @@ bool VertexDataTools::writeVD(const VertexData *vd, const std::string &path)
 	hline[4] = vd->primitive();
 
 	fwrite(hline,1,5*sizeof(uint32_t),f);
-	const vd::Vertex v = vd->data()[0];
+	const Vertex v = vd->data()[0];
 
 #define addr_diff(a,b) (((char*)a-(char*) b))
 	hline[0] = POSITION;
@@ -2314,7 +2314,7 @@ vec4 read_from_string(std::string& str)
 			loc = loc_end;
 		}
 		std::string elem = str.substr(0,loc);
-		stru::trim(elem);
+		ofl::trim(elem);
 		res[i] = atof(elem.c_str());
 		str = str.substr(loc+1);
 		if(loc == loc_end)

@@ -6,7 +6,7 @@
 
 
 
-class Converter : public vd::VertexDataTools
+class Converter : public ofl::VertexDataTools
 {
 	bool calc_normals;
 	bool calc_tangents;
@@ -94,7 +94,7 @@ public:
 
 		for(uint i = 0 ; i< input_files.size();i++)
 		{
-			vd::VertexData* vd =this->readFromFile(input_files[i]);
+			ofl::VertexData* vd =this->readFromFile(input_files[i]);
 
 			if(calc_normals)
 				calculateNormals(vd);

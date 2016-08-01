@@ -4,8 +4,8 @@
 #include <map>
 
 #include "stru.h"
-using namespace stru;
-namespace vd {
+using namespace ofl;
+namespace ofl {
 
 bool Vertex::operator ==(const Vertex &o)
 {
@@ -418,7 +418,7 @@ bool VertexDataTools::writeVD(const VertexData *vd, const std::string &path)
 	hline[4] = vd->primitive();
 
 	fwrite(hline,1,5*sizeof(uint32_t),f);
-	const vd::Vertex v = vd->data()[0];
+	const Vertex v = vd->data()[0];
 
 #define addr_diff(a,b) (((char*)a-(char*) b))
 	hline[0] = POSITION;

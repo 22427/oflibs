@@ -11,7 +11,7 @@
 #include <cmath>
 
 
-namespace stru
+namespace ofl
 {
 
 /**

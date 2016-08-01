@@ -1,9 +1,9 @@
 #include "ogl_geo.h"
 
-namespace ogl
+namespace ofl
 {
 
-Geometry::Geometry(vd::VertexData* vd, bool destroy_vd)
+Geometry::Geometry(VertexData* vd, bool destroy_vd)
 {
 
 	m_vbo = m_vao = m_ibo = 0;
@@ -27,12 +27,12 @@ Geometry::Geometry()
 	glGenBuffers(1, &m_vbo);
 }
 
-void Geometry::uploadData(vd::VertexData *vd)
+void Geometry::uploadData(VertexData *vd)
 {
 	if (m_vao)
 		glBindVertexArray(m_vao);
 
-	const size_t vertex_size = sizeof(vd::Vertex);
+	const size_t vertex_size = sizeof(Vertex);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, vd->indices().size() *
@@ -45,7 +45,7 @@ void Geometry::uploadData(vd::VertexData *vd)
 				 vd->data().data(),
 				 GL_STATIC_DRAW);
 
-	const vd::Vertex v = vd->data()[0];
+	const Vertex v = vd->data()[0];
 
 
 

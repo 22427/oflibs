@@ -14,6 +14,8 @@
 
 #include <iostream>
 
+namespace ofl
+{
 /**
  * @brief The Socket class is a simple socket abstraction layer, providing
  * socket functionality for Windows and Unix-Systems alike.
@@ -309,3 +311,4 @@ public:
 		return	this->recv(buffer, len);
 	}
 };
+}

@@ -5,7 +5,7 @@
  #define USING_OFL_OGL_WIN_H
  
 #include <string>
-namespace ogl {
+namespace ofl {
 
 
 enum WindowEvents

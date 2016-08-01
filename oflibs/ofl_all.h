@@ -211,7 +211,7 @@ ___File-format_________________________________________________________________
 #include <cmath>
 
 
-namespace stru
+namespace ofl
 {
 
 /**
@@ -735,7 +735,7 @@ public:
 
 
 
-namespace vd
+namespace ofl
 {
 enum Primitive
 {
@@ -864,9 +864,9 @@ protected:
 	VertexData* readOBJ(const std::string& path);
 	VertexData* readPLY(const std::string& path);
 
-	bool writeVD(const VertexData* vd, const std::string& path);
-	bool writeOBJ(const VertexData* vd, const std::string& path);
-	bool writePLY(const VertexData* vd, const std::string& path);
+	bool writeVD(const VertexData* ofl, const std::string& path);
+	bool writeOBJ(const VertexData* ofl, const std::string& path);
+	bool writePLY(const VertexData* ofl, const std::string& path);
 public:
 	enum Format
 	{
@@ -875,11 +875,11 @@ public:
 		VD,
 		FROM_PATH
 	};
-	bool writeToFile(const VertexData* vd,const std::string& path, Format f=FROM_PATH);
+	bool writeToFile(const VertexData* ofl,const std::string& path, Format f=FROM_PATH);
 	VertexData* readFromFile(const std::string& path, Format f = FROM_PATH);
 
-	void calculateNormals(VertexData* vd);
-	void calculateTangents(VertexData* vd);
+	void calculateNormals(VertexData* ofl);
+	void calculateTangents(VertexData* ofl);
 };
 }
 
@@ -891,7 +891,7 @@ public:
 
 
 
-namespace ogl
+namespace ofl
 {
 
 #ifndef ALOC_POSITION
@@ -930,14 +930,14 @@ public:
 	 * @param vd The vertex data.
 	 * @param destroy_vd If set true vd will be freed.
 	 */
-	Geometry(vd::VertexData* vd, bool destroy_vd = false);
+	Geometry(ofl::VertexData* ofl, bool destroy_vd = false);
 	Geometry();
 
 	/**
 	 * @brief uploadData updates all the data storen with data from vp
 	 * @param vp Source of the new data.
 	 */
-	void uploadData(vd::VertexData* vp);
+	void uploadData(ofl::VertexData* vp);
 
 	/** Destroys the structure and releases all memory allocated on the GPU-
 	 * and CPUside.
@@ -975,8 +975,8 @@ public:
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
 			glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-			const size_t vertex_size = sizeof(vd::Vertex);
-			const vd::Vertex v;
+			const size_t vertex_size = sizeof(ofl::Vertex);
+			const ofl::Vertex v;
 
 
 #define addr_diff(a,b) ((void*)((char*)a-(char*) b))
@@ -1031,7 +1031,7 @@ public:
 #include <stack>
 
 
-namespace ogl
+namespace ofl
 {
 
 
@@ -1271,7 +1271,7 @@ protected:
 }
 
 #include <string>
-namespace ogl {
+namespace ofl {
 
 
 enum WindowEvents
@@ -1679,6 +1679,8 @@ public:
 
 #include <iostream>
 
+namespace ofl
+{
 /**
  * @brief The Socket class is a simple socket abstraction layer, providing
  * socket functionality for Windows and Unix-Systems alike.
@@ -1974,6 +1976,7 @@ public:
 		return	this->recv(buffer, len);
 	}
 };
+}
 
 #include <sstream>
 #include <vector>
@@ -1981,6 +1984,7 @@ public:
 #include <map>
 #include <thread>
 
+namespace ofl {
 
 class Target
 {
@@ -2095,6 +2099,7 @@ public:
 
 };
 
+}
 
 
 #include <vector>
@@ -2107,10 +2112,10 @@ public:
 #include <vector>
 
 
-namespace vdman
+namespace ofl
 {
 
-class VertexDataManufacturer : public vd::VertexDataTools
+class VertexDataManufacturer : public ofl::VertexDataTools
 {
 
 private:
@@ -2135,13 +2140,13 @@ private:
 	/**
 	 * @brief m_input_primitive The primitive mode chosen by begin(..).
 	 */
-	vd::Primitive m_input_primitive;
+	ofl::Primitive m_input_primitive;
 
 private:
 	/** Datastructures supporting the begin/end/finish operations.*/
 	// A map to check if given vertex already exists and where it is.
-	std::map<vd::Vertex, unsigned int> vertex_ids;
-	vd::VertexData* current_mesh;
+	std::map<ofl::Vertex, unsigned int> vertex_ids;
+	ofl::VertexData* current_mesh;
 
 	// A primitive buffer to deal with quads.
 	std::vector<unsigned int> primitive_buffer;
@@ -2183,7 +2188,7 @@ public:
 		... will return the two triangles with four vertices.
 	 * @param primitive
 	 */
-	void begin(vd::Primitive primitive);
+	void begin(ofl::Primitive primitive);
 
 
 
@@ -2195,7 +2200,7 @@ public:
 	 * again. Note: You will have to free the geometry by yourself
 	 * @return A Vertex data struct containing the vertex information.
 	 */
-	vd::VertexData* finish();
+	ofl::VertexData* finish();
 
 
 	/**
@@ -2260,7 +2265,7 @@ public:
 			const float& w = 1.0f);
 	void vertex(const float * vertex);
 
-	void vertex(const vd::Vertex& vertex);
+	void vertex(const ofl::Vertex& vertex);
 
 
 	/**
@@ -2284,7 +2289,7 @@ public:
 	 * @param d depth of the box
 	 * @return
 	 */
-	vd::VertexData* createBox(
+	ofl::VertexData* createBox(
 			float w = 1.0f,
 			float h = 1.0f,
 			float d = 1.0f);
@@ -2305,7 +2310,7 @@ public:
 	 * @return
 	 */
 
-	vd::VertexData* createPlane(
+	ofl::VertexData* createPlane(
 			float w = 1.0f,
 			float h = 1.0f,
 			unsigned int tess_w = 1,
@@ -2316,7 +2321,7 @@ public:
 	 * @brief createCoordinateSystem Will create a colorfull coordinate system
 	 * @return The coordinate system
 	 */
-	vd::VertexData* createCoordinateSystem();
+	ofl::VertexData* createCoordinateSystem();
 
 
 	/**
@@ -2339,7 +2344,7 @@ public:
 	 * @param stacks
 	 * @return
 	 */
-	vd::VertexData* createUVSphere(
+	ofl::VertexData* createUVSphere(
 			float radius = 1,
 			unsigned int slices = 32,
 			unsigned int stacks = 16);
@@ -2366,7 +2371,7 @@ public:
 	 * @param stacks segments along the length of the cylinder
 	 * @return
 	 */
-	vd::VertexData* createCylinder(
+	ofl::VertexData* createCylinder(
 			float radius = 1,
 			float height = 1,
 			unsigned int slices = 32,
@@ -2394,7 +2399,7 @@ public:
 	 * @param stacks segments along the length of the cone
 	 * @return
 	 */
-	vd::VertexData* createCone(
+	ofl::VertexData* createCone(
 			float baseRadius = 1,
 			float topRadius = 0,
 			float height = 1,
@@ -2420,7 +2425,7 @@ public:
 	 * @param loops loops between inner and outer radius
 	 * @return
 	 */
-	vd::VertexData* createDisk(
+	ofl::VertexData* createDisk(
 			float innerRadius = 0,
 			float outerRadius = 1,
 			unsigned int slices = 32,
@@ -2472,7 +2477,7 @@ public:
 #include <sstream>
 
 
-namespace vrpv {
+namespace ofl {
 
 
 /**
@@ -2635,10 +2640,10 @@ public:
 #endif //USING_OFL_VRPV_H
 #ifdef OFL_IMPLEMENTATION
 
-namespace ogl
+namespace ofl
 {
 
-Geometry::Geometry(vd::VertexData* vd, bool destroy_vd)
+Geometry::Geometry(VertexData* vd, bool destroy_vd)
 {
 
 	m_vbo = m_vao = m_ibo = 0;
@@ -2662,12 +2667,12 @@ Geometry::Geometry()
 	glGenBuffers(1, &m_vbo);
 }
 
-void Geometry::uploadData(vd::VertexData *vd)
+void Geometry::uploadData(VertexData *vd)
 {
 	if (m_vao)
 		glBindVertexArray(m_vao);
 
-	const size_t vertex_size = sizeof(vd::Vertex);
+	const size_t vertex_size = sizeof(Vertex);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, vd->indices().size() *
@@ -2680,7 +2685,7 @@ void Geometry::uploadData(vd::VertexData *vd)
 				 vd->data().data(),
 				 GL_STATIC_DRAW);
 
-	const vd::Vertex v = vd->data()[0];
+	const Vertex v = vd->data()[0];
 
 
 
@@ -2729,7 +2734,7 @@ Geometry::~Geometry()
 #include <fstream>
 
 
-namespace ogl {
+namespace ofl {
 
 
 bool compileShader(GLuint shader)
@@ -3180,7 +3185,7 @@ void StateSimulator::setLightAttenuationFactors(int light, const glm::vec4& att)
 }
 }
 
-namespace stru
+namespace ofl
 {
 Tokenizer::Tokenizer(const std::string& base)
 {
@@ -3268,6 +3273,7 @@ void Tokenizer::reset(const std::string& base)
 std::string Tokenizer::whitespaces = " \t\n\v\f\r";
 }
 
+using namespace ofl;
 Target3DOF::Target3DOF(unsigned int id, unsigned int frame_no, const vec4 &pos)
 	:Target(id, frame_no)
 {
@@ -3334,10 +3340,10 @@ void TrackingData::unlock_all()
 
 
 
-std::vector<float> readARTBlob(stru::Tokenizer& tkn)
+std::vector<float> readARTBlob(ofl::Tokenizer& tkn)
 {
 	std::vector<float> res;
-	stru::Tokenizer t(tkn.getToken(']'));
+	ofl::Tokenizer t(tkn.getToken(']'));
 	t.skipOverAll("["+t.whitespaces);
 
 	std::string seperators = ","+t.whitespaces;
@@ -3364,7 +3370,7 @@ mat4 mat4_from_array(const std::vector<float> &vec)
 	return res;
 }
 
-Target6DOF read6d(stru::Tokenizer &tkn, int frame_no)
+Target6DOF read6d(ofl::Tokenizer &tkn, int frame_no)
 {
 	std::vector<float> head = readARTBlob(tkn);
 	std::vector<float> pos_eul = readARTBlob(tkn);
@@ -3377,7 +3383,7 @@ Target6DOF read6d(stru::Tokenizer &tkn, int frame_no)
 
 }
 
-Target3DOF  read3d(stru::Tokenizer &tkn, int frame_no)
+Target3DOF  read3d(ofl::Tokenizer &tkn, int frame_no)
 {
 	std::vector<float> head = readARTBlob(tkn);
 	std::vector<float> pos = readARTBlob(tkn);
@@ -3387,7 +3393,7 @@ Target3DOF  read3d(stru::Tokenizer &tkn, int frame_no)
 			vec4(pos[0],pos[1],pos[2]));
 }
 
-TargetFlystick  read6df(stru::Tokenizer &tkn, int frame_no)
+TargetFlystick  read6df(ofl::Tokenizer &tkn, int frame_no)
 {
 	std::vector<float> head = readARTBlob(tkn);
 	std::vector<float> pos_eul = readARTBlob(tkn);
@@ -3424,7 +3430,7 @@ void TrackingData::loop()
 
 		while(std::getline(strm,l))
 		{
-			stru::Tokenizer line(l);
+			ofl::Tokenizer line(l);
 			std::string lt = line.getToken(' ');
 			int cnt = 0;
 			line.getTokenAs(cnt," ");
@@ -3553,8 +3559,8 @@ Target6DOF TrackingData::getFlystick(const unsigned int id)
 #include <fstream>
 #include <map>
 
-using namespace stru;
-namespace vd {
+using namespace ofl;
+namespace ofl {
 
 bool Vertex::operator ==(const Vertex &o)
 {
@@ -3967,7 +3973,7 @@ bool VertexDataTools::writeVD(const VertexData *vd, const std::string &path)
 	hline[4] = vd->primitive();
 
 	fwrite(hline,1,5*sizeof(uint32_t),f);
-	const vd::Vertex v = vd->data()[0];
+	const Vertex v = vd->data()[0];
 
 #define addr_diff(a,b) (((char*)a-(char*) b))
 	hline[0] = POSITION;
@@ -4347,8 +4353,8 @@ void VertexDataTools::calculateTangents(VertexData *vd)
 using namespace std;
 
 
-namespace vdman {
-using namespace vd;
+namespace ofl {
+using namespace ofl;
 
 #define RESET_PRIMITIVE 0x0000FFFF
 
@@ -5638,7 +5644,7 @@ vec4 read_from_string(std::string& str)
 			loc = loc_end;
 		}
 		std::string elem = str.substr(0,loc);
-		stru::trim(elem);
+		ofl::trim(elem);
 		res[i] = atof(elem.c_str());
 		str = str.substr(loc+1);
 		if(loc == loc_end)
@@ -5651,7 +5657,7 @@ vec4 read_from_string(std::string& str)
 
 
 
-namespace vrpv {
+namespace ofl {
 
 
 ////// Screen //////////////////////////////////////////////////////////////////
@@ -5751,7 +5757,7 @@ bool ScreenArrangement::loadScreens(const std::string &path)
 	std::string line;
 	while(std::getline(file,line))
 	{
-		stru::trim(line);
+		ofl::trim(line);
 		if(line.empty()|| line.at(0)=='#') continue;
 
 		vec4 bl,br,tl;

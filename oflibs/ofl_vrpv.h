@@ -70,7 +70,7 @@ ___File-format_________________________________________________________________
 #include <cmath>
 
 
-namespace stru
+namespace ofl
 {
 
 /**
@@ -608,7 +608,7 @@ public:
 #include <sstream>
 
 
-namespace vrpv {
+namespace ofl {
 
 
 /**
@@ -729,7 +729,7 @@ public:
 #endif //USING_OFL_VRPV_H
 #ifdef OFL_IMPLEMENTATION
 
-namespace stru
+namespace ofl
 {
 Tokenizer::Tokenizer(const std::string& base)
 {
@@ -1311,7 +1311,7 @@ vec4 read_from_string(std::string& str)
 			loc = loc_end;
 		}
 		std::string elem = str.substr(0,loc);
-		stru::trim(elem);
+		ofl::trim(elem);
 		res[i] = atof(elem.c_str());
 		str = str.substr(loc+1);
 		if(loc == loc_end)
@@ -1324,7 +1324,7 @@ vec4 read_from_string(std::string& str)
 
 
 
-namespace vrpv {
+namespace ofl {
 
 
 ////// Screen //////////////////////////////////////////////////////////////////
@@ -1424,7 +1424,7 @@ bool ScreenArrangement::loadScreens(const std::string &path)
 	std::string line;
 	while(std::getline(file,line))
 	{
-		stru::trim(line);
+		ofl::trim(line);
 		if(line.empty()|| line.at(0)=='#') continue;
 
 		vec4 bl,br,tl;

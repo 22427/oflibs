@@ -15,7 +15,7 @@
 #include <cmath>
 
 
-namespace stru
+namespace ofl
 {
 
 /**
@@ -546,7 +546,7 @@ public:
 #endif //USING_OFL_VMATH_H
 #ifdef OFL_IMPLEMENTATION
 
-namespace stru
+namespace ofl
 {
 Tokenizer::Tokenizer(const std::string& base)
 {
@@ -1128,7 +1128,7 @@ vec4 read_from_string(std::string& str)
 			loc = loc_end;
 		}
 		std::string elem = str.substr(0,loc);
-		stru::trim(elem);
+		ofl::trim(elem);
 		res[i] = atof(elem.c_str());
 		str = str.substr(loc+1);
 		if(loc == loc_end)

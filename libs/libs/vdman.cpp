@@ -8,8 +8,8 @@
 using namespace std;
 
 
-namespace vdman {
-using namespace vd;
+namespace ofl {
+using namespace ofl;
 
 #define RESET_PRIMITIVE 0x0000FFFF
 

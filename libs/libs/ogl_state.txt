@@ -1,26 +1,26 @@
-   OGL_STATE: OpenGL State
+	OGL_STATE: OpenGL State
 ================================================================================
-   This is a state tracking class, which also provides some stock shaders and
-   functions.
+	This is a state tracking class, which also provides some stock shaders and
+	functions.
 
-	State tracking:
-	There is a matrix stack for modelview- and projection-matrix, and a state
-	for	eight light sources. Just like in OpenGL 1.x
+		State tracking:
+		There is a matrix stack for modelview- and projection-matrix, and a state
+		for	eight light sources. Just like in OpenGL 1.x
 
-	Stock Shaders:
-	There are shaders for texturing, phong shading and distance field alpha
-	handling.
+		Stock Shaders:
+		There are shaders for texturing, phong shading and distance field alpha
+		handling.
 
 ___Usage_______________________________________________________________________
 
-   You need to specify an OpenGL header in as OFL_GL_HEADER. for example:
+	You need to specify an OpenGL header in as OFL_GL_HEADER. for example:
 
-	#define OFL_GL_HEADER <glad/glad.h>
-	#define OFL_GL_HEADER <glew.h>
+		#define OFL_GL_HEADER <glad/glad.h>
+		#define OFL_GL_HEADER <glew.h>
 
 
-	This module also uses GLM ... sorry I was too lazy to implement all
-	these functions, and its not feasible anyway.
+		This module also uses GLM ... sorry I was too lazy to implement all
+		these functions, and its not feasible anyway.
 
 
 ___API_________________________________________________________________________
@@ -55,4 +55,3 @@ ___API_________________________________________________________________________
 	- NonStockShader: Use the set non stock shader. If this feature is
 	Enabled all uniforms and attributes will still be set, but your shader
 	will be used.
-

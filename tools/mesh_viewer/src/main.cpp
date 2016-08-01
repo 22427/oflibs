@@ -7,10 +7,10 @@
 
 #include <ofl_open_gl_tools.h>
 
-using namespace ogl;
-using namespace vd;
+using namespace ofl;
+using namespace ofl;
 
-class MeshViewer : public vd::VertexDataTools, public ogl::Window_GLFW, public ogl::StateSimulator
+class MeshViewer : public ofl::VertexDataTools, public ofl::Window_GLFW, public ofl::StateSimulator
 {
 	bool render_on;
 	ShaderWrap* render_sw;
@@ -21,7 +21,7 @@ class MeshViewer : public vd::VertexDataTools, public ogl::Window_GLFW, public o
 	glm::vec3 origin;
 	glm::vec3 cam_pos;
 public:
-	MeshViewer(ogl::WindowPreferences* wp) : Window_GLFW(wp)
+	MeshViewer(ofl::WindowPreferences* wp) : Window_GLFW(wp)
 	{
 		fno = 0;
 		to_show_angle= 0;
@@ -157,7 +157,7 @@ public:
 
 int main(int argc, char** argv)
 {
-	ogl::WindowPreferences wp;
+	ofl::WindowPreferences wp;
 	MeshViewer mv(&wp);
 	std::vector<std::string> args;
 	for(int i = 0 ; i< argc;i++)

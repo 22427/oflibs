@@ -4,7 +4,7 @@
 
 #include "ogl_state.h"
 
-namespace ogl {
+namespace ofl {
 
 
 bool compileShader(GLuint shader)

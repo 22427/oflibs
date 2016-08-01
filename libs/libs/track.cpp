@@ -1,6 +1,7 @@
 #include "track.h"
 #include "stru.h"
 
+using namespace ofl;
 Target3DOF::Target3DOF(unsigned int id, unsigned int frame_no, const vec4 &pos)
 	:Target(id, frame_no)
 {
@@ -67,10 +68,10 @@ void TrackingData::unlock_all()
 
 
 
-std::vector<float> readARTBlob(stru::Tokenizer& tkn)
+std::vector<float> readARTBlob(ofl::Tokenizer& tkn)
 {
 	std::vector<float> res;
-	stru::Tokenizer t(tkn.getToken(']'));
+	ofl::Tokenizer t(tkn.getToken(']'));
 	t.skipOverAll("["+t.whitespaces);
 
 	std::string seperators = ","+t.whitespaces;
@@ -97,7 +98,7 @@ mat4 mat4_from_array(const std::vector<float> &vec)
 	return res;
 }
 
-Target6DOF read6d(stru::Tokenizer &tkn, int frame_no)
+Target6DOF read6d(ofl::Tokenizer &tkn, int frame_no)
 {
 	std::vector<float> head = readARTBlob(tkn);
 	std::vector<float> pos_eul = readARTBlob(tkn);
@@ -110,7 +111,7 @@ Target6DOF read6d(stru::Tokenizer &tkn, int frame_no)
 
 }
 
-Target3DOF  read3d(stru::Tokenizer &tkn, int frame_no)
+Target3DOF  read3d(ofl::Tokenizer &tkn, int frame_no)
 {
 	std::vector<float> head = readARTBlob(tkn);
 	std::vector<float> pos = readARTBlob(tkn);
@@ -120,7 +121,7 @@ Target3DOF  read3d(stru::Tokenizer &tkn, int frame_no)
 			vec4(pos[0],pos[1],pos[2]));
 }
 
-TargetFlystick  read6df(stru::Tokenizer &tkn, int frame_no)
+TargetFlystick  read6df(ofl::Tokenizer &tkn, int frame_no)
 {
 	std::vector<float> head = readARTBlob(tkn);
 	std::vector<float> pos_eul = readARTBlob(tkn);
@@ -157,7 +158,7 @@ void TrackingData::loop()
 
 		while(std::getline(strm,l))
 		{
-			stru::Tokenizer line(l);
+			ofl::Tokenizer line(l);
 			std::string lt = line.getToken(' ');
 			int cnt = 0;
 			line.getTokenAs(cnt," ");

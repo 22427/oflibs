@@ -73,7 +73,7 @@ ___API_________________________________________________________________________
 #include <cmath>
 
 
-namespace stru
+namespace ofl
 {
 
 /**
@@ -616,7 +616,7 @@ public:
 #include <stack>
 
 
-namespace ogl
+namespace ofl
 {
 
 
@@ -870,7 +870,7 @@ protected:
 #include <fstream>
 
 
-namespace ogl {
+namespace ofl {
 
 
 bool compileShader(GLuint shader)
@@ -1321,7 +1321,7 @@ void StateSimulator::setLightAttenuationFactors(int light, const glm::vec4& att)
 }
 }
 
-namespace stru
+namespace ofl
 {
 Tokenizer::Tokenizer(const std::string& base)
 {
@@ -1903,7 +1903,7 @@ vec4 read_from_string(std::string& str)
 			loc = loc_end;
 		}
 		std::string elem = str.substr(0,loc);
-		stru::trim(elem);
+		ofl::trim(elem);
 		res[i] = atof(elem.c_str());
 		str = str.substr(loc+1);
 		if(loc == loc_end)

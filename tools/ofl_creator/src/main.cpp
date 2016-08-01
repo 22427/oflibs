@@ -38,7 +38,7 @@ public:
 		while(std::getline(f,l))
 		{
 			working = l;
-			stru::ltrim(working);
+			ofl::ltrim(working);
 			if(working.find("#pragma once") != working.npos)
 				continue;
 			if( working.find("#include") == working.npos)
@@ -87,7 +87,7 @@ public:
 		while(std::getline(f,l))
 		{
 			working = l;
-			stru::ltrim(working);
+			ofl::ltrim(working);
 			if(working[0]!='#')
 			{
 				continue;

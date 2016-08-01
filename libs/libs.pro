@@ -22,8 +22,8 @@ DISTFILES += \
     libs/ogl_state.txt \
     libs/track.txt \
     libs/vdman.txt \
-    libs/vec_math.txt \
-    libs/vrpv.txt
+    libs/vrpv.txt \
+    libs/vmath.txt
 
 HEADERS += \
     libs/all.h \
