@@ -168,7 +168,18 @@ int main(int argc, char** argv)
 			docs.push_back(f.second);
 
 	}
-	printf("#if 0\n<begin_doc>\n");
+	
+	AFile license("LICENSE.md","../LICENSE.md");
+	AFile readme("README.md","../README.md");
+	
+	
+	printf("#if 0\n");
+	printf("<begin_doc>\n");
+	license.print();
+	printf("\n--------------------------------------------------------------------------------\n\n");
+	readme.print();
+	printf("\n--------------------------------------------------------------------------------\n\n");
+	
 	for( AFile *f : docs)
 	{
 		f->print();
@@ -194,5 +205,7 @@ int main(int argc, char** argv)
 	}
 	printf("#endif\n");
 
+	for(auto& f : files)
+		delete f.second;
 	return 0;
 }

@@ -17,3 +17,6 @@ mesh_viewer.subdir  = ./tools/mesh_viewer
  # what subproject depends on others
  CONFIG += ordered
 
+DISTFILES += \
+	README.md \
+    LICENSE.md

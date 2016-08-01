@@ -41,9 +41,9 @@ public:
 
 		setLightPosition(0,glm::vec4(1.0,1.0,2.0,1));
 		setLightDiffuseColor(0,glm::vec3(1.0,1.0,1.0));
-		setLightSpecularColor(0,glm::vec3(1.0,1.0,1.0));
+		setLightSpecularColor(0,glm::vec3(1.0,0.75,0.2));
 		setLightAmbientColor(0,glm::vec3(0.1,0.1,0.1));
-		setLightAttenuationFactors(0,glm::vec4(1,0,0,1));
+		setLightAttenuationFactors(0,glm::vec4(1,1,0,1));
 		render_on = true;
 	}
 
