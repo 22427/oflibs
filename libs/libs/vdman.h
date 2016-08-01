@@ -12,6 +12,8 @@
 
 #include "vd.h"
 
+/** @include vdman.md */
+
 namespace ofl
 {
 

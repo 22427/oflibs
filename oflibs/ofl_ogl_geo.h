@@ -1,28 +1,88 @@
-/*
-   OGL_GEO: OpenGL Geometry
+#if 0
+<begin_doc>
+OGL_GEO: OpenGL Geometry
 ================================================================================
-   A class representing vertex Attribute data. You can generate a Geometry
-   object from a VertexData-Object, so they are obviously connected.
+A class representing vertex Attribute data. You can generate a Geometry
+object from a VertexData-Object, so they are obviously connected.
 
-___Usage_______________________________________________________________________
-   You need to specify an OpenGL header in as OFL_GL_HEADER. for example:
+Usage
+--------------------------------------------------------------------------------
+You need to specify an OpenGL header in as `OFL_GL_HEADER`. for example:
 
-	#define OFL_GL_HEADER <glad/glad.h>
+```cpp
+	#define OFL_GL_HEADER <glad/glad.h>  
 	#define OFL_GL_HEADER <glew.h>
+```
+
+This module also uses GLM ... sorry I was too lazy to implement all
+these functions, and its not feasible anyway.
+
+API
+--------------------------------------------------------------------------------
+You can pass the data on construction or vie the method uploadData(...).
+The	data is then uploaeded into OpenGL buffer objets and a corresponding
+VAO is created.
+Call the draw() method to provoke a glDrawElements() call.
 
 
-	This module also uses GLM ... sorry I was too lazy to implement all
-	these functions, and its not feasible anyway.
 
-___API_________________________________________________________________________
-   You can pass the data on construction or vie the method uploadData(...). The
-   data is then uploaeded into OpenGL buffer objets and a matching VAO is
-   created.
-   Call the draw() method to provoke a glDrawElements() call.
+--------------------------------------------------------------------------------
+
+VD: Vertex Data
+================================================================================
+This module constist of two structures the VertexData and VertexDataTools.
+The first is a simple, straight forward datastructure to store geometry in
+a renderable fashion.
+VertexDataTools contain methods to load and store vertex data and some 
+simple functions to calculate normals and tangents.
+
+Usage
+--------------------------------------------------------------------------------
+If you use glm, make sure, that glm.hpp is included before you include vd.h
+so that vd uses glm. If you don't use glm (which is fine) vd will use its own
+glm compatible, rudimentary mat4 and vec4 implementation.
 
 
-*/
+File-formats
+--------------------------------------------------------------------------------
+The .vd file format is a simple memory dump of a VertexData Object.
+The header is organized in "lines" each of 5 unsigned integers.
+The first line contains information about the other lines and the object.
+The other lines contain information about the attributes.
+The last one contains information about the size of the actual data.
 
+| 0          | 1            | 2       | 3              | 4               |
+|------------|--------------|---------|----------------|-----------------|
+| VDFF       | #lines-1     | version | #attributes    | primitive type  |
+| ATTRIBUTE0 | #elements    | type    | normalized?    | stride in bytes |
+| ATTRIBUTE1 | ...          | ...     | ...            | ...             |
+| #vertices  | sizeof(data) |#indices | sizeof(indeces)| index type      |
+
+Then comes the data as BLOB
+
+--------------------------------------------------------------------------------
+
+VMATH : vector-maths
+================================================================================
+This is a set of classes containing the needed vector-math for the ofl tools.
+It is ment to be an backup data exchange format, if there is no GLM in your
+project.
+Note: Do not use this vector and matrix class. Use GLM or something else!
+GLM is also header only, and does - imho - a great job. These classes are
+only here, so you do not have to use GLM. There are two classes with a very
+limited set of methods: vec4 and mat4 a vector of 4 floats and a 4x4-matrix.
+
+Usage
+--------------------------------------------------------------------------------
+As mentioned above you should not use these classes for anything but
+exchanging data with oflibs. To enshure, that GLM is used (if you use it in
+your project) include `<glm/glm.hpp>` before you include this file.
+
+
+--------------------------------------------------------------------------------
+
+<end_doc>
+#endif 
 #ifndef USING_OFL_OGL_GEO_H
  #define USING_OFL_OGL_GEO_H
  
@@ -561,6 +621,8 @@ public:
 
 
 
+/** @include vmath.md */
+
 namespace ofl
 {
 enum Primitive
@@ -648,7 +710,9 @@ public:
 };
 
 
-
+/**
+ * @brief The VertexData class represents vertex data in a renderable form.
+ */
 class VertexData
 {
 private:
@@ -659,21 +723,57 @@ private:
 public:
 	VertexData(Primitive primitive = TRIANGLES);
 	virtual ~VertexData();
-
-
+	
+	/**
+	 * @brief push_back adds an index to the index list
+	 * @param i the new index
+	 */
 	void push_back(const uint32_t& i)
 	{
 		this->m_indices_data.push_back(i);
 	}
+	
+	/**
+	 * @brief push_back adds a Vertex to the vertex list.
+	 * @param v The new Vertex
+	 * @return the index of the newly added vertex.
+	 */
 	size_t push_back(const Vertex& v);
 
+	/**
+	 * @brief data gives read access to the Vertex list
+	 * @return The vertex list.
+	 */
 	const std::vector<Vertex>& data() const;
+	
+	/**
+	 * @brief indices gives read access to the index list
+	 * @return The index list
+	 */
 	const std::vector<uint32_t>& indices() const;
-
+	
+	/**
+	 * @brief data gives write access to the Vertex list
+	 * @return The vertex list.
+	 */
 	std::vector<Vertex>& data();
+	
+	/**
+	 * @brief indices gives write access to the index list
+	 * @return The index list
+	 */
 	std::vector<uint32_t>& indices();
-
+	
+	/**
+	 * @brief primitive 
+	 * @return The vertex datas primitive
+	 */
 	virtual Primitive primitive() const;
+	/**
+	 * @brief setPrimitive sets the primitive mode this vertex data is 
+	 * constructed in.
+	 * @param p new primitive 
+	 */
 	void setPrimitive(const Primitive& p);
 
 	auto begin() -> decltype(m_data.begin())
@@ -701,11 +801,26 @@ public:
 		VD,
 		FROM_PATH
 	};
-	bool writeToFile(const VertexData* ofl,const std::string& path, Format f=FROM_PATH);
+	/**
+	 * @brief writeToFile writes the given vertexdaa into a file.
+	 * @param vd Vertex data to write from
+	 * @param path Path to write to
+	 * @param f Format of the outpu file. if FROM_PATH is used, the format will
+	 * be determined from the file ending
+	 * @return true if everything went well, false if there was a problem.
+	 */
+	bool writeToFile(const VertexData* vd,const std::string& path, Format f=FROM_PATH);
+	
+	/**
+	 * @brief readFromFile reads VertexData from a file
+	 * @param path Path to the source file.
+	 * @param f The format of the source file
+	 * @return the VertexData read, or a nullptr, if something went wrong.
+	 */
 	VertexData* readFromFile(const std::string& path, Format f = FROM_PATH);
 
-	void calculateNormals(VertexData* ofl);
-	void calculateTangents(VertexData* ofl);
+	void calculateNormals(VertexData* vd);
+	void calculateTangents(VertexData* vd);
 };
 }
 

@@ -1,64 +1,92 @@
-/*
-   OGL_STATE: OpenGL State
+#if 0
+<begin_doc>
+OGL_STATE: OpenGL State
 ================================================================================
-   This is a state tracking class, which also provides some stock shaders and
-   functions.
+This is a state tracking class, which also provides some stock shaders and
+functions.
 
-	State tracking:
-	There is a matrix stack for modelview- and projection-matrix, and a state
-	for	eight light sources. Just like in OpenGL 1.x
+###State tracking:
+There is a matrix stack for modelview- and projection-matrix, and a state
+foreight light sources. Just like in OpenGL 1.x
 
-	Stock Shaders:
-	There are shaders for texturing, phong shading and distance field alpha
-	handling.
+###Stock Shaders:
+There are shaders for texturing, phong shading and distance field alpha
+handling.
 
-___Usage_______________________________________________________________________
+Usage
+--------------------------------------------------------------------------------
 
-   You need to specify an OpenGL header in as OFL_GL_HEADER. for example:
+You need to specify an OpenGL header in as OFL_GL_HEADER. for example:  
 
-	#define OFL_GL_HEADER <glad/glad.h>
+```
+	#define OFL_GL_HEADER <glad/glad.h>  
 	#define OFL_GL_HEADER <glew.h>
+```
+
+This module also uses GLM ... sorry I was too lazy to implement all
+these functions, and its not feasible anyway.
 
 
-	This module also uses GLM ... sorry I was too lazy to implement all
-	these functions, and its not feasible anyway.
+API
+--------------------------------------------------------------------------------
+
+###Matrix-Stacks:
+There are two stacks. `PROJECITON` and `MODEL_VIEW`. You can change which is
+modified using the `matrixMode(...)` method.
+with `pushMatrix()` and `popMatrix()` you can either push a copy of the top-most
+matrix onto the stack or pop the top-most matrix from the stack.
+All other matrix modifying methods effect the top-most(current)
+matrix of the selected stack:  
+
+```
+void loadIdentity();//   sets the matrix as identity  
+void translate(..);//    translates the current matrix  
+void rotate(...);//      rotates the current matrix  
+void scale(...);//       scales the current matrix  
+void lookAt(...);//      multiplies the current matrix with a lookAt-matix  
+void ortho(...);//       multiplies the current matrix with an ortho-matix  
+void frustum(...);//     multiplies the current matrix with a frustum-matix  
+void perspective(...);// multiplies the current matrix with a persp.-matix  
+```
+###Lights:
+You can set Light parameters using the `setLight*(...)` methods.
+
+###Stock-shaders:
+You can select different stock shaders by calling `enable(...)` or `disable(...)`
+fordifferent features.
+The features are:
+
+* Texturing: Basic color mapping
+* Lighting: Basic per fragment lighting
+* DFAlpha: Iterpreting the Alpha channel as distance field.
+* NonStockShader: Use the set non stock shader. If this feature is
+enabled all uniforms and attributes will still be set, but your shader
+will be used.
 
 
-___API_________________________________________________________________________
+--------------------------------------------------------------------------------
 
-	Matrix-Stacks:
-	There are two stacks. PROJECITON and MODEL_VIEW. You can change which is
-	modified using the matrixMode(...) method.
-	with pushMatrix() and popMatrix() you can either push a copy of the top-most
-	matrix onto the stack or pop the top-most matrix from the stack.
-	All other matrix modifying methods effect the top-most(current)
-	matrix of the selected stack:
+VMATH : vector-maths
+================================================================================
+This is a set of classes containing the needed vector-math for the ofl tools.
+It is ment to be an backup data exchange format, if there is no GLM in your
+project.
+Note: Do not use this vector and matrix class. Use GLM or something else!
+GLM is also header only, and does - imho - a great job. These classes are
+only here, so you do not have to use GLM. There are two classes with a very
+limited set of methods: vec4 and mat4 a vector of 4 floats and a 4x4-matrix.
 
-	void loadIdentity();	sets the matrix as identity
-	void translate(..);		translates the current matrix
-	void rotate(...);		rotates the current matrix
-	void scale(...);		scales the current matrix
-	void lookAt(...);		multiplys the current matrix with a lookAt-matix
-	void ortho(...);		multiplys the current matrix with a ortho-matix
-	void frustum(...);		multiplys the current matrix with a frustum-matix
-	void perspective(...);	multiplys the current matrix with a persp.-matix
+Usage
+--------------------------------------------------------------------------------
+As mentioned above you should not use these classes for anything but
+exchanging data with oflibs. To enshure, that GLM is used (if you use it in
+your project) include `<glm/glm.hpp>` before you include this file.
 
-	Lights:
-	You can set Light parameters using the setLight*(...) methods.
 
-	Stock-shaders:
-	You can select different stock shaders by calling enable() or disable() for
-	different features.
-	The features are:
-	- Texturing: Basic color mapping
-	- Lighting: Basic per fragment lighting
-	- DFAlpha: Iterpreting the Alpha channel as distance field.
-	- NonStockShader: Use the set non stock shader. If this feature is
-	Enabled all uniforms and attributes will still be set, but your shader
-	will be used.
+--------------------------------------------------------------------------------
 
-*/
-
+<end_doc>
+#endif 
 #ifndef USING_OFL_OGL_STATE_H
  #define USING_OFL_OGL_STATE_H
  

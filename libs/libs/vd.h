@@ -1,6 +1,8 @@
 #pragma once
 #include "vmath.h"
 
+/** @include vmath.md */
+
 namespace ofl
 {
 enum Primitive
@@ -88,7 +90,9 @@ public:
 };
 
 
-
+/**
+ * @brief The VertexData class represents vertex data in a renderable form.
+ */
 class VertexData
 {
 private:
@@ -99,21 +103,57 @@ private:
 public:
 	VertexData(Primitive primitive = TRIANGLES);
 	virtual ~VertexData();
-
-
+	
+	/**
+	 * @brief push_back adds an index to the index list
+	 * @param i the new index
+	 */
 	void push_back(const uint32_t& i)
 	{
 		this->m_indices_data.push_back(i);
 	}
+	
+	/**
+	 * @brief push_back adds a Vertex to the vertex list.
+	 * @param v The new Vertex
+	 * @return the index of the newly added vertex.
+	 */
 	size_t push_back(const Vertex& v);
 
+	/**
+	 * @brief data gives read access to the Vertex list
+	 * @return The vertex list.
+	 */
 	const std::vector<Vertex>& data() const;
+	
+	/**
+	 * @brief indices gives read access to the index list
+	 * @return The index list
+	 */
 	const std::vector<uint32_t>& indices() const;
-
+	
+	/**
+	 * @brief data gives write access to the Vertex list
+	 * @return The vertex list.
+	 */
 	std::vector<Vertex>& data();
+	
+	/**
+	 * @brief indices gives write access to the index list
+	 * @return The index list
+	 */
 	std::vector<uint32_t>& indices();
-
+	
+	/**
+	 * @brief primitive 
+	 * @return The vertex datas primitive
+	 */
 	virtual Primitive primitive() const;
+	/**
+	 * @brief setPrimitive sets the primitive mode this vertex data is 
+	 * constructed in.
+	 * @param p new primitive 
+	 */
 	void setPrimitive(const Primitive& p);
 
 	auto begin() -> decltype(m_data.begin())
@@ -141,10 +181,25 @@ public:
 		VD,
 		FROM_PATH
 	};
-	bool writeToFile(const VertexData* ofl,const std::string& path, Format f=FROM_PATH);
+	/**
+	 * @brief writeToFile writes the given vertexdaa into a file.
+	 * @param vd Vertex data to write from
+	 * @param path Path to write to
+	 * @param f Format of the outpu file. if FROM_PATH is used, the format will
+	 * be determined from the file ending
+	 * @return true if everything went well, false if there was a problem.
+	 */
+	bool writeToFile(const VertexData* vd,const std::string& path, Format f=FROM_PATH);
+	
+	/**
+	 * @brief readFromFile reads VertexData from a file
+	 * @param path Path to the source file.
+	 * @param f The format of the source file
+	 * @return the VertexData read, or a nullptr, if something went wrong.
+	 */
 	VertexData* readFromFile(const std::string& path, Format f = FROM_PATH);
 
-	void calculateNormals(VertexData* ofl);
-	void calculateTangents(VertexData* ofl);
+	void calculateNormals(VertexData* vd);
+	void calculateTangents(VertexData* vd);
 };
 }

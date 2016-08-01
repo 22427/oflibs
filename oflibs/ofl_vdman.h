@@ -1,43 +1,96 @@
-/*
-   VDMAN: VertexData Manufacturer
+#if 0
+<begin_doc>
+VD: Vertex Data
 ================================================================================
-	This class provides functionality to create VertexData, the same intuitive
-	way you might do it in OpenGL1.x. vertex per vertex in a given primitive
-	mode.
-	It can also produce some simple geometric shapes:
-		- Plane
-		- Box
-		- Cone
-		- UV-Sphere
-		- Cylinder
-		- Disk
-		- Coordinate system.
+This module constist of two structures the VertexData and VertexDataTools.
+The first is a simple, straight forward datastructure to store geometry in
+a renderable fashion.
+VertexDataTools contain methods to load and store vertex data and some 
+simple functions to calculate normals and tangents.
 
-   You can also load VertexData from .obj, ASCII .ply files and the .vd Format.
+Usage
+--------------------------------------------------------------------------------
+If you use glm, make sure, that glm.hpp is included before you include vd.h
+so that vd uses glm. If you don't use glm (which is fine) vd will use its own
+glm compatible, rudimentary mat4 and vec4 implementation.
 
-___Usage_______________________________________________________________________
-	This Tool creates VertexData, so the ofl_vd oflib is needed.
 
-___API_________________________________________________________________________
-	It is very easy, with begin(PRIMITIVE) you start to constuct a new
-	VertexData object. With color(...), texCoord(...), and normal(...) you can
-	modify the data used for these attributes. With a call of vertex(...) the
-	vertex is finished and another is started. The state you set with color(...)
-	etc. is not changed with a call of vertex(...).
+File-formats
+--------------------------------------------------------------------------------
+The .vd file format is a simple memory dump of a VertexData Object.
+The header is organized in "lines" each of 5 unsigned integers.
+The first line contains information about the other lines and the object.
+The other lines contain information about the attributes.
+The last one contains information about the size of the actual data.
 
-	You can call calculateNormals() to (re)calculate the normals from the
-	vertex positions in the current state, and calculateTangents() to calculate
-	the tangents in the current state. (You should call them just before you
-	call finish().
+| 0          | 1            | 2       | 3              | 4               |
+|------------|--------------|---------|----------------|-----------------|
+| VDFF       | #lines-1     | version | #attributes    | primitive type  |
+| ATTRIBUTE0 | #elements    | type    | normalized?    | stride in bytes |
+| ATTRIBUTE1 | ...          | ...     | ...            | ...             |
+| #vertices  | sizeof(data) |#indices | sizeof(indeces)| index type      |
 
-	Calling finish() returns the VertexData object and the Manufactuerer is
-	ready to construct a new one.
+Then comes the data as BLOB
 
-	When loading VertexData from files, or creating one of the primitives you
-	must not call begin() or finish(), just create*().
+--------------------------------------------------------------------------------
 
-*/
+VDMAN: VertexData Manufacturer
+================================================================================
+This class provides functionality to create VertexData, the same intuitive
+way you might do it in OpenGL1.x. vertex per vertex in a given primitive
+mode.  
+It can also produce some simple geometric shapes:  
 
+- Plane
+- Box
+- Cone
+- UV-Sphere
+- Cylinder
+- Disk
+- Coordinate system
+
+Usage
+--------------------------------------------------------------------------------
+
+This tool creates VertexData, so the ofl_vd oflib is needed.
+
+API
+--------------------------------------------------------------------------------
+It is very easy, with `begin(PRIMITIVE)` you start to constuct a new
+VertexData object. With `color(...)`, `texCoord(...)`, and `normal(...)` you can
+modify the data used for these attributes. With a call of `vertex(...)` the
+vertex is finished and another is started. The state you set with `color(...)`
+etc. is not changed with a call of `vertex(...)`.
+
+Calling `finish()` returns the VertexData object and the Manufactuerer is
+ready to construct a new one.
+
+
+
+
+--------------------------------------------------------------------------------
+
+VMATH : vector-maths
+================================================================================
+This is a set of classes containing the needed vector-math for the ofl tools.
+It is ment to be an backup data exchange format, if there is no GLM in your
+project.
+Note: Do not use this vector and matrix class. Use GLM or something else!
+GLM is also header only, and does - imho - a great job. These classes are
+only here, so you do not have to use GLM. There are two classes with a very
+limited set of methods: vec4 and mat4 a vector of 4 floats and a 4x4-matrix.
+
+Usage
+--------------------------------------------------------------------------------
+As mentioned above you should not use these classes for anything but
+exchanging data with oflibs. To enshure, that GLM is used (if you use it in
+your project) include `<glm/glm.hpp>` before you include this file.
+
+
+--------------------------------------------------------------------------------
+
+<end_doc>
+#endif 
 #ifndef USING_OFL_STRU_H
  #define USING_OFL_STRU_H
  
@@ -580,6 +633,8 @@ public:
 
 
 
+/** @include vmath.md */
+
 namespace ofl
 {
 enum Primitive
@@ -667,7 +722,9 @@ public:
 };
 
 
-
+/**
+ * @brief The VertexData class represents vertex data in a renderable form.
+ */
 class VertexData
 {
 private:
@@ -678,21 +735,57 @@ private:
 public:
 	VertexData(Primitive primitive = TRIANGLES);
 	virtual ~VertexData();
-
-
+	
+	/**
+	 * @brief push_back adds an index to the index list
+	 * @param i the new index
+	 */
 	void push_back(const uint32_t& i)
 	{
 		this->m_indices_data.push_back(i);
 	}
+	
+	/**
+	 * @brief push_back adds a Vertex to the vertex list.
+	 * @param v The new Vertex
+	 * @return the index of the newly added vertex.
+	 */
 	size_t push_back(const Vertex& v);
 
+	/**
+	 * @brief data gives read access to the Vertex list
+	 * @return The vertex list.
+	 */
 	const std::vector<Vertex>& data() const;
+	
+	/**
+	 * @brief indices gives read access to the index list
+	 * @return The index list
+	 */
 	const std::vector<uint32_t>& indices() const;
-
+	
+	/**
+	 * @brief data gives write access to the Vertex list
+	 * @return The vertex list.
+	 */
 	std::vector<Vertex>& data();
+	
+	/**
+	 * @brief indices gives write access to the index list
+	 * @return The index list
+	 */
 	std::vector<uint32_t>& indices();
-
+	
+	/**
+	 * @brief primitive 
+	 * @return The vertex datas primitive
+	 */
 	virtual Primitive primitive() const;
+	/**
+	 * @brief setPrimitive sets the primitive mode this vertex data is 
+	 * constructed in.
+	 * @param p new primitive 
+	 */
 	void setPrimitive(const Primitive& p);
 
 	auto begin() -> decltype(m_data.begin())
@@ -720,11 +813,26 @@ public:
 		VD,
 		FROM_PATH
 	};
-	bool writeToFile(const VertexData* ofl,const std::string& path, Format f=FROM_PATH);
+	/**
+	 * @brief writeToFile writes the given vertexdaa into a file.
+	 * @param vd Vertex data to write from
+	 * @param path Path to write to
+	 * @param f Format of the outpu file. if FROM_PATH is used, the format will
+	 * be determined from the file ending
+	 * @return true if everything went well, false if there was a problem.
+	 */
+	bool writeToFile(const VertexData* vd,const std::string& path, Format f=FROM_PATH);
+	
+	/**
+	 * @brief readFromFile reads VertexData from a file
+	 * @param path Path to the source file.
+	 * @param f The format of the source file
+	 * @return the VertexData read, or a nullptr, if something went wrong.
+	 */
 	VertexData* readFromFile(const std::string& path, Format f = FROM_PATH);
 
-	void calculateNormals(VertexData* ofl);
-	void calculateTangents(VertexData* ofl);
+	void calculateNormals(VertexData* vd);
+	void calculateTangents(VertexData* vd);
 };
 }
 
@@ -742,6 +850,8 @@ public:
 #include <limits>
 #include <vector>
 
+
+/** @include vdman.md */
 
 namespace ofl
 {

@@ -1,6 +1,7 @@
-/*
-*/
-
+#if 0
+<begin_doc>
+<end_doc>
+#endif 
 #ifndef USING_OFL_STRU_H
  #define USING_OFL_STRU_H
  

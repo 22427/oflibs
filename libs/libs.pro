@@ -18,12 +18,14 @@ QMAKE_EXTRA_TARGETS += first stock_shaders oflibs
 INCLUDEPATH += deps/glad/include
 
 DISTFILES += \
-    libs/ogl_geo.txt \
-    libs/ogl_state.txt \
-    libs/track.txt \
-    libs/vdman.txt \
-    libs/vrpv.txt \
-    libs/vmath.txt
+    libs/ogl_geo.md \
+    libs/ogl_state.md \
+    libs/track.md \
+    libs/vdman.md \
+    libs/vmath.md \
+    libs/vrpv.md \
+    libs/vd.md \
+    libs/ogl_win.md
 
 HEADERS += \
     libs/all.h \

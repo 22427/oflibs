@@ -1,202 +1,291 @@
-/*
-   OGL_GEO: OpenGL Geometry
+#if 0
+<begin_doc>
+OGL_GEO: OpenGL Geometry
 ================================================================================
-   A class representing vertex Attribute data. You can generate a Geometry
-   object from a VertexData-Object, so they are obviously connected.
+A class representing vertex Attribute data. You can generate a Geometry
+object from a VertexData-Object, so they are obviously connected.
 
-___Usage_______________________________________________________________________
-   You need to specify an OpenGL header in as OFL_GL_HEADER. for example:
+Usage
+--------------------------------------------------------------------------------
+You need to specify an OpenGL header in as `OFL_GL_HEADER`. for example:
 
-	#define OFL_GL_HEADER <glad/glad.h>
+```cpp
+	#define OFL_GL_HEADER <glad/glad.h>  
 	#define OFL_GL_HEADER <glew.h>
+```
+
+This module also uses GLM ... sorry I was too lazy to implement all
+these functions, and its not feasible anyway.
+
+API
+--------------------------------------------------------------------------------
+You can pass the data on construction or vie the method uploadData(...).
+The	data is then uploaeded into OpenGL buffer objets and a corresponding
+VAO is created.
+Call the draw() method to provoke a glDrawElements() call.
 
 
-	This module also uses GLM ... sorry I was too lazy to implement all
-	these functions, and its not feasible anyway.
 
-___API_________________________________________________________________________
-   You can pass the data on construction or vie the method uploadData(...). The
-   data is then uploaeded into OpenGL buffer objets and a matching VAO is
-   created.
-   Call the draw() method to provoke a glDrawElements() call.
+--------------------------------------------------------------------------------
 
-
-   OGL_STATE: OpenGL State
+OGL_STATE: OpenGL State
 ================================================================================
-   This is a state tracking class, which also provides some stock shaders and
-   functions.
+This is a state tracking class, which also provides some stock shaders and
+functions.
 
-	State tracking:
-	There is a matrix stack for modelview- and projection-matrix, and a state
-	for	eight light sources. Just like in OpenGL 1.x
+###State tracking:
+There is a matrix stack for modelview- and projection-matrix, and a state
+foreight light sources. Just like in OpenGL 1.x
 
-	Stock Shaders:
-	There are shaders for texturing, phong shading and distance field alpha
-	handling.
+###Stock Shaders:
+There are shaders for texturing, phong shading and distance field alpha
+handling.
 
-___Usage_______________________________________________________________________
+Usage
+--------------------------------------------------------------------------------
 
-   You need to specify an OpenGL header in as OFL_GL_HEADER. for example:
+You need to specify an OpenGL header in as OFL_GL_HEADER. for example:  
 
-	#define OFL_GL_HEADER <glad/glad.h>
+```
+	#define OFL_GL_HEADER <glad/glad.h>  
 	#define OFL_GL_HEADER <glew.h>
+```
+
+This module also uses GLM ... sorry I was too lazy to implement all
+these functions, and its not feasible anyway.
 
 
-	This module also uses GLM ... sorry I was too lazy to implement all
-	these functions, and its not feasible anyway.
+API
+--------------------------------------------------------------------------------
+
+###Matrix-Stacks:
+There are two stacks. `PROJECITON` and `MODEL_VIEW`. You can change which is
+modified using the `matrixMode(...)` method.
+with `pushMatrix()` and `popMatrix()` you can either push a copy of the top-most
+matrix onto the stack or pop the top-most matrix from the stack.
+All other matrix modifying methods effect the top-most(current)
+matrix of the selected stack:  
+
+```
+void loadIdentity();//   sets the matrix as identity  
+void translate(..);//    translates the current matrix  
+void rotate(...);//      rotates the current matrix  
+void scale(...);//       scales the current matrix  
+void lookAt(...);//      multiplies the current matrix with a lookAt-matix  
+void ortho(...);//       multiplies the current matrix with an ortho-matix  
+void frustum(...);//     multiplies the current matrix with a frustum-matix  
+void perspective(...);// multiplies the current matrix with a persp.-matix  
+```
+###Lights:
+You can set Light parameters using the `setLight*(...)` methods.
+
+###Stock-shaders:
+You can select different stock shaders by calling `enable(...)` or `disable(...)`
+fordifferent features.
+The features are:
+
+* Texturing: Basic color mapping
+* Lighting: Basic per fragment lighting
+* DFAlpha: Iterpreting the Alpha channel as distance field.
+* NonStockShader: Use the set non stock shader. If this feature is
+enabled all uniforms and attributes will still be set, but your shader
+will be used.
 
 
-___API_________________________________________________________________________
+--------------------------------------------------------------------------------
 
-	Matrix-Stacks:
-	There are two stacks. PROJECITON and MODEL_VIEW. You can change which is
-	modified using the matrixMode(...) method.
-	with pushMatrix() and popMatrix() you can either push a copy of the top-most
-	matrix onto the stack or pop the top-most matrix from the stack.
-	All other matrix modifying methods effect the top-most(current)
-	matrix of the selected stack:
-
-	void loadIdentity();	sets the matrix as identity
-	void translate(..);		translates the current matrix
-	void rotate(...);		rotates the current matrix
-	void scale(...);		scales the current matrix
-	void lookAt(...);		multiplys the current matrix with a lookAt-matix
-	void ortho(...);		multiplys the current matrix with a ortho-matix
-	void frustum(...);		multiplys the current matrix with a frustum-matix
-	void perspective(...);	multiplys the current matrix with a persp.-matix
-
-	Lights:
-	You can set Light parameters using the setLight*(...) methods.
-
-	Stock-shaders:
-	You can select different stock shaders by calling enable() or disable() for
-	different features.
-	The features are:
-	- Texturing: Basic color mapping
-	- Lighting: Basic per fragment lighting
-	- DFAlpha: Iterpreting the Alpha channel as distance field.
-	- NonStockShader: Use the set non stock shader. If this feature is
-	Enabled all uniforms and attributes will still be set, but your shader
-	will be used.
-
-   TRACK : Tracking
+OGL_WIN: OpenGL Window
 ================================================================================
-   This is basically an API to the ART network data stream. The data send by
-   the ARTDTrack2 is received, and provided in one easy to use class.
-
-___API__________________________________________________________________________
-   Just create an TrackingData object. From here on you can ask the objekt of
-   the current state of all tracked targets.
-   After calling the method start() the object spawns a thread to handle the
-   communication with the DTrack2 server. All public methods are save to call
-   any time. You can use the setTransformation(...) method to set a
-   transformation that  will be  applied to all positions and orientations.
-
-   There are different methods to acces different types of targets:
-   -get3ds()	returns all 3DoF-targets found in the last frame.
-   -get6d(id)	returns the selected 6DoF-Target*.
-   -get6di(id)	returns the selected Dtrack2-Internal-6DoF-Target*.
-   -getFlystick(id) retunrs the selected Flystick*.
-   * If there is no information a Corresponding Target Object will be returned,
-   located in (0,0,0). If there are no new informations about a Target the last
-   knonw Information is returned.
+This module will - one day - help to create an OpenGL context, and give access
+to mouse and keyboard events. For now it is a simple GLFW wrapper, but the
+interface shall be the same in the finished library.
 
 
+--------------------------------------------------------------------------------
 
-   VDMAN: VertexData Manufacturer
+TRACK : Tracking
 ================================================================================
-	This class provides functionality to create VertexData, the same intuitive
-	way you might do it in OpenGL1.x. vertex per vertex in a given primitive
-	mode.
-	It can also produce some simple geometric shapes:
-		- Plane
-		- Box
-		- Cone
-		- UV-Sphere
-		- Cylinder
-		- Disk
-		- Coordinate system.
+This is basically an API to the ART network data stream. The data send by
+the ARTDTrack2 is received, and provided in one easy to use class.
 
-   You can also load VertexData from .obj, ASCII .ply files and the .vd Format.
+API
+--------------------------------------------------------------------------------
+Just create an TrackingData object. From here on you can ask the objekt of
+the current state of all tracked targets.
+After calling the method `start()` the object spawns a thread to handle the
+communication with the DTrack2 server. All public methods are save to call
+any time. You can use the `setTransformation(...)` method to set a
+transformation that  will be  applied to all positions and orientations.
 
-___Usage_______________________________________________________________________
-	This Tool creates VertexData, so the ofl_vd oflib is needed.
+There are different methods to access different types of targets:
 
-___API_________________________________________________________________________
-	It is very easy, with begin(PRIMITIVE) you start to constuct a new
-	VertexData object. With color(...), texCoord(...), and normal(...) you can
-	modify the data used for these attributes. With a call of vertex(...) the
-	vertex is finished and another is started. The state you set with color(...)
-	etc. is not changed with a call of vertex(...).
+* `get3ds()`returns all 3DoF-targets found in the last frame.
+* `get6d(id)`returns the selected 6DoF-Target*.
+* `get6di(id)`returns the selected Dtrack2-Internal-6DoF-Target*.
+* `getFlystick(id)` retunrs the selected Flystick*.
 
-	You can call calculateNormals() to (re)calculate the normals from the
-	vertex positions in the current state, and calculateTangents() to calculate
-	the tangents in the current state. (You should call them just before you
-	call finish().
+*If there is no information a Target object will be returned,
+located in (0,0,0). If there are no new informations about a Target the last
+knonw information is returned.
 
-	Calling finish() returns the VertexData object and the Manufactuerer is
-	ready to construct a new one.
 
-	When loading VertexData from files, or creating one of the primitives you
-	must not call begin() or finish(), just create*().
+--------------------------------------------------------------------------------
 
-   VRPV: Virtual Reality Projection & Viewmatrix
+VD: Vertex Data
 ================================================================================
-   The toolkit consists of two main components: Screens and ScreenArrangements.
-   Screens are the data structures you are interested in. A Screen represents a
-   rectengular area in world space, on which you want to render. (This could be
-   one side of a cave, one display in a display array, a power wall, etc.).
+This module constist of two structures the VertexData and VertexDataTools.
+The first is a simple, straight forward datastructure to store geometry in
+a renderable fashion.
+VertexDataTools contain methods to load and store vertex data and some 
+simple functions to calculate normals and tangents.
 
-   A ScreenArrangement is a collection of screens. ScreenArangements can be
-   loaded from a file, which is handy if you want to change the screen
-   arragement without recompiling your program.
-
-___Usage_______________________________________________________________________
-
-
-   If you use glm, make sure, that glm.hpp is included before you include vrpv.h
-   so that VRPV uses glm. If you don't use glm (which is fine) vrpv uses its own
-   glm compatible, rudimentary mat4 and vec4 implementation.
+Usage
+--------------------------------------------------------------------------------
+If you use glm, make sure, that glm.hpp is included before you include vd.h
+so that vd uses glm. If you don't use glm (which is fine) vd will use its own
+glm compatible, rudimentary mat4 and vec4 implementation.
 
 
-___API_________________________________________________________________________
-   You can create a ScreenArrangement and load screens by these two lines of
-   code:
+File-formats
+--------------------------------------------------------------------------------
+The .vd file format is a simple memory dump of a VertexData Object.
+The header is organized in "lines" each of 5 unsigned integers.
+The first line contains information about the other lines and the object.
+The other lines contain information about the attributes.
+The last one contains information about the size of the actual data.
 
-   ScreenArrangement sa;
-   sa.loadScreens("path/to/screens/file")
+| 0          | 1            | 2       | 3              | 4               |
+|------------|--------------|---------|----------------|-----------------|
+| VDFF       | #lines-1     | version | #attributes    | primitive type  |
+| ATTRIBUTE0 | #elements    | type    | normalized?    | stride in bytes |
+| ATTRIBUTE1 | ...          | ...     | ...            | ...             |
+| #vertices  | sizeof(data) |#indices | sizeof(indeces)| index type      |
 
-   You can access a Screen using the getScreen(...) methods you can either
-   access it via its name, specified in the screen-file or via its id
-   (with id in [0,sa.countScreens()]):
+Then comes the data as BLOB
 
-   Screen* s = sa.getScreen(0); // by id
-   Screen*  s = sa.getScreen("screen0"); // by name
+--------------------------------------------------------------------------------
 
-   Now you can calculate projection and  view-matrices for this screen using
-   the calculate_projection_and_view(...) method:
+VDMAN: VertexData Manufacturer
+================================================================================
+This class provides functionality to create VertexData, the same intuitive
+way you might do it in OpenGL1.x. vertex per vertex in a given primitive
+mode.  
+It can also produce some simple geometric shapes:  
 
-   mat4 projection,view;
-   vec4 eye_position;
-   float near;
-   float far;
-   s->calculate_projection_and_view(eye_position, near, far, projection, view);
+- Plane
+- Box
+- Cone
+- UV-Sphere
+- Cylinder
+- Disk
+- Coordinate system
 
-   Note: The eye_position must be in the same space as the screen corners in
-   the screen-file.
+Usage
+--------------------------------------------------------------------------------
 
-___File-format_________________________________________________________________
-   The screen files contain one line per screen. Each line constist of the
-   name of the screen, and the position of three corners of the screen:
-   bottom-left, bottom-right, top-left. You can use vec3 or vec4
-   (when using vec4 make shure the w-component is 1), however when you saver the
-   ScreenArrangement, vec4s will be used.
-   Example:
-   # <- the '#' marks a line as comment.
-   screen0 (0.0,0.0,0.0,1.0) (1.0,0.0,0.0,1.0) (0.0,1.0,0.0,1.0)
-   screen1 (0.0,1.0,0.0) (1.0,1.0,0.0) (0.0,2.0,0.0)
-*/
+This tool creates VertexData, so the ofl_vd oflib is needed.
 
+API
+--------------------------------------------------------------------------------
+It is very easy, with `begin(PRIMITIVE)` you start to constuct a new
+VertexData object. With `color(...)`, `texCoord(...)`, and `normal(...)` you can
+modify the data used for these attributes. With a call of `vertex(...)` the
+vertex is finished and another is started. The state you set with `color(...)`
+etc. is not changed with a call of `vertex(...)`.
+
+Calling `finish()` returns the VertexData object and the Manufactuerer is
+ready to construct a new one.
+
+
+
+
+--------------------------------------------------------------------------------
+
+VMATH : vector-maths
+================================================================================
+This is a set of classes containing the needed vector-math for the ofl tools.
+It is ment to be an backup data exchange format, if there is no GLM in your
+project.
+Note: Do not use this vector and matrix class. Use GLM or something else!
+GLM is also header only, and does - imho - a great job. These classes are
+only here, so you do not have to use GLM. There are two classes with a very
+limited set of methods: vec4 and mat4 a vector of 4 floats and a 4x4-matrix.
+
+Usage
+--------------------------------------------------------------------------------
+As mentioned above you should not use these classes for anything but
+exchanging data with oflibs. To enshure, that GLM is used (if you use it in
+your project) include `<glm/glm.hpp>` before you include this file.
+
+
+--------------------------------------------------------------------------------
+
+VRPV: Virtual Reality Projection & Viewmatrix
+================================================================================
+The toolkit consists of two main components: Screens and ScreenArrangements.
+Screens are the data structures you are interested in. A Screen represents a
+rectengular area in world space, on which you want to render. (This could be
+one side of a cave, one display in a display array, a power wall, etc.).
+
+A ScreenArrangement is a collection of screens. ScreenArangements can be
+loaded from a file, which is handy if you want to change the screen
+arragement without recompiling your program.
+
+Usage
+--------------------------------------------------------------------------------
+If you use glm, make sure, that glm.hpp is included before you include vrpv.h
+so that VRPV uses glm. If you don't use glm (which is fine) vrpv uses its own
+glm compatible, rudimentary mat4 and vec4 implementation.
+
+
+API
+--------------------------------------------------------------------------------
+You can create a ScreenArrangement and load screens by these two lines of
+code:
+
+```
+	ScreenArrangement sa;
+	sa.loadScreens("path/to/screens/file")
+```
+
+You can access a Screen using the `getScreen(...)` methods you can either
+access it via its name, specified in the screen-file or via its id
+(with id in [0,sa.countScreens()]):
+```
+	Screen* s = sa.getScreen(0); // by id
+	Screen*  s = sa.getScreen("screen0"); // by name
+```
+Now you can calculate projection and  view-matrices for this screen using
+the calculate_projection_and_view(...) method:
+
+```
+	mat4 projection,view;
+	vec4 eye_position;
+	float near;
+	float far;
+	s->calculate_projection_and_view(eye_position, near, far, projection, view);
+```
+Note: The eye_position must be in the same space as the screen corners in
+the screen-file.
+
+File-formats
+--------------------------------------------------------------------------------
+The screen files contain one line per screen. Each line constist of the
+name of the screen, and the position of three corners of the screen:
+bottom-left, bottom-right, top-left. You can use vec3 or vec4
+(when using vec4 make shure the w-component is 1), however when you saver the
+ScreenArrangement, vec4s will be used.
+Example:
+```
+	# <- the '#' marks a line as comment.
+	screen0 (0.0,0.0,0.0,1.0) (1.0,0.0,0.0,1.0) (0.0,1.0,0.0,1.0)
+	screen1 (0.0,1.0,0.0) (1.0,1.0,0.0) (0.0,2.0,0.0)
+```
+
+--------------------------------------------------------------------------------
+
+<end_doc>
+#endif 
 #ifndef USING_OFL_ALL_H
  #define USING_OFL_ALL_H
  
@@ -735,6 +824,8 @@ public:
 
 
 
+/** @include vmath.md */
+
 namespace ofl
 {
 enum Primitive
@@ -822,7 +913,9 @@ public:
 };
 
 
-
+/**
+ * @brief The VertexData class represents vertex data in a renderable form.
+ */
 class VertexData
 {
 private:
@@ -833,21 +926,57 @@ private:
 public:
 	VertexData(Primitive primitive = TRIANGLES);
 	virtual ~VertexData();
-
-
+	
+	/**
+	 * @brief push_back adds an index to the index list
+	 * @param i the new index
+	 */
 	void push_back(const uint32_t& i)
 	{
 		this->m_indices_data.push_back(i);
 	}
+	
+	/**
+	 * @brief push_back adds a Vertex to the vertex list.
+	 * @param v The new Vertex
+	 * @return the index of the newly added vertex.
+	 */
 	size_t push_back(const Vertex& v);
 
+	/**
+	 * @brief data gives read access to the Vertex list
+	 * @return The vertex list.
+	 */
 	const std::vector<Vertex>& data() const;
+	
+	/**
+	 * @brief indices gives read access to the index list
+	 * @return The index list
+	 */
 	const std::vector<uint32_t>& indices() const;
-
+	
+	/**
+	 * @brief data gives write access to the Vertex list
+	 * @return The vertex list.
+	 */
 	std::vector<Vertex>& data();
+	
+	/**
+	 * @brief indices gives write access to the index list
+	 * @return The index list
+	 */
 	std::vector<uint32_t>& indices();
-
+	
+	/**
+	 * @brief primitive 
+	 * @return The vertex datas primitive
+	 */
 	virtual Primitive primitive() const;
+	/**
+	 * @brief setPrimitive sets the primitive mode this vertex data is 
+	 * constructed in.
+	 * @param p new primitive 
+	 */
 	void setPrimitive(const Primitive& p);
 
 	auto begin() -> decltype(m_data.begin())
@@ -875,11 +1004,26 @@ public:
 		VD,
 		FROM_PATH
 	};
-	bool writeToFile(const VertexData* ofl,const std::string& path, Format f=FROM_PATH);
+	/**
+	 * @brief writeToFile writes the given vertexdaa into a file.
+	 * @param vd Vertex data to write from
+	 * @param path Path to write to
+	 * @param f Format of the outpu file. if FROM_PATH is used, the format will
+	 * be determined from the file ending
+	 * @return true if everything went well, false if there was a problem.
+	 */
+	bool writeToFile(const VertexData* vd,const std::string& path, Format f=FROM_PATH);
+	
+	/**
+	 * @brief readFromFile reads VertexData from a file
+	 * @param path Path to the source file.
+	 * @param f The format of the source file
+	 * @return the VertexData read, or a nullptr, if something went wrong.
+	 */
 	VertexData* readFromFile(const std::string& path, Format f = FROM_PATH);
 
-	void calculateNormals(VertexData* ofl);
-	void calculateTangents(VertexData* ofl);
+	void calculateNormals(VertexData* vd);
+	void calculateTangents(VertexData* vd);
 };
 }
 
@@ -1267,6 +1411,130 @@ protected:
 	void setLightSpotCutOff(int light, const float& co);
 	void setLightSpotExponent(int light, const float& ex);
 	void setLightAttenuationFactors(int lignt, const glm::vec4& att);
+};
+}
+#include <map>
+#include <vector>
+#include <string>
+#include <fstream>
+#include <sstream>
+
+
+namespace ofl {
+
+
+/**
+ * @brief The Screen class is basically an area in world space you want to
+ * render to. This might be a powerwall or the side of a cave or a segment
+ * in a segmented display.
+ */
+class Screen
+{
+	vec4 m_corners[3];
+	mat4 m_wall_space;
+	mat4 m_inv_wall_space;
+
+public:
+
+	enum CORNER
+	{
+		BL=0,
+		BR,
+		TL
+	} ;
+
+	vec4 corner(const int i) const;
+	/**
+	 * @brief Screen Constructor. Consumes three corners of the Screen area
+	 * The last corner is implied.
+	 * @param blc Bottom left corner.
+	 * @param trc Top right corner.
+	 * @param tlc Top left corner.
+	 */
+	Screen(const vec4 blc,const vec4 brc, const vec4& tlc);
+
+	/**
+	 * @brief calculate_projection_and_view Calculates a projection- and a view
+	 * matrix for a given eye position.
+	 * Note for stereo rendering you have to call this twice, once per eye.
+	 * @param eye The postition of the eye.
+	 * @param near The near distance.
+	 * @param far The far distance.
+	 * @param projection output where the projection matrix will be written to
+	 * @param view output where the view matrix will be written to
+	 */
+	void calculate_projection_and_view(
+			const vec4& eye,
+			const float near,
+			const float far,
+			mat4& projection_matrix,
+			mat4& view_matrix) const;
+};
+
+/**
+ * @brief The ScreenArrangement class groups Screens together. This might be use
+ * full for a cave or a multi-segment-display. Each Screen is accessible via
+ * its name or its id, or you just store a pointer to the screen you are
+ * interested in. In that case this class is only usefull for loading and
+ * storing ScreenArrangements
+ */
+class ScreenArrangement
+{
+	std::vector<Screen> m_screens;
+	std::map<std::string,Screen*> m_by_name;
+public:
+	/**
+	 * @brief addScreen Adds a Screen to the arrangement.
+	 * @param scrn The screen you wish to add (will be copied).
+	 * @param name The name of the screen.
+	 * @return a pointer to the interal screen, which can be accessed as long
+	 * as this Object exists.
+	 */
+	Screen* addScreen(const Screen scrn, const std::string& name);
+
+	/**
+	 * @brief getScreen Provides access to a screen via its id. If there is
+	 * no screen with this id a nullptr is returned.
+	 * @param id The id of the screen.
+	 * @return The Screen you asked for or nullptr if it does not exist.
+	 */
+	const Screen* getScreen(const int id)const;
+
+	/**
+	 * @brief getScreen Provides access to a screen via its name. If there is
+	 * no screen with this name a nullptr is returned.
+	 * @param name name of the screen.
+	 * @return	The Screen you asked for or nullptr if it does not exist.
+	 */
+	const Screen* getScreen(const std::string& name);
+
+	/**
+	 * @brief count_screens Returns the number of screens in this
+	 * ScreenArrangement
+	 * @return #Screens
+	 */
+	unsigned int countScreens() const;
+
+	/**
+	 * @brief addScreens Adds screens from a file to this arrangement.
+	 * The format of the file should be:
+	 * <name0> (blx,bly,blz,blw) (brx,bry,brz,brw) (tlx,tly,tlz,tlw)
+	 * <name1> (blx,bly,blz,blw) (brx,bry,brz,brw) (tlx,tly,tlz,tlw)
+	 * # ...
+	 * # a line starting with # is a comment line.
+	 * @param path to the file.
+	 * @return true if everything went well. false if there was a problem with
+	 * the file.
+	 */
+	bool loadScreens(const std::string& path);
+
+	/**
+	 * @brief saveScreens saves this ScreenArrangement to the disk
+	 * @param path where you want to store this.
+	 * @return true if ecerything went well, false if there was a problem with
+	 * the file.
+	 */
+	bool saveScreens(const std::string& path);
 };
 }
 
@@ -1661,6 +1929,378 @@ public:
 		glfwGetWindowSize(m_window,nullptr,&h);
 		return (unsigned int) h;
 	}
+};
+
+}
+
+
+#include <vector>
+#include <map>
+#include <limits>
+#include <numeric>
+#include <cstdio>
+#include <cstring>
+#include <limits>
+#include <vector>
+
+
+/** @include vdman.md */
+
+namespace ofl
+{
+
+class VertexDataManufacturer : public ofl::VertexDataTools
+{
+
+private:
+
+
+	/**
+	 * @brief m_normal_state Current normal state. With any call of .vertex(..)
+	 * a vertex is created with this as a normal.
+	 */
+	vec3 m_normal_state;
+	/**
+	 * @brief m_color_state Current normal state. With any call of .vertex(..)
+	 * a vertex is created with this as a color.
+	 */
+	vec4 m_color_state;
+	/**
+	 * @brief m_tex_coord_state Current normal state. With any call of
+	 * .vertex(..) a vertex is created with this as a texture coordinate.
+	 */
+	vec3 tex_coord_state;
+
+	/**
+	 * @brief m_input_primitive The primitive mode chosen by begin(..).
+	 */
+	ofl::Primitive m_input_primitive;
+
+private:
+	/** Datastructures supporting the begin/end/finish operations.*/
+	// A map to check if given vertex already exists and where it is.
+	std::map<ofl::Vertex, unsigned int> vertex_ids;
+	ofl::VertexData* current_mesh;
+
+	// A primitive buffer to deal with quads.
+	std::vector<unsigned int> primitive_buffer;
+
+	void handlePrimitiveBuffer();
+
+public:
+
+	VertexDataManufacturer();
+	~VertexDataManufacturer();
+
+	/**
+	 * @brief begin  Will set the GeomtryDataLoader in the corresponding
+		OpenGL primitive mode.
+
+		Supported modes are:
+		TRIANGLES,
+		POINTS,
+		LINES,
+		QUADS,
+
+		LINE_STRIP,
+		TRIANGLE_STRIP,
+		QUAD_STRIP
+
+		Note: Geometry created in this way is as dense packed as possible.
+		For example...
+
+		begin(TRIANGLES);
+		vertex(0,0);
+		vertex(1,0);
+		vertex(0,1);
+
+		vertex(0,1);
+		vertex(1,0);
+		vertex(1,1);
+		finish();
+
+		... will return the two triangles with four vertices.
+	 * @param primitive
+	 */
+	void begin(ofl::Primitive primitive);
+
+
+
+	/**
+	 * @brief finish An alternative to end(). This will create a renderable
+	 * geometry. After calling finish the manufacturer will then be empty and
+	 * reusable. Creating a geometry once and rendering it again and again will
+	 * be a lot faster then creating the geometry with begin(..) end() all over
+	 * again. Note: You will have to free the geometry by yourself
+	 * @return A Vertex data struct containing the vertex information.
+	 */
+	ofl::VertexData* finish();
+
+
+	/**
+	 * @brief color Sets the current color state
+	 * @param color The color you wish to set.
+	 */
+	void color(const vec4& color);
+
+	/**
+	 * @brief color Sets the current color state
+	 * @param color The color you wish to set.
+	 */
+	void color(const vec3& color);
+
+	/**
+	 * @brief color Sets the current color state.
+	 * @param red The red part.
+	 * @param green The green part.
+	 * @param blue The blue part.
+	 * @param alpha The alpha value.
+	 */
+	void color(
+			const float& red,
+			const float& green = 0.0f,
+			const float& blue = 0.0f,
+			const float& alpha = 1.0f);
+
+	/**
+	 * @brief normal Sets the current normal state
+	 * @param normal The normal you wish to set.
+	 */
+	void normal(const vec3& normal);
+	void normal(
+			const float& x,
+			const float& y = 0.0f,
+			const float& z = 1.0f);
+
+	/**
+	 * @brief texCoord Sets the texture coordinate state
+	 * @param tc The texture coordinate you want to set.
+	 */
+	void texCoord(const vec3& tc);
+	void texCoord(const vec2& tc);
+	void texCoord(const float& s,
+				  const float& t = 0.0f,
+				  const float& r = 0.0f);
+
+	/**
+	*/
+	/**
+	 * @brief vertex Creates a vertex using the current state values
+	 * for color, normal and texture coordinate.
+	 * @param vertex The position of the vertex
+	 */
+	void vertex(const vec4& vertex);
+	void vertex(const vec2& vertex);
+	void vertex(const vec3& vertex);
+	void vertex(
+			const float& x,
+			const float& y = 0.0f,
+			const float& z = 0.0f,
+			const float& w = 1.0f);
+	void vertex(const float * vertex);
+
+	void vertex(const ofl::Vertex& vertex);
+
+
+	/**
+	 * @brief createBox Will create all vertices and faces needed to render a
+	 * box. Texture coordinates and normals will be correct. The UV layout is:
+	 *
+	 *     0,1______  ______  0.7,0.9
+	 *       |      ||      |
+	 *       | BTM  ||	-z  |
+	 *  0,0.7|______||______|______ 1,0.6
+	 * 0.1,0.6|      |      |      |
+	 *        |  -x  |  TOP |   +x |
+	 * 0.1,0.3|______|______|______| 1.0.3
+	 *               |      |
+	 *               |  +z  |
+	 *         0.4,0 |______| 0.7,0
+	 *
+	 *
+	 * @param w width of the box
+	 * @param h height of the box
+	 * @param d depth of the box
+	 * @return
+	 */
+	ofl::VertexData* createBox(
+			float w = 1.0f,
+			float h = 1.0f,
+			float d = 1.0f);
+
+
+	/** @brief createPlane Will create all vertices and faces needed to render a
+	 * plane. Texture coordinates and normals will be correct. The UV layout is
+	 *   0,1 ______1,1
+	 *      |      |
+	 *      |      |
+	 *      |______|
+	 *   0,0       1,0
+	 * The primitive mode will be a TRIANGLE_STRIP.
+	 * @param w width of the plane
+	 * @param h height of the plane
+	 * @param tess_w tesselation in width
+	 * @param tess_h tesselation in height
+	 * @return
+	 */
+
+	ofl::VertexData* createPlane(
+			float w = 1.0f,
+			float h = 1.0f,
+			unsigned int tess_w = 1,
+			unsigned int tess_h = 1);
+
+
+	/**
+	 * @brief createCoordinateSystem Will create a colorfull coordinate system
+	 * @return The coordinate system
+	 */
+	ofl::VertexData* createCoordinateSystem();
+
+
+	/**
+	 * @brief createUVSphere Will create all vertices and faces needed to
+	 * render a UV-Shpere.  Normals will be set correct!
+	 *
+	 *     0,1 _____________1,1
+	 *        |       /    \|		The top and bottom hemisphere are seperated.
+	 *        | TOP> |      |
+	 *        |       \____/|
+	 *        |/    \       |
+	 *        |      |< BOT	|
+	 *        |\____/_______|
+	 *		 0,0            1,0
+	 *
+	 * @param radius of the sphere.
+	 * @param slices the number of slices between the poles, parallel to the
+	 *        equator. This number should allways be odd! otherwise the default
+	 *        uv-coordinates wont work.
+	 * @param stacks
+	 * @return
+	 */
+	ofl::VertexData* createUVSphere(
+			float radius = 1,
+			unsigned int slices = 32,
+			unsigned int stacks = 16);
+
+
+
+	/**
+	 * @brief createCylinder Will create all vertices and faces needed to render
+	 * a cylinder. Normals and tangents will be set correct. The UV layout is
+	 *
+	 *         circumference
+	 *     0,1 ____________1,1
+	 *        |             | h
+	 *        |             | e
+	 *        |             | i
+	 *        |             | g
+	 *        |             | h
+	 *        |_____________| t
+	 *		 0,0       q+.01,0
+	 *
+	 * @param radius of the cylinder.
+	 * @param height of the cylinder.
+	 * @param slices segments around the circumference of the cylinder
+	 * @param stacks segments along the length of the cylinder
+	 * @return
+	 */
+	ofl::VertexData* createCylinder(
+			float radius = 1,
+			float height = 1,
+			unsigned int slices = 32,
+			unsigned int stacks = 1);
+
+
+	/**
+	 * @brief createCone Will create a cone.
+	 * Normals and tangents will be set correctly.
+	 * The UV layout is
+	 *
+	 *     0,1 ____________1,1
+	 *        | /         \ |    T is  the  top border  with a raduis of 0.01.
+	 *        |/     _T    \|    The  outer circle   b  has  a  radius  of 0.5.
+	 *        |     / \     |    Note: this  mapping is  far from good, but it
+	 *        |     \_/     |    is ok to use it, especially for pointed cones.
+	 *        |\          b/|
+	 *        |_\_________/_|
+	 *		 0,0       q+.01,0
+	 *
+	 * @param baseRadius the base radius on the XY-plane
+	 * @param topRadius the top radius, parallel to the XY-plane
+	 * @param height hight of the cone
+	 * @param slices segments around the circumference of the cone
+	 * @param stacks segments along the length of the cone
+	 * @return
+	 */
+	ofl::VertexData* createCone(
+			float baseRadius = 1,
+			float topRadius = 0,
+			float height = 1,
+			unsigned int slices = 32,
+			unsigned int stacks = 1);
+
+
+	/**
+	 * @brief createDisk Will create a disk.
+	 *  Normals and tangents will be set correctly.
+	 * The UV layout is
+	 *     0,1 ____________1,1
+	 *        | /         \ |    T has the  inner radius/outer radius.
+	 *        |/     _T    \|    The  outer circle   b  has  a  radius of 2 Pi.
+	 *        |     / \     |
+	 *        |     \_/     |
+	 *        |\          b/|
+	 *        |_\_________/_|
+	 *		 0,0       q+.01,0
+	 * @param innerRadius the inner radius of the disk.
+	 * @param outerRadius the outer radius of the disk.
+	 * @param slices segments around the circumference of the disk(Pizza slices)
+	 * @param loops loops between inner and outer radius
+	 * @return
+	 */
+	ofl::VertexData* createDisk(
+			float innerRadius = 0,
+			float outerRadius = 1,
+			unsigned int slices = 32,
+			unsigned int loops = 1);
+
+
+
+	/** Shortcut function to add a vertex with parameters.
+		The same operation like:
+		.texCoord(t);
+		.normal(n);
+		.color(c);
+		.vertex(p);
+	*/
+	void addVertex(vec3 p, vec2 t, vec3 n, vec4 c);
+
+	/** Shortcut function to add a whole triangle with parameters.
+	The same result like:
+	addVertex(p1,t1,n1,c1);
+	addVertex(p2,t2,n2,c2);
+	addVertex(p3,t3,n3,c3);
+	*/
+	void addTriangle(
+			vec3 p1          , vec3 p2          , vec3 p3,
+			vec2 t1= vec2NaN, vec2 t2= vec2NaN, vec2 t3= vec2NaN,
+			vec3 n1= vec3NaN, vec3 n2= vec3NaN, vec3 n3= vec3NaN,
+			vec4 c1= vec4NaN, vec4 c2= vec4NaN, vec4 c3= vec4NaN
+			);
+
+
+	void addQuad(
+			vec3 p1          , vec3 p2          ,
+			vec3 p3          , vec3 p4          ,
+			vec2 t1 = vec2NaN, vec2 t2 = vec2NaN,
+			vec2 t3 = vec2NaN, vec2 t4 = vec2NaN,
+			vec3 n1 = vec3NaN, vec3 n2 = vec3NaN,
+			vec3 n3 = vec3NaN, vec3 n4 = vec3NaN,
+			vec4 c1 = vec4NaN, vec4 c2 = vec4NaN,
+			vec4 c3 = vec4NaN, vec4 c4 = vec4NaN
+			);
+
 };
 
 }
@@ -2099,500 +2739,6 @@ public:
 
 };
 
-}
-
-
-#include <vector>
-#include <map>
-#include <limits>
-#include <numeric>
-#include <cstdio>
-#include <cstring>
-#include <limits>
-#include <vector>
-
-
-namespace ofl
-{
-
-class VertexDataManufacturer : public ofl::VertexDataTools
-{
-
-private:
-
-
-	/**
-	 * @brief m_normal_state Current normal state. With any call of .vertex(..)
-	 * a vertex is created with this as a normal.
-	 */
-	vec3 m_normal_state;
-	/**
-	 * @brief m_color_state Current normal state. With any call of .vertex(..)
-	 * a vertex is created with this as a color.
-	 */
-	vec4 m_color_state;
-	/**
-	 * @brief m_tex_coord_state Current normal state. With any call of
-	 * .vertex(..) a vertex is created with this as a texture coordinate.
-	 */
-	vec3 tex_coord_state;
-
-	/**
-	 * @brief m_input_primitive The primitive mode chosen by begin(..).
-	 */
-	ofl::Primitive m_input_primitive;
-
-private:
-	/** Datastructures supporting the begin/end/finish operations.*/
-	// A map to check if given vertex already exists and where it is.
-	std::map<ofl::Vertex, unsigned int> vertex_ids;
-	ofl::VertexData* current_mesh;
-
-	// A primitive buffer to deal with quads.
-	std::vector<unsigned int> primitive_buffer;
-
-	void handlePrimitiveBuffer();
-
-public:
-
-	VertexDataManufacturer();
-	~VertexDataManufacturer();
-
-	/**
-	 * @brief begin  Will set the GeomtryDataLoader in the corresponding
-		OpenGL primitive mode.
-
-		Supported modes are:
-		TRIANGLES,
-		POINTS,
-		LINES,
-		QUADS,
-
-		LINE_STRIP,
-		TRIANGLE_STRIP,
-		QUAD_STRIP
-
-		Note: Geometry created in this way is as dense packed as possible.
-		For example...
-
-		begin(TRIANGLES);
-		vertex(0,0);
-		vertex(1,0);
-		vertex(0,1);
-
-		vertex(0,1);
-		vertex(1,0);
-		vertex(1,1);
-		finish();
-
-		... will return the two triangles with four vertices.
-	 * @param primitive
-	 */
-	void begin(ofl::Primitive primitive);
-
-
-
-	/**
-	 * @brief finish An alternative to end(). This will create a renderable
-	 * geometry. After calling finish the manufacturer will then be empty and
-	 * reusable. Creating a geometry once and rendering it again and again will
-	 * be a lot faster then creating the geometry with begin(..) end() all over
-	 * again. Note: You will have to free the geometry by yourself
-	 * @return A Vertex data struct containing the vertex information.
-	 */
-	ofl::VertexData* finish();
-
-
-	/**
-	 * @brief color Sets the current color state
-	 * @param color The color you wish to set.
-	 */
-	void color(const vec4& color);
-
-	/**
-	 * @brief color Sets the current color state
-	 * @param color The color you wish to set.
-	 */
-	void color(const vec3& color);
-
-	/**
-	 * @brief color Sets the current color state.
-	 * @param red The red part.
-	 * @param green The green part.
-	 * @param blue The blue part.
-	 * @param alpha The alpha value.
-	 */
-	void color(
-			const float& red,
-			const float& green = 0.0f,
-			const float& blue = 0.0f,
-			const float& alpha = 1.0f);
-
-	/**
-	 * @brief normal Sets the current normal state
-	 * @param normal The normal you wish to set.
-	 */
-	void normal(const vec3& normal);
-	void normal(
-			const float& x,
-			const float& y = 0.0f,
-			const float& z = 1.0f);
-
-	/**
-	 * @brief texCoord Sets the texture coordinate state
-	 * @param tc The texture coordinate you want to set.
-	 */
-	void texCoord(const vec3& tc);
-	void texCoord(const vec2& tc);
-	void texCoord(const float& s,
-				  const float& t = 0.0f,
-				  const float& r = 0.0f);
-
-	/**
-	*/
-	/**
-	 * @brief vertex Creates a vertex using the current state values
-	 * for color, normal and texture coordinate.
-	 * @param vertex The position of the vertex
-	 */
-	void vertex(const vec4& vertex);
-	void vertex(const vec2& vertex);
-	void vertex(const vec3& vertex);
-	void vertex(
-			const float& x,
-			const float& y = 0.0f,
-			const float& z = 0.0f,
-			const float& w = 1.0f);
-	void vertex(const float * vertex);
-
-	void vertex(const ofl::Vertex& vertex);
-
-
-	/**
-	 * @brief createBox Will create all vertices and faces needed to render a
-	 * box. Texture coordinates and normals will be correct. The UV layout is:
-	 *
-	 *     0,1______  ______  0.7,0.9
-	 *       |      ||      |
-	 *       | BTM  ||	-z  |
-	 *  0,0.7|______||______|______ 1,0.6
-	 * 0.1,0.6|      |      |      |
-	 *        |  -x  |  TOP |   +x |
-	 * 0.1,0.3|______|______|______| 1.0.3
-	 *               |      |
-	 *               |  +z  |
-	 *         0.4,0 |______| 0.7,0
-	 *
-	 *
-	 * @param w width of the box
-	 * @param h height of the box
-	 * @param d depth of the box
-	 * @return
-	 */
-	ofl::VertexData* createBox(
-			float w = 1.0f,
-			float h = 1.0f,
-			float d = 1.0f);
-
-
-	/** @brief createPlane Will create all vertices and faces needed to render a
-	 * plane. Texture coordinates and normals will be correct. The UV layout is
-	 *   0,1 ______1,1
-	 *      |      |
-	 *      |      |
-	 *      |______|
-	 *   0,0       1,0
-	 * The primitive mode will be a TRIANGLE_STRIP.
-	 * @param w width of the plane
-	 * @param h height of the plane
-	 * @param tess_w tesselation in width
-	 * @param tess_h tesselation in height
-	 * @return
-	 */
-
-	ofl::VertexData* createPlane(
-			float w = 1.0f,
-			float h = 1.0f,
-			unsigned int tess_w = 1,
-			unsigned int tess_h = 1);
-
-
-	/**
-	 * @brief createCoordinateSystem Will create a colorfull coordinate system
-	 * @return The coordinate system
-	 */
-	ofl::VertexData* createCoordinateSystem();
-
-
-	/**
-	 * @brief createUVSphere Will create all vertices and faces needed to
-	 * render a UV-Shpere.  Normals will be set correct!
-	 *
-	 *     0,1 _____________1,1
-	 *        |       /    \|		The top and bottom hemisphere are seperated.
-	 *        | TOP> |      |
-	 *        |       \____/|
-	 *        |/    \       |
-	 *        |      |< BOT	|
-	 *        |\____/_______|
-	 *		 0,0            1,0
-	 *
-	 * @param radius of the sphere.
-	 * @param slices the number of slices between the poles, parallel to the
-	 *        equator. This number should allways be odd! otherwise the default
-	 *        uv-coordinates wont work.
-	 * @param stacks
-	 * @return
-	 */
-	ofl::VertexData* createUVSphere(
-			float radius = 1,
-			unsigned int slices = 32,
-			unsigned int stacks = 16);
-
-
-
-	/**
-	 * @brief createCylinder Will create all vertices and faces needed to render
-	 * a cylinder. Normals and tangents will be set correct. The UV layout is
-	 *
-	 *         circumference
-	 *     0,1 ____________1,1
-	 *        |             | h
-	 *        |             | e
-	 *        |             | i
-	 *        |             | g
-	 *        |             | h
-	 *        |_____________| t
-	 *		 0,0       q+.01,0
-	 *
-	 * @param radius of the cylinder.
-	 * @param height of the cylinder.
-	 * @param slices segments around the circumference of the cylinder
-	 * @param stacks segments along the length of the cylinder
-	 * @return
-	 */
-	ofl::VertexData* createCylinder(
-			float radius = 1,
-			float height = 1,
-			unsigned int slices = 32,
-			unsigned int stacks = 1);
-
-
-	/**
-	 * @brief createCone Will create a cone.
-	 * Normals and tangents will be set correctly.
-	 * The UV layout is
-	 *
-	 *     0,1 ____________1,1
-	 *        | /         \ |    T is  the  top border  with a raduis of 0.01.
-	 *        |/     _T    \|    The  outer circle   b  has  a  radius  of 0.5.
-	 *        |     / \     |    Note: this  mapping is  far from good, but it
-	 *        |     \_/     |    is ok to use it, especially for pointed cones.
-	 *        |\          b/|
-	 *        |_\_________/_|
-	 *		 0,0       q+.01,0
-	 *
-	 * @param baseRadius the base radius on the XY-plane
-	 * @param topRadius the top radius, parallel to the XY-plane
-	 * @param height hight of the cone
-	 * @param slices segments around the circumference of the cone
-	 * @param stacks segments along the length of the cone
-	 * @return
-	 */
-	ofl::VertexData* createCone(
-			float baseRadius = 1,
-			float topRadius = 0,
-			float height = 1,
-			unsigned int slices = 32,
-			unsigned int stacks = 1);
-
-
-	/**
-	 * @brief createDisk Will create a disk.
-	 *  Normals and tangents will be set correctly.
-	 * The UV layout is
-	 *     0,1 ____________1,1
-	 *        | /         \ |    T has the  inner radius/outer radius.
-	 *        |/     _T    \|    The  outer circle   b  has  a  radius of 2 Pi.
-	 *        |     / \     |
-	 *        |     \_/     |
-	 *        |\          b/|
-	 *        |_\_________/_|
-	 *		 0,0       q+.01,0
-	 * @param innerRadius the inner radius of the disk.
-	 * @param outerRadius the outer radius of the disk.
-	 * @param slices segments around the circumference of the disk(Pizza slices)
-	 * @param loops loops between inner and outer radius
-	 * @return
-	 */
-	ofl::VertexData* createDisk(
-			float innerRadius = 0,
-			float outerRadius = 1,
-			unsigned int slices = 32,
-			unsigned int loops = 1);
-
-
-
-	/** Shortcut function to add a vertex with parameters.
-		The same operation like:
-		.texCoord(t);
-		.normal(n);
-		.color(c);
-		.vertex(p);
-	*/
-	void addVertex(vec3 p, vec2 t, vec3 n, vec4 c);
-
-	/** Shortcut function to add a whole triangle with parameters.
-	The same result like:
-	addVertex(p1,t1,n1,c1);
-	addVertex(p2,t2,n2,c2);
-	addVertex(p3,t3,n3,c3);
-	*/
-	void addTriangle(
-			vec3 p1          , vec3 p2          , vec3 p3,
-			vec2 t1= vec2NaN, vec2 t2= vec2NaN, vec2 t3= vec2NaN,
-			vec3 n1= vec3NaN, vec3 n2= vec3NaN, vec3 n3= vec3NaN,
-			vec4 c1= vec4NaN, vec4 c2= vec4NaN, vec4 c3= vec4NaN
-			);
-
-
-	void addQuad(
-			vec3 p1          , vec3 p2          ,
-			vec3 p3          , vec3 p4          ,
-			vec2 t1 = vec2NaN, vec2 t2 = vec2NaN,
-			vec2 t3 = vec2NaN, vec2 t4 = vec2NaN,
-			vec3 n1 = vec3NaN, vec3 n2 = vec3NaN,
-			vec3 n3 = vec3NaN, vec3 n4 = vec3NaN,
-			vec4 c1 = vec4NaN, vec4 c2 = vec4NaN,
-			vec4 c3 = vec4NaN, vec4 c4 = vec4NaN
-			);
-
-};
-
-}
-#include <map>
-#include <vector>
-#include <string>
-#include <fstream>
-#include <sstream>
-
-
-namespace ofl {
-
-
-/**
- * @brief The Screen class is basically an area in world space you want to
- * render to. This might be a powerwall or the side of a cave or a segment
- * in a segmented display.
- */
-class Screen
-{
-	vec4 m_corners[3];
-	mat4 m_wall_space;
-	mat4 m_inv_wall_space;
-
-public:
-
-	enum CORNER
-	{
-		BL=0,
-		BR,
-		TL
-	} ;
-
-	vec4 corner(const int i) const;
-	/**
-	 * @brief Screen Constructor. Consumes three corners of the Screen area
-	 * The last corner is implied.
-	 * @param blc Bottom left corner.
-	 * @param trc Top right corner.
-	 * @param tlc Top left corner.
-	 */
-	Screen(const vec4 blc,const vec4 brc, const vec4& tlc);
-
-	/**
-	 * @brief calculate_projection_and_view Calculates a projection- and a view
-	 * matrix for a given eye position.
-	 * Note for stereo rendering you have to call this twice, once per eye.
-	 * @param eye The postition of the eye.
-	 * @param near The near distance.
-	 * @param far The far distance.
-	 * @param projection output where the projection matrix will be written to
-	 * @param view output where the view matrix will be written to
-	 */
-	void calculate_projection_and_view(
-			const vec4& eye,
-			const float near,
-			const float far,
-			mat4& projection_matrix,
-			mat4& view_matrix) const;
-};
-
-/**
- * @brief The ScreenArrangement class groups Screens together. This might be use
- * full for a cave or a multi-segment-display. Each Screen is accessible via
- * its name or its id, or you just store a pointer to the screen you are
- * interested in. In that case this class is only usefull for loading and
- * storing ScreenArrangements
- */
-class ScreenArrangement
-{
-	std::vector<Screen> m_screens;
-	std::map<std::string,Screen*> m_by_name;
-public:
-	/**
-	 * @brief addScreen Adds a Screen to the arrangement.
-	 * @param scrn The screen you wish to add (will be copied).
-	 * @param name The name of the screen.
-	 * @return a pointer to the interal screen, which can be accessed as long
-	 * as this Object exists.
-	 */
-	Screen* addScreen(const Screen scrn, const std::string& name);
-
-	/**
-	 * @brief getScreen Provides access to a screen via its id. If there is
-	 * no screen with this id a nullptr is returned.
-	 * @param id The id of the screen.
-	 * @return The Screen you asked for or nullptr if it does not exist.
-	 */
-	const Screen* getScreen(const int id)const;
-
-	/**
-	 * @brief getScreen Provides access to a screen via its name. If there is
-	 * no screen with this name a nullptr is returned.
-	 * @param name name of the screen.
-	 * @return	The Screen you asked for or nullptr if it does not exist.
-	 */
-	const Screen* getScreen(const std::string& name);
-
-	/**
-	 * @brief count_screens Returns the number of screens in this
-	 * ScreenArrangement
-	 * @return #Screens
-	 */
-	unsigned int countScreens() const;
-
-	/**
-	 * @brief addScreens Adds screens from a file to this arrangement.
-	 * The format of the file should be:
-	 * <name0> (blx,bly,blz,blw) (brx,bry,brz,brw) (tlx,tly,tlz,tlw)
-	 * <name1> (blx,bly,blz,blw) (brx,bry,brz,brw) (tlx,tly,tlz,tlw)
-	 * # ...
-	 * # a line starting with # is a comment line.
-	 * @param path to the file.
-	 * @return true if everything went well. false if there was a problem with
-	 * the file.
-	 */
-	bool loadScreens(const std::string& path);
-
-	/**
-	 * @brief saveScreens saves this ScreenArrangement to the disk
-	 * @param path where you want to store this.
-	 * @return true if ecerything went well, false if there was a problem with
-	 * the file.
-	 */
-	bool saveScreens(const std::string& path);
-};
 }
 
 

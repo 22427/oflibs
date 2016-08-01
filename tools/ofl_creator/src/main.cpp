@@ -101,7 +101,7 @@ public:
 				std::string name = paths::filename(incl);
 				AFile* h = new AFile(name+".h",dir+mod+".h");
 				AFile* cpp = new AFile(name+".cpp",dir+mod+".cpp");
-				AFile* txt = new AFile(name+".txt",dir+mod+".txt");
+				AFile* txt = new AFile(name+".md",dir+mod+".md");
 				if(!h->analyze(files))
 				{
 					if(h->exists())
@@ -148,7 +148,7 @@ int main(int argc, char** argv)
 		f = new AFile(name+".cpp",mod+".cpp");
 		if(!f->analyze(files))
 			delete f;
-		f = new AFile(name+".txt",mod+".txt");
+		f = new AFile(name+".md",mod+".md");
 		if(!f->analyze(files))
 			delete f;
 
@@ -164,16 +164,18 @@ int main(int argc, char** argv)
 			headers.push_back(f.second);
 		if(paths::extension(f.first) == "cpp")
 			src.push_back(f.second);
-		if(paths::extension(f.first) == "txt")
+		if(paths::extension(f.first) == "md")
 			docs.push_back(f.second);
 
 	}
-	printf("/*\n");
+	printf("#if 0\n<begin_doc>\n");
 	for( AFile *f : docs)
 	{
 		f->print();
+		printf("\n--------------------------------------------------------------------------------\n\n");
 	}
-	printf("*/\n\n");
+	
+	printf("<end_doc>\n#endif \n");
 
 	for( AFile *f : headers)
 	{
