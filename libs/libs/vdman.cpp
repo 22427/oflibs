@@ -81,7 +81,14 @@ void VertexDataManufacturer::end()
 
 VertexData* VertexDataManufacturer::finish()
 {
-	current_mesh->setPrimitive(m_input_primitive);
+	Primitive res_prim = m_input_primitive;
+	
+	if(res_prim == QUADS)
+		res_prim = TRIANGLES;
+	if(res_prim == QUAD_STRIP)
+		res_prim = TRIANGLE_STRIP;
+	 
+	current_mesh->setPrimitive(res_prim);
 	auto res = this->current_mesh;
 	this->current_mesh = new VertexData();
 	this->vertex_ids.clear();

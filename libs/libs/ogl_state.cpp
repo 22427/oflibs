@@ -16,7 +16,7 @@ bool compileShader(GLuint shader)
 	{
 		GLint maxLength = 0;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
-
+		
 		std::vector<GLchar> errorLog(maxLength);
 		glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
 		printf("[ERR] Compiling shader failed: \n\t%s\n",errorLog.data());
@@ -29,13 +29,13 @@ bool linkShader(GLuint shader_program)
 {
 	glLinkProgram(shader_program);
 	GLint wasLinked ;
-	glGetShaderiv(shader_program, GL_LINK_STATUS, &wasLinked);
+	glGetProgramiv(shader_program, GL_LINK_STATUS, &wasLinked);
 	if(wasLinked == GL_FALSE)
 	{
 		GLint maxLength = 0;
-		glGetShaderiv(shader_program, GL_INFO_LOG_LENGTH, &maxLength);
+		glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &maxLength);
 		std::vector<GLchar> errorLog(maxLength);
-		glGetShaderInfoLog(shader_program, maxLength, &maxLength, &errorLog[0]);
+		glGetProgramInfoLog(shader_program, maxLength, &maxLength, &errorLog[0]);
 		printf("[ERR] Linking shader failed: \n\t%s\n",errorLog.data());
 		return false;
 	}
@@ -73,7 +73,7 @@ ShaderWrap::~ShaderWrap()
 void ShaderWrap::learnUniform(const std::string& name, int id)
 {
 	m_uniformID2location[id]=glGetUniformLocation(m_handle, name.c_str());
-//	printf("s:%d,%s\t%d\t%d\n",m_handle, name.c_str(), m_uniformID2location[id],id);
+	//	printf("s:%d,%s\t%d\t%d\n",m_handle, name.c_str(), m_uniformID2location[id],id);
 }
 
 int ShaderWrap::getUniformLocation(int id)
@@ -102,7 +102,7 @@ StateSimulator::~StateSimulator()
 void StateSimulator::enable (Feature f)
 {
 	printf("[ifo] %s: ON\n",to_string(f).c_str());
-
+	
 	if(m_features & f)
 		return;
 	m_features |= f;
@@ -145,7 +145,7 @@ StateSimulator::StateSimulator(const std::string& path_to_stock_shaders)
 	// create the vertex shader for every stock program
 	GLuint vshader = glCreateShader(GL_VERTEX_SHADER);
 	std::string vshader_src = loadFile(path_to_stock_shaders+"stock.glsl.vs");
-
+	
 	const char* cstr = vshader_src.c_str();
 	int len = vshader_src.length();
 	glShaderSource(vshader,1,&cstr, &len);
@@ -154,7 +154,7 @@ StateSimulator::StateSimulator(const std::string& path_to_stock_shaders)
 		glDeleteShader(vshader);
 		return;
 	}
-
+	
 	// Load all 4 stock shaders. They all share the same vertex stage
 	// so we will load 4 different fragment-shaders and combine them with
 	// the vertex-shader to 4 different shader-programms
@@ -165,7 +165,7 @@ StateSimulator::StateSimulator(const std::string& path_to_stock_shaders)
 		GLuint fshader = glCreateShader(GL_FRAGMENT_SHADER);
 		// load the source code from a file
 		std::string fshader_src = loadFile(path_to_stock_shaders+"stock_"+std::to_string(i)+".glsl.fs");
-			cstr = fshader_src.c_str();
+		cstr = fshader_src.c_str();
 		len = fshader_src.length();
 		// attach the code to the shader object
 		glShaderSource(fshader,1,&cstr,&len);
@@ -212,19 +212,19 @@ StateSimulator::StateSimulator(const std::string& path_to_stock_shaders)
 void StateSimulator::m_upload_matrix()
 {
 	glUniformMatrix4fv(
-		m_current_program->getUniformLocation(m_matrixMode),
-		1,
-		GL_FALSE,
-		glm::value_ptr(___currMat));
+				m_current_program->getUniformLocation(m_matrixMode),
+				1,
+				GL_FALSE,
+				glm::value_ptr(___currMat));
 	if(m_matrixMode == MODELVIEW)
 	{
 		auto normal_mat = glm::transpose(glm::inverse(m_matrix[MODELVIEW].top()));
-
+		
 		glUniformMatrix4fv(
-			m_current_program->getUniformLocation(ID_NMM),
-			1,
-			GL_FALSE,
-			glm::value_ptr(normal_mat));
+					m_current_program->getUniformLocation(ID_NMM),
+					1,
+					GL_FALSE,
+					glm::value_ptr(normal_mat));
 	}
 }
 void StateSimulator::pushMatrix()
@@ -252,8 +252,8 @@ void StateSimulator::matrixMode(MatrixMode m)
 }
 void StateSimulator::translate(float x, float y, float z)
 {
-//	auto m = glm::translate(glm::mat4(1.0f),glm::vec3(x,y,z));
-
+	//	auto m = glm::translate(glm::mat4(1.0f),glm::vec3(x,y,z));
+	
 	___currMat = glm::translate(___currMat,glm::vec3(x,y,z));
 	m_upload_matrix();
 	m_set_dirty_mats();
@@ -278,44 +278,44 @@ void StateSimulator::scale(float x, float y, float z)
 	m_set_dirty_mats();
 }
 void StateSimulator::lookAt(
-	float ex,
-	float ey,
-	float ez,
-	float tx,
-	float ty,
-	float tz,
-	float ux,
-	float uy,
-	float uz
-	)
+		float ex,
+		float ey,
+		float ez,
+		float tx,
+		float ty,
+		float tz,
+		float ux,
+		float uy,
+		float uz
+		)
 {
 	___currMat *= glm::lookAt(
-		glm::vec3(ex,ey,ez),
-		glm::vec3(tx,ty,tz),
-		glm::vec3(ux,uy,uz));
+				glm::vec3(ex,ey,ez),
+				glm::vec3(tx,ty,tz),
+				glm::vec3(ux,uy,uz));
 	m_upload_matrix();
 	m_set_dirty_mats();
 }
 
 void StateSimulator::ortho(
-	float l,
-	float r,
-	float b,
-	float t,
-	float n,
-	float f)
+		float l,
+		float r,
+		float b,
+		float t,
+		float n,
+		float f)
 {
 	___currMat *= glm::ortho(l,r,b,t,n,f);
 	m_upload_matrix();
 	m_set_dirty_mats();
 }
 void StateSimulator::frustum(
-	float l,
-	float r,
-	float b,
-	float t,
-	float n,
-	float f)
+		float l,
+		float r,
+		float b,
+		float t,
+		float n,
+		float f)
 {
 	___currMat *= glm::frustum(l,r,b,t,n,f);
 	m_upload_matrix();
@@ -347,7 +347,7 @@ void setLightUniforms(const Light& l, int i, ShaderWrap* sw)
 	glUniform4fv(sw->getUniformLocation(ID_LIGHT_DIFF(i)) ,1,glm::value_ptr(l.diffuse));
 	glUniform4fv(sw->getUniformLocation(ID_LIGHT_SPEC(i)) ,1,glm::value_ptr(l.specular));
 	glUniform4fv(sw->getUniformLocation(ID_LIGHT_ATTEN(i)),1,glm::value_ptr(l.attenuation_factors));
-
+	
 }
 void StateSimulator::useShader(ShaderWrap* sw, bool first_time )
 {
@@ -367,28 +367,28 @@ void StateSimulator::useShader(ShaderWrap* sw, bool first_time )
 			sw->learnUniform(NAME_LIGHT_ATTEN(i),ID_LIGHT_ATTEN(i));
 		}
 	}
-
+	
 	m_current_program = sw;
 	if(m_dirty_mats[m_features])
 	{
-	for(int i  = 0 ; i<MATRIXMODE_COUNT;i++)
-	{
-		glUniformMatrix4fv(
-			m_current_program->getUniformLocation(i),
-			1,
-			GL_FALSE,
-			glm::value_ptr(m_matrix[i].top()));
-		if(i == MODELVIEW)
+		for(int i  = 0 ; i<MATRIXMODE_COUNT;i++)
 		{
-			auto normal_mat = glm::transpose(glm::inverse(m_matrix[MODELVIEW].top()));
 			glUniformMatrix4fv(
-				m_current_program->getUniformLocation(ID_NMM),
-				1,
-				GL_FALSE,
-				glm::value_ptr(normal_mat));
+						m_current_program->getUniformLocation(i),
+						1,
+						GL_FALSE,
+						glm::value_ptr(m_matrix[i].top()));
+			if(i == MODELVIEW)
+			{
+				auto normal_mat = glm::transpose(glm::inverse(m_matrix[MODELVIEW].top()));
+				glUniformMatrix4fv(
+							m_current_program->getUniformLocation(ID_NMM),
+							1,
+							GL_FALSE,
+							glm::value_ptr(normal_mat));
+			}
 		}
-	}
-	m_dirty_mats[m_features] = false;
+		m_dirty_mats[m_features] = false;
 	}
 	if((m_features & Lighting) && m_dirty_lights[m_features])
 	{
@@ -418,7 +418,7 @@ void StateSimulator::setLightDiffuseColor(int light, const glm::vec3 c)
 	m_light[light].setDiffuseColor(c);
 	setLightUniforms(m_light[light],light,m_current_program);
 	m_set_dirty_lights();
-
+	
 }
 void StateSimulator::setLightSpecularColor(int light, const glm::vec3 c)
 {
@@ -431,26 +431,80 @@ void StateSimulator::setLightSpotDirection(int light, const glm::vec3 d)
 	m_light[light].setSpotDirection(glm::vec4(d,0));
 	setLightUniforms(m_light[light],light,m_current_program);
 	m_set_dirty_lights();
-
+	
 }
 void StateSimulator::setLightSpotCutOff(int light, const float& co)
 {
 	m_light[light].setSpotCutoff(co);
 	setLightUniforms(m_light[light],light,m_current_program);
 	m_set_dirty_lights();
-
+	
 }
 void StateSimulator::setLightSpotExponent(int light, const float& ex)
 {
 	m_light[light].setSpotExponent(ex);
 	setLightUniforms(m_light[light],light,m_current_program);
 	m_set_dirty_lights();
-
+	
 }
 void StateSimulator::setLightAttenuationFactors(int light, const glm::vec4& att)
 {
 	m_light[light].setAttenuationFactors(att);
 	setLightUniforms(m_light[light],light,m_current_program);
 	m_set_dirty_lights();
+}
+
+ShaderWrap* StateSimulator::loadShaderFormFiles(const std::string &vs_path, const std::string &fs_path)
+{
+	GLuint vshader = glCreateShader(GL_VERTEX_SHADER);
+	std::string vshader_src = loadFile(vs_path);
+	
+	const char* cstr = vshader_src.c_str();
+	int len = vshader_src.length();
+	glShaderSource(vshader,1,&cstr, &len);
+	if(! compileShader(vshader))
+	{
+		glDeleteShader(vshader);
+		return nullptr;
+	}
+	
+	// generate Fragment shaders
+	GLuint fshader = glCreateShader(GL_FRAGMENT_SHADER);
+	// load the source code from a file
+	std::string fshader_src = loadFile(fs_path);
+	cstr = fshader_src.c_str();
+	len = fshader_src.length();
+	// attach the code to the shader object
+	glShaderSource(fshader,1,&cstr,&len);
+	// compile and check for errors
+	if(!compileShader(fshader))
+	{
+		printf("CODE:\n%s\n",cstr);
+		glDeleteShader(fshader);
+		return nullptr;
+	}
+	else
+	{
+		// generate the program.
+		GLuint prog = glCreateProgram();
+		// add vertex and fragment shader
+		glAttachShader(prog,vshader);
+		glAttachShader(prog,fshader);
+		// bind the attribute locations. This is due to backwards
+		// compatibility, with newer GL/GLSL versions you can define the
+		// location in the shader.
+		glBindAttribLocation(prog, ALOC_POSITION, NAME_POS_ATTR);
+		glBindAttribLocation(prog, ALOC_NORMAL, NAME_NRM_ATTR);
+		glBindAttribLocation(prog, ALOC_COLOR, NAME_CLR_ATTR);
+		glBindAttribLocation(prog, ALOC_TEXCOORD, NAME_TEX_ATTR);
+		// link the program
+		linkShader(prog);
+		// use it for the first time to learn the uniform mappings
+		ShaderWrap* result= new ShaderWrap(prog);
+		this->useShader(result,true);
+		// delete the fragment-shader we don't need it anymore
+		glDeleteShader(fshader);
+		return result;
+	}
 }
 }

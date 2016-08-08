@@ -256,5 +256,7 @@ protected:
 	void setLightSpotCutOff(int light, const float& co);
 	void setLightSpotExponent(int light, const float& ex);
 	void setLightAttenuationFactors(int lignt, const glm::vec4& att);
+	
+	ShaderWrap* loadShaderFormFiles(const std::string& vs_path, const std::string& fs_path);
 };
 }
