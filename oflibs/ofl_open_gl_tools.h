@@ -1,298 +1,298 @@
 #if 0
 <begin_doc>
-The MIT License (MIT)
-================================================================================
-
-Copyright (c) 2016 Timon Zietlow
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//The MIT License (MIT)
+//================================================================================
+//
+//Copyright (c) 2016 Timon Zietlow
+//
+//Permission is hereby granted, free of charge, to any person obtaining a copy of
+//this software and associated documentation files (the "Software"), to deal in
+//the Software without restriction, including without limitation the rights to
+//use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+//the Software, and to permit persons to whom the Software is furnished to do so,
+//subject to the following conditions:
+//
+//The above copyright notice and this permission notice shall be included in all
+//copies or substantial portions of the Software.
+//
+//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+//FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+//COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+//IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+//CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 
-What is this?
-================================================================================
-The oflibs are a set of usefull classes and tools dealing with all kinds of 
-problems.  
-My personal focus is in 3D-visualisation and VR, so most of these deal with 
-these topics. OFLIBS stands for "**o**ne **f**ile **lib**rarie**s**". The basic 
-idea is to write libraries in a single file, which you just have to include into
-your project, and you are ready to go.
-I find these usefull for fast prototypes and "experimental" code, which is what 
-this collection currently is, so don't expect a well tested, woking toolset, but
-maybe you find the one or two lines of code you were searching ;).
-I'm constantly working whith these tools and I am shure they will get better 
-over time.
-
-Structure
---------------------------------------------------------------------------------
-In oflibs/ you find the finished one file libraries. They are ready to use. The 
-documentation to each library is also inside of the lib. Here is a short list of
-the different modules and libraries:
-
-- ofl_all: All oflibs in one 
-- ofl_ogl_geo - A class reperesenting vertex-data on the GPU
-- ofl_ogl_state - A state-wrapper imulating the "classic" OpenGL-fixed-function 
-  states, including matrix stacks and lighting.
-- ofl_ogl_win - An interface to create an OpenGL-Context with window and reading 
-  events. Currently implemented using glfw.
-- ofl_open_gl_tools: combines the above.
-- ofl_socket: A class wrapping sockets.
-- ofl_stru: Some string utilities. Used by many other oflibs.
-- ofl_track - Tracking: An interface to the ART-DTrack2 tracking system.
-- olf_vd - Vertex Data: A data structure representing geometry on the client 
-  side. This is OpenGL independend. 
-- ofl_vdman - Vertex Data MANufacturer: Allows you to create VertexData using
-  the old begin(..) ... end() paradigma from fixed-function-GL, but is OpenGL
-  independend.
-- ofl_vmath - Vector MATH : Some simple vector operations, but no alternative to 
-  GLM.
-- ofl_vrpv - Virtual Reality Projection and View - A module to genereate view-
-  and projection-matrices for VR systems like PowerWalls or CAVEs
-
-How do oflibs work?
---------------------------------------------------------------------------------
-You use the oflib as a regular header, for example:
-```c_cpp
+//What is this?
+//================================================================================
+//The oflibs are a set of usefull classes and tools dealing with all kinds of 
+//problems.  
+//My personal focus is in 3D-visualisation and VR, so most of these deal with 
+//these topics. OFLIBS stands for "**o**ne **f**ile **lib**rarie**s**". The basic 
+//idea is to write libraries in a single file, which you just have to include into
+//your project, and you are ready to go.
+//I find these usefull for fast prototypes and "experimental" code, which is what 
+//this collection currently is, so don't expect a well tested, woking toolset, but
+//maybe you find the one or two lines of code you were searching ;).
+//I'm constantly working whith these tools and I am shure they will get better 
+//over time.
+//
+//Structure
+//--------------------------------------------------------------------------------
+//In oflibs/ you find the finished one file libraries. They are ready to use. The 
+//documentation to each library is also inside of the lib. Here is a short list of
+//the different modules and libraries:
+//
+//- ofl_all: All oflibs in one 
+//- ofl_ogl_geo - A class reperesenting vertex-data on the GPU
+//- ofl_ogl_state - A state-wrapper imulating the "classic" OpenGL-fixed-function 
+//  states, including matrix stacks and lighting.
+//- ofl_ogl_win - An interface to create an OpenGL-Context with window and reading 
+//  events. Currently implemented using glfw.
+//- ofl_open_gl_tools: combines the above.
+//- ofl_socket: A class wrapping sockets.
+//- ofl_stru: Some string utilities. Used by many other oflibs.
+//- ofl_track - Tracking: An interface to the ART-DTrack2 tracking system.
+//- olf_vd - Vertex Data: A data structure representing geometry on the client 
+//  side. This is OpenGL independend. 
+//- ofl_vdman - Vertex Data MANufacturer: Allows you to create VertexData using
+//  the old begin(..) ... end() paradigma from fixed-function-GL, but is OpenGL
+//  independend.
+//- ofl_vmath - Vector MATH : Some simple vector operations, but no alternative to 
+//  GLM.
+//- ofl_vrpv - Virtual Reality Projection and View - A module to genereate view-
+//  and projection-matrices for VR systems like PowerWalls or CAVEs
+//
+//How do oflibs work?
+//--------------------------------------------------------------------------------
+//You use the oflib as a regular header, for example:
+//```c_cpp
 	#include <ofl_all.h>
-```
-Then in one .cpp-file of your project you include the oflib defining
-`OFL_IMPLEMENTATION` before:
-```c_cpp
-	#define OFL_IMPLEMENTATION
+//```
+//Then in one .cpp-file of your project you include the oflib defining
+//`OFL_IMPLEMENTATION` before:
+//```c_cpp
+//	#define OFL_IMPLEMENTATION
 	#include <ofl_all.h>
-	#undef OFL_IMPLEMENTATION
-```
-That's it :)
-
-Internally the oflib-header is organized in two parts, the declaration-part 
-(that's what you would write into an ordinary header) and the implementation-part 
-(that's what you would write into *.cpp files)
-Example:
-```c_cpp
-	#ifndef OFL_ALL_H
-	#define OFL_ALL_H
-		// ALL DECLARATIONS
-	#endif
-	#ifdef OFL_IMPLEMENTATION
-		// ALL THE IMPLEMENTATIONS
-	#endif
-```
-
-Where can I get more information?
---------------------------------------------------------------------------------
-Inside the oflib files there is the documentation for each module used. 
-In the subdirectory tools/ there are also some more or less simple tools using 
-the oflibs.
-
-
-
-
---------------------------------------------------------------------------------
-
-OGL_GEO: OpenGL Geometry
-================================================================================
-A class representing vertex Attribute data. You can generate a Geometry
-object from a VertexData-Object, so they are obviously connected.
-
-Usage
---------------------------------------------------------------------------------
-You need to specify an OpenGL header in as `OFL_GL_HEADER`. for example:
-
-```cpp
-	#define OFL_GL_HEADER <glad/glad.h>  
-	#define OFL_GL_HEADER <glew.h>
-```
-
-This module also uses GLM ... sorry I was too lazy to implement all
-these functions, and its not feasible anyway.
-
-API
---------------------------------------------------------------------------------
-You can pass the data on construction or vie the method uploadData(...).
-The	data is then uploaeded into OpenGL buffer objets and a corresponding
-VAO is created.
-Call the draw() method to provoke a glDrawElements() call.
-
-
+//	#undef OFL_IMPLEMENTATION
+//```
+//That's it :)
+//
+//Internally the oflib-header is organized in two parts, the declaration-part 
+//(that's what you would write into an ordinary header) and the implementation-part 
+//(that's what you would write into *.cpp files)
+//Example:
+//```c_cpp
+//	#ifndef OFL_ALL_H
+//	#define OFL_ALL_H
+//		// ALL DECLARATIONS
+//	#endif
+//	#ifdef OFL_IMPLEMENTATION
+//		// ALL THE IMPLEMENTATIONS
+//	#endif
+//```
+//
+//Where can I get more information?
+//--------------------------------------------------------------------------------
+//Inside the oflib files there is the documentation for each module used. 
+//In the subdirectory tools/ there are also some more or less simple tools using 
+//the oflibs.
+//
+//
+//
 
 --------------------------------------------------------------------------------
 
-OGL_STATE: OpenGL State
-================================================================================
-This is a state tracking class, which also provides some stock shaders and
-functions.
-
-###State tracking:
-There is a matrix stack for modelview- and projection-matrix, and a state
-foreight light sources. Just like in OpenGL 1.x
-
-###Stock Shaders:
-There are shaders for texturing, phong shading and distance field alpha
-handling.
-
-Usage
---------------------------------------------------------------------------------
-
-You need to specify an OpenGL header in as OFL_GL_HEADER. for example:  
-
-```
-	#define OFL_GL_HEADER <glad/glad.h>  
-	#define OFL_GL_HEADER <glew.h>
-```
-
-This module also uses GLM ... sorry I was too lazy to implement all
-these functions, and its not feasible anyway.
-
-
-API
---------------------------------------------------------------------------------
-
-###Matrix-Stacks:
-There are two stacks. `PROJECITON` and `MODEL_VIEW`. You can change which is
-modified using the `matrixMode(...)` method.
-with `pushMatrix()` and `popMatrix()` you can either push a copy of the top-most
-matrix onto the stack or pop the top-most matrix from the stack.
-All other matrix modifying methods effect the top-most(current)
-matrix of the selected stack:  
-
-```
-void loadIdentity();//   sets the matrix as identity  
-void translate(..);//    translates the current matrix  
-void rotate(...);//      rotates the current matrix  
-void scale(...);//       scales the current matrix  
-void lookAt(...);//      multiplies the current matrix with a lookAt-matix  
-void ortho(...);//       multiplies the current matrix with an ortho-matix  
-void frustum(...);//     multiplies the current matrix with a frustum-matix  
-void perspective(...);// multiplies the current matrix with a persp.-matix  
-```
-###Lights:
-You can set Light parameters using the `setLight*(...)` methods.
-
-###Stock-shaders:
-You can select different stock shaders by calling `enable(...)` or `disable(...)`
-fordifferent features.
-The features are:
-
-* Texturing: Basic color mapping
-* Lighting: Basic per fragment lighting
-* DFAlpha: Iterpreting the Alpha channel as distance field.
-* NonStockShader: Use the set non stock shader. If this feature is
-enabled all uniforms and attributes will still be set, but your shader
-will be used.
-
+//OGL_GEO: OpenGL Geometry
+//================================================================================
+//A class representing vertex Attribute data. You can generate a Geometry
+//object from a VertexData-Object, so they are obviously connected.
+//
+//Usage
+//--------------------------------------------------------------------------------
+//You need to specify an OpenGL header in as `OFL_GL_HEADER`. for example:
+//
+//```cpp
+//	#define OFL_GL_HEADER <glad/glad.h>  
+//	#define OFL_GL_HEADER <glew.h>
+//```
+//
+//This module also uses GLM ... sorry I was too lazy to implement all
+//these functions, and its not feasible anyway.
+//
+//API
+//--------------------------------------------------------------------------------
+//You can pass the data on construction or vie the method uploadData(...).
+//The	data is then uploaeded into OpenGL buffer objets and a corresponding
+//VAO is created.
+//Call the draw() method to provoke a glDrawElements() call.
+//
+//
 
 --------------------------------------------------------------------------------
 
-OGL_WIN: OpenGL Window
-================================================================================
-This module will - one day - help to create an OpenGL context, and give access
-to mouse and keyboard events. For now it is a simple GLFW wrapper, but the
-interface shall be the same in the finished library.
-
-
---------------------------------------------------------------------------------
-
-VD: Vertex Data
-================================================================================
-This module constist of two structures the VertexData and VertexDataTools.
-The first is a simple, straight forward datastructure to store geometry in
-a renderable fashion.
-VertexDataTools contain methods to load and store vertex data and some 
-simple functions to calculate normals and tangents.
-
-Usage
---------------------------------------------------------------------------------
-If you use glm, make sure, that glm.hpp is included before you include vd.h
-so that vd uses glm. If you don't use glm (which is fine) vd will use its own
-glm compatible, rudimentary mat4 and vec4 implementation.
-
-
-File-formats
---------------------------------------------------------------------------------
-The .vd file format is a simple memory dump of a VertexData Object.
-The header is organized in "lines" each of 5 unsigned integers.
-The first line contains information about the other lines and the object.
-The other lines contain information about the attributes.
-The last one contains information about the size of the actual data.
-
-| 0          | 1            | 2       | 3              | 4               |
-|------------|--------------|---------|----------------|-----------------|
-| VDFF       | #lines-1     | version | #attributes    | primitive type  |
-| ATTRIBUTE0 | #elements    | type    | normalized?    | stride in bytes |
-| ATTRIBUTE1 | ...          | ...     | ...            | ...             |
-| #vertices  | sizeof(data) |#indices | sizeof(indeces)| index type      |
-
-Then comes the data as BLOB
-
---------------------------------------------------------------------------------
-
-VDMAN: VertexData Manufacturer
-================================================================================
-This class provides functionality to create VertexData, the same intuitive
-way you might do it in OpenGL1.x. vertex per vertex in a given primitive
-mode.  
-It can also produce some simple geometric shapes:  
-
-- Plane
-- Box
-- Cone
-- UV-Sphere
-- Cylinder
-- Disk
-- Coordinate system
-
-Usage
---------------------------------------------------------------------------------
-
-This tool creates VertexData, so the ofl_vd oflib is needed.
-
-API
---------------------------------------------------------------------------------
-It is very easy, with `begin(PRIMITIVE)` you start to constuct a new
-VertexData object. With `color(...)`, `texCoord(...)`, and `normal(...)` you can
-modify the data used for these attributes. With a call of `vertex(...)` the
-vertex is finished and another is started. The state you set with `color(...)`
-etc. is not changed with a call of `vertex(...)`.
-
-Calling `finish()` returns the VertexData object and the Manufactuerer is
-ready to construct a new one.
-
-
-
+//OGL_STATE: OpenGL State
+//================================================================================
+//This is a state tracking class, which also provides some stock shaders and
+//functions.
+//
+//###State tracking:
+//There is a matrix stack for modelview- and projection-matrix, and a state
+//foreight light sources. Just like in OpenGL 1.x
+//
+//###Stock Shaders:
+//There are shaders for texturing, phong shading and distance field alpha
+//handling.
+//
+//Usage
+//--------------------------------------------------------------------------------
+//
+//You need to specify an OpenGL header in as OFL_GL_HEADER. for example:  
+//
+//```
+//	#define OFL_GL_HEADER <glad/glad.h>  
+//	#define OFL_GL_HEADER <glew.h>
+//```
+//
+//This module also uses GLM ... sorry I was too lazy to implement all
+//these functions, and its not feasible anyway.
+//
+//
+//API
+//--------------------------------------------------------------------------------
+//
+//###Matrix-Stacks:
+//There are two stacks. `PROJECITON` and `MODEL_VIEW`. You can change which is
+//modified using the `matrixMode(...)` method.
+//with `pushMatrix()` and `popMatrix()` you can either push a copy of the top-most
+//matrix onto the stack or pop the top-most matrix from the stack.
+//All other matrix modifying methods effect the top-most(current)
+//matrix of the selected stack:  
+//
+//```
+//void loadIdentity();//   sets the matrix as identity  
+//void translate(..);//    translates the current matrix  
+//void rotate(...);//      rotates the current matrix  
+//void scale(...);//       scales the current matrix  
+//void lookAt(...);//      multiplies the current matrix with a lookAt-matix  
+//void ortho(...);//       multiplies the current matrix with an ortho-matix  
+//void frustum(...);//     multiplies the current matrix with a frustum-matix  
+//void perspective(...);// multiplies the current matrix with a persp.-matix  
+//```
+//###Lights:
+//You can set Light parameters using the `setLight*(...)` methods.
+//
+//###Stock-shaders:
+//You can select different stock shaders by calling `enable(...)` or `disable(...)`
+//fordifferent features.
+//The features are:
+//
+//* Texturing: Basic color mapping
+//* Lighting: Basic per fragment lighting
+//* DFAlpha: Iterpreting the Alpha channel as distance field.
+//* NonStockShader: Use the set non stock shader. If this feature is
+//enabled all uniforms and attributes will still be set, but your shader
+//will be used.
+//
 
 --------------------------------------------------------------------------------
 
-VMATH : vector-maths
-================================================================================
-This is a set of classes containing the needed vector-math for the ofl tools.
-It is ment to be an backup data exchange format, if there is no GLM in your
-project.
-Note: Do not use this vector and matrix class. Use GLM or something else!
-GLM is also header only, and does - imho - a great job. These classes are
-only here, so you do not have to use GLM. There are two classes with a very
-limited set of methods: vec4 and mat4 a vector of 4 floats and a 4x4-matrix.
+//OGL_WIN: OpenGL Window
+//================================================================================
+//This module will - one day - help to create an OpenGL context, and give access
+//to mouse and keyboard events. For now it is a simple GLFW wrapper, but the
+//interface shall be the same in the finished library.
+//
 
-Usage
 --------------------------------------------------------------------------------
-As mentioned above you should not use these classes for anything but
-exchanging data with oflibs. To enshure, that GLM is used (if you use it in
-your project) include `<glm/glm.hpp>` before you include this file.
 
+//VD: Vertex Data
+//================================================================================
+//This module constist of two structures the VertexData and VertexDataTools.
+//The first is a simple, straight forward datastructure to store geometry in
+//a renderable fashion.
+//VertexDataTools contain methods to load and store vertex data and some 
+//simple functions to calculate normals and tangents.
+//
+//Usage
+//--------------------------------------------------------------------------------
+//If you use glm, make sure, that glm.hpp is included before you include vd.h
+//so that vd uses glm. If you don't use glm (which is fine) vd will use its own
+//glm compatible, rudimentary mat4 and vec4 implementation.
+//
+//
+//File-formats
+//--------------------------------------------------------------------------------
+//The .vd file format is a simple memory dump of a VertexData Object.
+//The header is organized in "lines" each of 5 unsigned integers.
+//The first line contains information about the other lines and the object.
+//The other lines contain information about the attributes.
+//The last one contains information about the size of the actual data.
+//
+//| 0          | 1            | 2       | 3              | 4               |
+//|------------|--------------|---------|----------------|-----------------|
+//| VDFF       | #lines-1     | version | #attributes    | primitive type  |
+//| ATTRIBUTE0 | #elements    | type    | normalized?    | stride in bytes |
+//| ATTRIBUTE1 | ...          | ...     | ...            | ...             |
+//| #vertices  | sizeof(data) |#indices | sizeof(indeces)| index type      |
+//
+//Then comes the data as BLOB
+
+--------------------------------------------------------------------------------
+
+//VDMAN: VertexData Manufacturer
+//================================================================================
+//This class provides functionality to create VertexData, the same intuitive
+//way you might do it in OpenGL1.x. vertex per vertex in a given primitive
+//mode.  
+//It can also produce some simple geometric shapes:  
+//
+//- Plane
+//- Box
+//- Cone
+//- UV-Sphere
+//- Cylinder
+//- Disk
+//- Coordinate system
+//
+//Usage
+//--------------------------------------------------------------------------------
+//
+//This tool creates VertexData, so the ofl_vd oflib is needed.
+//
+//API
+//--------------------------------------------------------------------------------
+//It is very easy, with `begin(PRIMITIVE)` you start to constuct a new
+//VertexData object. With `color(...)`, `texCoord(...)`, and `normal(...)` you can
+//modify the data used for these attributes. With a call of `vertex(...)` the
+//vertex is finished and another is started. The state you set with `color(...)`
+//etc. is not changed with a call of `vertex(...)`.
+//
+//Calling `finish()` returns the VertexData object and the Manufactuerer is
+//ready to construct a new one.
+//
+//
+//
+
+--------------------------------------------------------------------------------
+
+//VMATH : vector-maths
+//================================================================================
+//This is a set of classes containing the needed vector-math for the ofl tools.
+//It is ment to be an backup data exchange format, if there is no GLM in your
+//project.
+//Note: Do not use this vector and matrix class. Use GLM or something else!
+//GLM is also header only, and does - imho - a great job. These classes are
+//only here, so you do not have to use GLM. There are two classes with a very
+//limited set of methods: vec4 and mat4 a vector of 4 floats and a 4x4-matrix.
+//
+//Usage
+//--------------------------------------------------------------------------------
+//As mentioned above you should not use these classes for anything but
+//exchanging data with oflibs. To enshure, that GLM is used (if you use it in
+//your project) include `<glm/glm.hpp>` before you include this file.
+//
 
 --------------------------------------------------------------------------------
 
@@ -1427,6 +1427,9 @@ protected:
 	void setLightSpotCutOff(int light, const float& co);
 	void setLightSpotExponent(int light, const float& ex);
 	void setLightAttenuationFactors(int lignt, const glm::vec4& att);
+	ShaderWrap* loadShaderFormFiles(const std::string& vs_path, const std::string& fs_path);
+	void useCurrentShader();
+
 };
 }
 
@@ -2331,7 +2334,7 @@ bool compileShader(GLuint shader)
 	{
 		GLint maxLength = 0;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
-
+		
 		std::vector<GLchar> errorLog(maxLength);
 		glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
 		printf("[ERR] Compiling shader failed: \n\t%s\n",errorLog.data());
@@ -2344,13 +2347,13 @@ bool linkShader(GLuint shader_program)
 {
 	glLinkProgram(shader_program);
 	GLint wasLinked ;
-	glGetShaderiv(shader_program, GL_LINK_STATUS, &wasLinked);
+	glGetProgramiv(shader_program, GL_LINK_STATUS, &wasLinked);
 	if(wasLinked == GL_FALSE)
 	{
 		GLint maxLength = 0;
-		glGetShaderiv(shader_program, GL_INFO_LOG_LENGTH, &maxLength);
+		glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &maxLength);
 		std::vector<GLchar> errorLog(maxLength);
-		glGetShaderInfoLog(shader_program, maxLength, &maxLength, &errorLog[0]);
+		glGetProgramInfoLog(shader_program, maxLength, &maxLength, &errorLog[0]);
 		printf("[ERR] Linking shader failed: \n\t%s\n",errorLog.data());
 		return false;
 	}
@@ -2388,7 +2391,7 @@ ShaderWrap::~ShaderWrap()
 void ShaderWrap::learnUniform(const std::string& name, int id)
 {
 	m_uniformID2location[id]=glGetUniformLocation(m_handle, name.c_str());
-//	printf("s:%d,%s\t%d\t%d\n",m_handle, name.c_str(), m_uniformID2location[id],id);
+	//	printf("s:%d,%s\t%d\t%d\n",m_handle, name.c_str(), m_uniformID2location[id],id);
 }
 
 int ShaderWrap::getUniformLocation(int id)
@@ -2417,7 +2420,7 @@ StateSimulator::~StateSimulator()
 void StateSimulator::enable (Feature f)
 {
 	printf("[ifo] %s: ON\n",to_string(f).c_str());
-
+	
 	if(m_features & f)
 		return;
 	m_features |= f;
@@ -2460,7 +2463,7 @@ StateSimulator::StateSimulator(const std::string& path_to_stock_shaders)
 	// create the vertex shader for every stock program
 	GLuint vshader = glCreateShader(GL_VERTEX_SHADER);
 	std::string vshader_src = loadFile(path_to_stock_shaders+"stock.glsl.vs");
-
+	
 	const char* cstr = vshader_src.c_str();
 	int len = vshader_src.length();
 	glShaderSource(vshader,1,&cstr, &len);
@@ -2469,7 +2472,7 @@ StateSimulator::StateSimulator(const std::string& path_to_stock_shaders)
 		glDeleteShader(vshader);
 		return;
 	}
-
+	
 	// Load all 4 stock shaders. They all share the same vertex stage
 	// so we will load 4 different fragment-shaders and combine them with
 	// the vertex-shader to 4 different shader-programms
@@ -2480,7 +2483,7 @@ StateSimulator::StateSimulator(const std::string& path_to_stock_shaders)
 		GLuint fshader = glCreateShader(GL_FRAGMENT_SHADER);
 		// load the source code from a file
 		std::string fshader_src = loadFile(path_to_stock_shaders+"stock_"+std::to_string(i)+".glsl.fs");
-			cstr = fshader_src.c_str();
+		cstr = fshader_src.c_str();
 		len = fshader_src.length();
 		// attach the code to the shader object
 		glShaderSource(fshader,1,&cstr,&len);
@@ -2527,19 +2530,19 @@ StateSimulator::StateSimulator(const std::string& path_to_stock_shaders)
 void StateSimulator::m_upload_matrix()
 {
 	glUniformMatrix4fv(
-		m_current_program->getUniformLocation(m_matrixMode),
-		1,
-		GL_FALSE,
-		glm::value_ptr(___currMat));
+				m_current_program->getUniformLocation(m_matrixMode),
+				1,
+				GL_FALSE,
+				glm::value_ptr(___currMat));
 	if(m_matrixMode == MODELVIEW)
 	{
 		auto normal_mat = glm::transpose(glm::inverse(m_matrix[MODELVIEW].top()));
-
+		
 		glUniformMatrix4fv(
-			m_current_program->getUniformLocation(ID_NMM),
-			1,
-			GL_FALSE,
-			glm::value_ptr(normal_mat));
+					m_current_program->getUniformLocation(ID_NMM),
+					1,
+					GL_FALSE,
+					glm::value_ptr(normal_mat));
 	}
 }
 void StateSimulator::pushMatrix()
@@ -2567,8 +2570,8 @@ void StateSimulator::matrixMode(MatrixMode m)
 }
 void StateSimulator::translate(float x, float y, float z)
 {
-//	auto m = glm::translate(glm::mat4(1.0f),glm::vec3(x,y,z));
-
+	//	auto m = glm::translate(glm::mat4(1.0f),glm::vec3(x,y,z));
+	
 	___currMat = glm::translate(___currMat,glm::vec3(x,y,z));
 	m_upload_matrix();
 	m_set_dirty_mats();
@@ -2593,44 +2596,44 @@ void StateSimulator::scale(float x, float y, float z)
 	m_set_dirty_mats();
 }
 void StateSimulator::lookAt(
-	float ex,
-	float ey,
-	float ez,
-	float tx,
-	float ty,
-	float tz,
-	float ux,
-	float uy,
-	float uz
-	)
+		float ex,
+		float ey,
+		float ez,
+		float tx,
+		float ty,
+		float tz,
+		float ux,
+		float uy,
+		float uz
+		)
 {
 	___currMat *= glm::lookAt(
-		glm::vec3(ex,ey,ez),
-		glm::vec3(tx,ty,tz),
-		glm::vec3(ux,uy,uz));
+				glm::vec3(ex,ey,ez),
+				glm::vec3(tx,ty,tz),
+				glm::vec3(ux,uy,uz));
 	m_upload_matrix();
 	m_set_dirty_mats();
 }
 
 void StateSimulator::ortho(
-	float l,
-	float r,
-	float b,
-	float t,
-	float n,
-	float f)
+		float l,
+		float r,
+		float b,
+		float t,
+		float n,
+		float f)
 {
 	___currMat *= glm::ortho(l,r,b,t,n,f);
 	m_upload_matrix();
 	m_set_dirty_mats();
 }
 void StateSimulator::frustum(
-	float l,
-	float r,
-	float b,
-	float t,
-	float n,
-	float f)
+		float l,
+		float r,
+		float b,
+		float t,
+		float n,
+		float f)
 {
 	___currMat *= glm::frustum(l,r,b,t,n,f);
 	m_upload_matrix();
@@ -2662,7 +2665,7 @@ void setLightUniforms(const Light& l, int i, ShaderWrap* sw)
 	glUniform4fv(sw->getUniformLocation(ID_LIGHT_DIFF(i)) ,1,glm::value_ptr(l.diffuse));
 	glUniform4fv(sw->getUniformLocation(ID_LIGHT_SPEC(i)) ,1,glm::value_ptr(l.specular));
 	glUniform4fv(sw->getUniformLocation(ID_LIGHT_ATTEN(i)),1,glm::value_ptr(l.attenuation_factors));
-
+	
 }
 void StateSimulator::useShader(ShaderWrap* sw, bool first_time )
 {
@@ -2682,28 +2685,28 @@ void StateSimulator::useShader(ShaderWrap* sw, bool first_time )
 			sw->learnUniform(NAME_LIGHT_ATTEN(i),ID_LIGHT_ATTEN(i));
 		}
 	}
-
+	
 	m_current_program = sw;
 	if(m_dirty_mats[m_features])
 	{
-	for(int i  = 0 ; i<MATRIXMODE_COUNT;i++)
-	{
-		glUniformMatrix4fv(
-			m_current_program->getUniformLocation(i),
-			1,
-			GL_FALSE,
-			glm::value_ptr(m_matrix[i].top()));
-		if(i == MODELVIEW)
+		for(int i  = 0 ; i<MATRIXMODE_COUNT;i++)
 		{
-			auto normal_mat = glm::transpose(glm::inverse(m_matrix[MODELVIEW].top()));
 			glUniformMatrix4fv(
-				m_current_program->getUniformLocation(ID_NMM),
-				1,
-				GL_FALSE,
-				glm::value_ptr(normal_mat));
+						m_current_program->getUniformLocation(i),
+						1,
+						GL_FALSE,
+						glm::value_ptr(m_matrix[i].top()));
+			if(i == MODELVIEW)
+			{
+				auto normal_mat = glm::transpose(glm::inverse(m_matrix[MODELVIEW].top()));
+				glUniformMatrix4fv(
+							m_current_program->getUniformLocation(ID_NMM),
+							1,
+							GL_FALSE,
+							glm::value_ptr(normal_mat));
+			}
 		}
-	}
-	m_dirty_mats[m_features] = false;
+		m_dirty_mats[m_features] = false;
 	}
 	if((m_features & Lighting) && m_dirty_lights[m_features])
 	{
@@ -2733,7 +2736,7 @@ void StateSimulator::setLightDiffuseColor(int light, const glm::vec3 c)
 	m_light[light].setDiffuseColor(c);
 	setLightUniforms(m_light[light],light,m_current_program);
 	m_set_dirty_lights();
-
+	
 }
 void StateSimulator::setLightSpecularColor(int light, const glm::vec3 c)
 {
@@ -2746,27 +2749,85 @@ void StateSimulator::setLightSpotDirection(int light, const glm::vec3 d)
 	m_light[light].setSpotDirection(glm::vec4(d,0));
 	setLightUniforms(m_light[light],light,m_current_program);
 	m_set_dirty_lights();
-
+	
 }
 void StateSimulator::setLightSpotCutOff(int light, const float& co)
 {
 	m_light[light].setSpotCutoff(co);
 	setLightUniforms(m_light[light],light,m_current_program);
 	m_set_dirty_lights();
-
+	
 }
 void StateSimulator::setLightSpotExponent(int light, const float& ex)
 {
 	m_light[light].setSpotExponent(ex);
 	setLightUniforms(m_light[light],light,m_current_program);
 	m_set_dirty_lights();
-
+	
 }
 void StateSimulator::setLightAttenuationFactors(int light, const glm::vec4& att)
 {
 	m_light[light].setAttenuationFactors(att);
 	setLightUniforms(m_light[light],light,m_current_program);
 	m_set_dirty_lights();
+}
+
+ShaderWrap* StateSimulator::loadShaderFormFiles(const std::string &vs_path, const std::string &fs_path)
+{
+	GLuint vshader = glCreateShader(GL_VERTEX_SHADER);
+	std::string vshader_src = loadFile(vs_path);
+	
+	const char* cstr = vshader_src.c_str();
+	int len = vshader_src.length();
+	glShaderSource(vshader,1,&cstr, &len);
+	if(! compileShader(vshader))
+	{
+		glDeleteShader(vshader);
+		return nullptr;
+	}
+	
+	// generate Fragment shaders
+	GLuint fshader = glCreateShader(GL_FRAGMENT_SHADER);
+	// load the source code from a file
+	std::string fshader_src = loadFile(fs_path);
+	cstr = fshader_src.c_str();
+	len = fshader_src.length();
+	// attach the code to the shader object
+	glShaderSource(fshader,1,&cstr,&len);
+	// compile and check for errors
+	if(!compileShader(fshader))
+	{
+		printf("CODE:\n%s\n",cstr);
+		glDeleteShader(fshader);
+		return nullptr;
+	}
+	else
+	{
+		// generate the program.
+		GLuint prog = glCreateProgram();
+		// add vertex and fragment shader
+		glAttachShader(prog,vshader);
+		glAttachShader(prog,fshader);
+		// bind the attribute locations. This is due to backwards
+		// compatibility, with newer GL/GLSL versions you can define the
+		// location in the shader.
+		glBindAttribLocation(prog, ALOC_POSITION, NAME_POS_ATTR);
+		glBindAttribLocation(prog, ALOC_NORMAL, NAME_NRM_ATTR);
+		glBindAttribLocation(prog, ALOC_COLOR, NAME_CLR_ATTR);
+		glBindAttribLocation(prog, ALOC_TEXCOORD, NAME_TEX_ATTR);
+		// link the program
+		linkShader(prog);
+		// use it for the first time to learn the uniform mappings
+		ShaderWrap* result= new ShaderWrap(prog);
+		this->useShader(result,true);
+		// delete the fragment-shader we don't need it anymore
+		glDeleteShader(fshader);
+		return result;
+	}
+}
+void StateSimulator::useCurrentShader()
+{
+	useShader(m_current_program);
 }
 }
 
@@ -3728,7 +3789,14 @@ void VertexDataManufacturer::end()
 
 VertexData* VertexDataManufacturer::finish()
 {
-	current_mesh->setPrimitive(m_input_primitive);
+	Primitive res_prim = m_input_primitive;
+	
+	if(res_prim == QUADS)
+		res_prim = TRIANGLES;
+	if(res_prim == QUAD_STRIP)
+		res_prim = TRIANGLE_STRIP;
+	 
+	current_mesh->setPrimitive(res_prim);
 	auto res = this->current_mesh;
 	this->current_mesh = new VertexData();
 	this->vertex_ids.clear();

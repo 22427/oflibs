@@ -24,7 +24,7 @@ public:
 		uses.erase(f);
 	}
 
-	void print()
+	void print(const std::string& line_prefix="")
 	{
 		if(printed)
 			return;
@@ -43,7 +43,7 @@ public:
 				continue;
 			if( working.find("#include") == working.npos)
 			{
-				printf("%s\n",l.c_str());
+				printf("%s%s\n",line_prefix.c_str(),l.c_str());
 				continue;
 			}
 
@@ -175,14 +175,14 @@ int main(int argc, char** argv)
 	
 	printf("#if 0\n");
 	printf("<begin_doc>\n");
-	license.print();
+	license.print("//");
 	printf("\n--------------------------------------------------------------------------------\n\n");
-	readme.print();
+	readme.print("//");
 	printf("\n--------------------------------------------------------------------------------\n\n");
 	
 	for( AFile *f : docs)
 	{
-		f->print();
+		f->print("//");
 		printf("\n--------------------------------------------------------------------------------\n\n");
 	}
 	

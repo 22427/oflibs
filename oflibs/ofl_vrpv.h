@@ -1,189 +1,189 @@
 #if 0
 <begin_doc>
-The MIT License (MIT)
-================================================================================
-
-Copyright (c) 2016 Timon Zietlow
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//The MIT License (MIT)
+//================================================================================
+//
+//Copyright (c) 2016 Timon Zietlow
+//
+//Permission is hereby granted, free of charge, to any person obtaining a copy of
+//this software and associated documentation files (the "Software"), to deal in
+//the Software without restriction, including without limitation the rights to
+//use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+//the Software, and to permit persons to whom the Software is furnished to do so,
+//subject to the following conditions:
+//
+//The above copyright notice and this permission notice shall be included in all
+//copies or substantial portions of the Software.
+//
+//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+//FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+//COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+//IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+//CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 
-What is this?
-================================================================================
-The oflibs are a set of usefull classes and tools dealing with all kinds of 
-problems.  
-My personal focus is in 3D-visualisation and VR, so most of these deal with 
-these topics. OFLIBS stands for "**o**ne **f**ile **lib**rarie**s**". The basic 
-idea is to write libraries in a single file, which you just have to include into
-your project, and you are ready to go.
-I find these usefull for fast prototypes and "experimental" code, which is what 
-this collection currently is, so don't expect a well tested, woking toolset, but
-maybe you find the one or two lines of code you were searching ;).
-I'm constantly working whith these tools and I am shure they will get better 
-over time.
-
-Structure
---------------------------------------------------------------------------------
-In oflibs/ you find the finished one file libraries. They are ready to use. The 
-documentation to each library is also inside of the lib. Here is a short list of
-the different modules and libraries:
-
-- ofl_all: All oflibs in one 
-- ofl_ogl_geo - A class reperesenting vertex-data on the GPU
-- ofl_ogl_state - A state-wrapper imulating the "classic" OpenGL-fixed-function 
-  states, including matrix stacks and lighting.
-- ofl_ogl_win - An interface to create an OpenGL-Context with window and reading 
-  events. Currently implemented using glfw.
-- ofl_open_gl_tools: combines the above.
-- ofl_socket: A class wrapping sockets.
-- ofl_stru: Some string utilities. Used by many other oflibs.
-- ofl_track - Tracking: An interface to the ART-DTrack2 tracking system.
-- olf_vd - Vertex Data: A data structure representing geometry on the client 
-  side. This is OpenGL independend. 
-- ofl_vdman - Vertex Data MANufacturer: Allows you to create VertexData using
-  the old begin(..) ... end() paradigma from fixed-function-GL, but is OpenGL
-  independend.
-- ofl_vmath - Vector MATH : Some simple vector operations, but no alternative to 
-  GLM.
-- ofl_vrpv - Virtual Reality Projection and View - A module to genereate view-
-  and projection-matrices for VR systems like PowerWalls or CAVEs
-
-How do oflibs work?
---------------------------------------------------------------------------------
-You use the oflib as a regular header, for example:
-```c_cpp
+//What is this?
+//================================================================================
+//The oflibs are a set of usefull classes and tools dealing with all kinds of 
+//problems.  
+//My personal focus is in 3D-visualisation and VR, so most of these deal with 
+//these topics. OFLIBS stands for "**o**ne **f**ile **lib**rarie**s**". The basic 
+//idea is to write libraries in a single file, which you just have to include into
+//your project, and you are ready to go.
+//I find these usefull for fast prototypes and "experimental" code, which is what 
+//this collection currently is, so don't expect a well tested, woking toolset, but
+//maybe you find the one or two lines of code you were searching ;).
+//I'm constantly working whith these tools and I am shure they will get better 
+//over time.
+//
+//Structure
+//--------------------------------------------------------------------------------
+//In oflibs/ you find the finished one file libraries. They are ready to use. The 
+//documentation to each library is also inside of the lib. Here is a short list of
+//the different modules and libraries:
+//
+//- ofl_all: All oflibs in one 
+//- ofl_ogl_geo - A class reperesenting vertex-data on the GPU
+//- ofl_ogl_state - A state-wrapper imulating the "classic" OpenGL-fixed-function 
+//  states, including matrix stacks and lighting.
+//- ofl_ogl_win - An interface to create an OpenGL-Context with window and reading 
+//  events. Currently implemented using glfw.
+//- ofl_open_gl_tools: combines the above.
+//- ofl_socket: A class wrapping sockets.
+//- ofl_stru: Some string utilities. Used by many other oflibs.
+//- ofl_track - Tracking: An interface to the ART-DTrack2 tracking system.
+//- olf_vd - Vertex Data: A data structure representing geometry on the client 
+//  side. This is OpenGL independend. 
+//- ofl_vdman - Vertex Data MANufacturer: Allows you to create VertexData using
+//  the old begin(..) ... end() paradigma from fixed-function-GL, but is OpenGL
+//  independend.
+//- ofl_vmath - Vector MATH : Some simple vector operations, but no alternative to 
+//  GLM.
+//- ofl_vrpv - Virtual Reality Projection and View - A module to genereate view-
+//  and projection-matrices for VR systems like PowerWalls or CAVEs
+//
+//How do oflibs work?
+//--------------------------------------------------------------------------------
+//You use the oflib as a regular header, for example:
+//```c_cpp
 	#include <ofl_all.h>
-```
-Then in one .cpp-file of your project you include the oflib defining
-`OFL_IMPLEMENTATION` before:
-```c_cpp
-	#define OFL_IMPLEMENTATION
+//```
+//Then in one .cpp-file of your project you include the oflib defining
+//`OFL_IMPLEMENTATION` before:
+//```c_cpp
+//	#define OFL_IMPLEMENTATION
 	#include <ofl_all.h>
-	#undef OFL_IMPLEMENTATION
-```
-That's it :)
-
-Internally the oflib-header is organized in two parts, the declaration-part 
-(that's what you would write into an ordinary header) and the implementation-part 
-(that's what you would write into *.cpp files)
-Example:
-```c_cpp
-	#ifndef OFL_ALL_H
-	#define OFL_ALL_H
-		// ALL DECLARATIONS
-	#endif
-	#ifdef OFL_IMPLEMENTATION
-		// ALL THE IMPLEMENTATIONS
-	#endif
-```
-
-Where can I get more information?
---------------------------------------------------------------------------------
-Inside the oflib files there is the documentation for each module used. 
-In the subdirectory tools/ there are also some more or less simple tools using 
-the oflibs.
-
-
-
-
---------------------------------------------------------------------------------
-
-VMATH : vector-maths
-================================================================================
-This is a set of classes containing the needed vector-math for the ofl tools.
-It is ment to be an backup data exchange format, if there is no GLM in your
-project.
-Note: Do not use this vector and matrix class. Use GLM or something else!
-GLM is also header only, and does - imho - a great job. These classes are
-only here, so you do not have to use GLM. There are two classes with a very
-limited set of methods: vec4 and mat4 a vector of 4 floats and a 4x4-matrix.
-
-Usage
---------------------------------------------------------------------------------
-As mentioned above you should not use these classes for anything but
-exchanging data with oflibs. To enshure, that GLM is used (if you use it in
-your project) include `<glm/glm.hpp>` before you include this file.
-
+//	#undef OFL_IMPLEMENTATION
+//```
+//That's it :)
+//
+//Internally the oflib-header is organized in two parts, the declaration-part 
+//(that's what you would write into an ordinary header) and the implementation-part 
+//(that's what you would write into *.cpp files)
+//Example:
+//```c_cpp
+//	#ifndef OFL_ALL_H
+//	#define OFL_ALL_H
+//		// ALL DECLARATIONS
+//	#endif
+//	#ifdef OFL_IMPLEMENTATION
+//		// ALL THE IMPLEMENTATIONS
+//	#endif
+//```
+//
+//Where can I get more information?
+//--------------------------------------------------------------------------------
+//Inside the oflib files there is the documentation for each module used. 
+//In the subdirectory tools/ there are also some more or less simple tools using 
+//the oflibs.
+//
+//
+//
 
 --------------------------------------------------------------------------------
 
-VRPV: Virtual Reality Projection & Viewmatrix
-================================================================================
-The toolkit consists of two main components: Screens and ScreenArrangements.
-Screens are the data structures you are interested in. A Screen represents a
-rectengular area in world space, on which you want to render. (This could be
-one side of a cave, one display in a display array, a power wall, etc.).
+//VMATH : vector-maths
+//================================================================================
+//This is a set of classes containing the needed vector-math for the ofl tools.
+//It is ment to be an backup data exchange format, if there is no GLM in your
+//project.
+//Note: Do not use this vector and matrix class. Use GLM or something else!
+//GLM is also header only, and does - imho - a great job. These classes are
+//only here, so you do not have to use GLM. There are two classes with a very
+//limited set of methods: vec4 and mat4 a vector of 4 floats and a 4x4-matrix.
+//
+//Usage
+//--------------------------------------------------------------------------------
+//As mentioned above you should not use these classes for anything but
+//exchanging data with oflibs. To enshure, that GLM is used (if you use it in
+//your project) include `<glm/glm.hpp>` before you include this file.
+//
 
-A ScreenArrangement is a collection of screens. ScreenArangements can be
-loaded from a file, which is handy if you want to change the screen
-arragement without recompiling your program.
-
-Usage
 --------------------------------------------------------------------------------
-If you use glm, make sure, that glm.hpp is included before you include vrpv.h
-so that VRPV uses glm. If you don't use glm (which is fine) vrpv uses its own
-glm compatible, rudimentary mat4 and vec4 implementation.
 
-
-API
---------------------------------------------------------------------------------
-You can create a ScreenArrangement and load screens by these two lines of
-code:
-
-```
-	ScreenArrangement sa;
-	sa.loadScreens("path/to/screens/file")
-```
-
-You can access a Screen using the `getScreen(...)` methods you can either
-access it via its name, specified in the screen-file or via its id
-(with id in [0,sa.countScreens()]):
-```
-	Screen* s = sa.getScreen(0); // by id
-	Screen*  s = sa.getScreen("screen0"); // by name
-```
-Now you can calculate projection and  view-matrices for this screen using
-the calculate_projection_and_view(...) method:
-
-```
-	mat4 projection,view;
-	vec4 eye_position;
-	float near;
-	float far;
-	s->calculate_projection_and_view(eye_position, near, far, projection, view);
-```
-Note: The eye_position must be in the same space as the screen corners in
-the screen-file.
-
-File-formats
---------------------------------------------------------------------------------
-The screen files contain one line per screen. Each line constist of the
-name of the screen, and the position of three corners of the screen:
-bottom-left, bottom-right, top-left. You can use vec3 or vec4
-(when using vec4 make shure the w-component is 1), however when you saver the
-ScreenArrangement, vec4s will be used.
-Example:
-```
-	# <- the '#' marks a line as comment.
-	screen0 (0.0,0.0,0.0,1.0) (1.0,0.0,0.0,1.0) (0.0,1.0,0.0,1.0)
-	screen1 (0.0,1.0,0.0) (1.0,1.0,0.0) (0.0,2.0,0.0)
-```
+//VRPV: Virtual Reality Projection & Viewmatrix
+//================================================================================
+//The toolkit consists of two main components: Screens and ScreenArrangements.
+//Screens are the data structures you are interested in. A Screen represents a
+//rectengular area in world space, on which you want to render. (This could be
+//one side of a cave, one display in a display array, a power wall, etc.).
+//
+//A ScreenArrangement is a collection of screens. ScreenArangements can be
+//loaded from a file, which is handy if you want to change the screen
+//arragement without recompiling your program.
+//
+//Usage
+//--------------------------------------------------------------------------------
+//If you use glm, make sure, that glm.hpp is included before you include vrpv.h
+//so that VRPV uses glm. If you don't use glm (which is fine) vrpv uses its own
+//glm compatible, rudimentary mat4 and vec4 implementation.
+//
+//
+//API
+//--------------------------------------------------------------------------------
+//You can create a ScreenArrangement and load screens by these two lines of
+//code:
+//
+//```
+//	ScreenArrangement sa;
+//	sa.loadScreens("path/to/screens/file")
+//```
+//
+//You can access a Screen using the `getScreen(...)` methods you can either
+//access it via its name, specified in the screen-file or via its id
+//(with id in [0,sa.countScreens()]):
+//```
+//	Screen* s = sa.getScreen(0); // by id
+//	Screen*  s = sa.getScreen("screen0"); // by name
+//```
+//Now you can calculate projection and  view-matrices for this screen using
+//the calculate_projection_and_view(...) method:
+//
+//```
+//	mat4 projection,view;
+//	vec4 eye_position;
+//	float near;
+//	float far;
+//	s->calculate_projection_and_view(eye_position, near, far, projection, view);
+//```
+//Note: The eye_position must be in the same space as the screen corners in
+//the screen-file.
+//
+//File-formats
+//--------------------------------------------------------------------------------
+//The screen files contain one line per screen. Each line constist of the
+//name of the screen, and the position of three corners of the screen:
+//bottom-left, bottom-right, top-left. You can use vec3 or vec4
+//(when using vec4 make shure the w-component is 1), however when you saver the
+//ScreenArrangement, vec4s will be used.
+//Example:
+//```
+//	# <- the '#' marks a line as comment.
+//	screen0 (0.0,0.0,0.0,1.0) (1.0,0.0,0.0,1.0) (0.0,1.0,0.0,1.0)
+//	screen1 (0.0,1.0,0.0) (1.0,1.0,0.0) (0.0,2.0,0.0)
+//```
 
 --------------------------------------------------------------------------------
 

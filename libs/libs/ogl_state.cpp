@@ -507,4 +507,8 @@ ShaderWrap* StateSimulator::loadShaderFormFiles(const std::string &vs_path, cons
 		return result;
 	}
 }
+void StateSimulator::useCurrentShader()
+{
+	useShader(m_current_program);
+}
 }
