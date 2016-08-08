@@ -129,21 +129,26 @@ public:
 		HorizontalInterlace = 1,
 		CheckerboardInterlace = 2,
 		SideBySide = 3,
-		BottomTop ,
-		QuadBuffered
+		BottomTop =4,
+		AnaglyphRedCyan=5,
+		AnaglyphYellowBlue=6,
+		QuadBuffered=7,
+		MODE_CONT = 8
 	};
 	enum Eye
 	{
 		Left = 0,
 		Right = 1
 	};
-
-	void resize(const int width, const int height);
-
-	void setMode(CompositingMode cm);
+	
 	StereoCompositor(const CompositingMode mode = VerticalInterlace);
+	
+	void resize(const int width, const int height);
+	void setCompositingMode(CompositingMode cm);
 
 	void setEye(const Eye eye);
+	void composite(GLuint left_right_texture_array);
+	
 protected:
 	CompositingMode m_cmode;
 	unsigned int m_width;
@@ -152,12 +157,11 @@ protected:
 	bool m_wh_dirty;
 
 
-	GLuint m_shader[SideBySide];
-
-
-	GLint m_width_loc[SideBySide];
-	GLint m_height_loc[SideBySide];
-
+	GLuint m_stencil_shader[3];
+	GLint m_width_loc[3];
+	GLint m_height_loc[3];
+	
+	GLuint m_post_processing_shader[MODE_CONT];
 	void create_stencil_buffer();
 
 
@@ -167,7 +171,7 @@ protected:
 
 #endif //USING_OFL_OGL_STEREO_COMPOSITOR_H
 #ifdef OFL_IMPLEMENTATION
-
+#include <glad/glad.h>
 void ofl::StereoCompositor::resize(const int width, const int height)
 {
 	m_width  = width;
@@ -175,7 +179,7 @@ void ofl::StereoCompositor::resize(const int width, const int height)
 	m_wh_dirty = true;
 }
 
-void ofl::StereoCompositor::setMode(ofl::StereoCompositor::CompositingMode cm)
+void ofl::StereoCompositor::setCompositingMode(ofl::StereoCompositor::CompositingMode cm)
 {
 	m_cmode = cm;
 	m_wh_dirty = true;
@@ -190,7 +194,7 @@ ofl::StereoCompositor::StereoCompositor(const ofl::StereoCompositor::Compositing
 			"out vec4 clr; "
 			"void main()"
 			"{clr = vec4(1);}";
-	int fs_len = strlen(fragment_shader);
+	int len = strlen(fragment_shader);
 	const char* codes[] = {
 
 		"#version 330\n"
@@ -221,14 +225,15 @@ ofl::StereoCompositor::StereoCompositor(const ofl::StereoCompositor::Compositing
 		"}"
 	};
 	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fs,1,&fragment_shader,&fs_len);
+	GLuint vs = 0;
+	glShaderSource(fs,1,&fragment_shader,&len);
 	glCompileShader(fs);
 
 	for(int i =0 ; i < SideBySide ;i++)
 	{
-		m_shader[i] =glCreateProgram();
-		GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-		int len = strlen(codes[i]);
+		m_stencil_shader[i] =glCreateProgram();
+		vs = glCreateShader(GL_VERTEX_SHADER);
+		len = strlen(codes[i]);
 		glShaderSource(vs,1,&codes[i],&len);
 		glCompileShader(vs);
 		GLint compiled;
@@ -249,16 +254,165 @@ ofl::StereoCompositor::StereoCompositor(const ofl::StereoCompositor::Compositing
 			}
 		}
 
-		glAttachShader(m_shader[i],vs);
-		glAttachShader(m_shader[i],fs);
-		glLinkProgram(m_shader[i]);
+		glAttachShader(m_stencil_shader[i],vs);
+		glAttachShader(m_stencil_shader[i],fs);
+		glLinkProgram(m_stencil_shader[i]);
 
-		m_width_loc[i] = glGetUniformLocation(m_shader[i],"width");
-		m_height_loc[i] = glGetUniformLocation(m_shader[i],"height");
+		m_width_loc[i] = glGetUniformLocation(m_stencil_shader[i],"width");
+		m_height_loc[i] = glGetUniformLocation(m_stencil_shader[i],"height");
 	}
 
 
+	const char* pp_vs_code =
+			"#version 330\n"
+			"out vec2 tex_coord;\n"
+			"void main()\n"
+			"{\n"
+			"	tex_coord.x = float(gl_VertexID%2);\n"
+			"	tex_coord.y = float(gl_VertexID>>1);\n"
+			"	gl_Position = vec4(tex_coord,0,1);\n"
+
+			"}\n";
+
+	vs = glCreateShader(GL_VERTEX_SHADER);
+	len = strlen(pp_vs_code);
+	glShaderSource(vs,1,&pp_vs_code,&len);
+	glCompileShader(vs);
+
+	const char* pp_codes[] = {
+		// Vertical-------------------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr; \n"
+		"layout(binding = 99) uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	float eye = float(int(gl_FragCoord.x)%2);"
+		"	clr=texture(textures, vec3(tex_coord,eye));"
+		"}",
+		// Horizontal-----------------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr; \n"
+		"layout(binding = 99) uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	float eye = float(int(gl_FragCoord.y)%2);"
+		"	clr=texture(textures, vec3(tex_coord,eye));"
+		"}",
+		// checker--------------------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr; \n"
+		"layout(binding = 99) uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	float eye = float(int(gl_FragCoord.x+gl_FragCoord.y)%2);"
+		"	clr=texture(textures, vec3(tex_coord,eye));"
+		"}",
+		// sbs -----------------------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr; \n"
+		"layout(binding = 99) uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	float eye = int(2.0*tex_coord.x);\n"
+		"	vec3 texc = vec3(tex_coord,eye);"
+		"	texc.x = mod(2.0*tex_coord.x,1.0);"
+		"	clr=texture(textures, texc);"
+		"}",
+
+		// bt -----------------------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr; \n"
+		"layout(binding = 99) uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	float eye = int(2.0*tex_coord.y);"
+		"	vec3 texc = vec3(tex_coord,eye);"
+		"	texc.y = mod(2.0*tex_coord.y,1.0);"
+		"	clr=texture(textures, texc);"
+		"}",
+
+		// anaglyph red cyan --------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr; \n"
+		"layout(binding = 99) uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	vec4 l = texture(textures, vec3(tex_coord,0));\n"
+		"	vec4 r = texture(textures, vec3(tex_coord,1));\n"
+		"	float rg = 0.2126* r.r + 0.7152* r.g + 0.0722* r.b;\n"
+		"	float lg = 0.2126* l.r + 0.7152* l.g + 0.0722* l.b;\n"
+		"	clr= vec4(lg,rg,rg,1.0);"
+		"}",
+
+		// anaglyph yellow blue ------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr; \n"
+		"layout(binding = 99) uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	vec4 l = texture(textures, vec3(tex_coord,0));\n"
+		"	vec4 r = texture(textures, vec3(tex_coord,1));\n"
+		"	float rg = 0.2126* r.r + 0.7152* r.g + 0.0722* r.b;\n"
+		"	float lg = 0.2126* l.r + 0.7152* l.g + 0.0722* l.b;\n"
+		"	clr= vec4(lg,lg,rg,1.0);"
+		"}",
+
+		// quad buffering ------------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr_l; \n"
+		"layout(location = 1) out vec4 clr_r; \n"
+
+		"layout(binding = 99)  uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	clr_l = texture(textures, vec3(tex_coord,0));\n"
+		"	clr_r = texture(textures, vec3(tex_coord,1));\n"
+		"}"
+	};
+
+	for(int i =0 ; i < MODE_CONT ;i++)
+	{
+		m_post_processing_shader[i] =glCreateProgram();
+		fs = glCreateShader(GL_FRAGMENT_SHADER);
+		len = strlen(pp_codes[i]);
+		glShaderSource(fs,1,&pp_codes[i],&len);
+		glCompileShader(fs);
+		GLint compiled;
+
+		glGetShaderiv(fs, GL_COMPILE_STATUS, &compiled);
+		if (!compiled)
+		{
+			GLint blen = 0;
+			GLsizei slen = 0;
+
+			glGetShaderiv(fs, GL_INFO_LOG_LENGTH , &blen);
+			if (blen > 1)
+			{
+				GLchar* compiler_log = (GLchar*)malloc(blen);
+				glGetShaderInfoLog(fs, blen, &slen, compiler_log);
+				printf("compiler_log: %s\n", compiler_log);
+				free (compiler_log);
+			}
+		}
+
+		glAttachShader(m_post_processing_shader[i],vs);
+		glAttachShader(m_post_processing_shader[i],fs);
+		glLinkProgram(m_post_processing_shader[i]);
+		glUseProgram(m_post_processing_shader[i]);
+		glUniform1i(glGetUniformLocation(m_post_processing_shader[i],"textures")
+					,12);
+	}
+
 }
+
 
 void ofl::StereoCompositor::setEye(const ofl::StereoCompositor::Eye eye)
 {
@@ -276,28 +430,54 @@ void ofl::StereoCompositor::setEye(const ofl::StereoCompositor::Eye eye)
 		if(m_wh_dirty)
 			create_stencil_buffer();
 		glStencilFunc(GL_EQUAL, eye, 0xFF);
+
 		break;
 	case QuadBuffered:
 		glDrawBuffer(GL_BACK_LEFT+ eye);
+
 		break;
+	case AnaglyphRedCyan:
+		if(eye==Left)
+			glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
+		else
+			glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_FALSE);
+	case AnaglyphYellowBlue:
+		if(eye==Left)
+			glColorMask(GL_TRUE, GL_TRUE, GL_FALSE, GL_FALSE);
+		else
+			glColorMask(GL_FALSE, GL_FALSE, GL_TRUE, GL_FALSE);
+
 	default:
 		break;
+
 	}
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void ofl::StereoCompositor::composite(GLuint left_right_texture_array)
+{
+	glActiveTexture(GL_TEXTURE0+12);
+	glBindTexture(GL_TEXTURE_2D_ARRAY,left_right_texture_array);
+	if(m_cmode == QuadBuffered)
+	{
+		const GLenum buffs[]={GL_BACK_LEFT, GL_BACK_RIGHT};
+		glDrawBuffers(2,buffs);
+	}
+	glUseProgram(m_post_processing_shader[m_cmode]);
+	glDrawArrays(GL_TRIANGLE_STRIP,0,4);
 }
 
 void ofl::StereoCompositor::create_stencil_buffer()
-{
-	glClear(GL_DEPTH_BUFFER_BIT| GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+{	
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 	glDepthMask(GL_FALSE);
 	glStencilFunc(GL_NEVER, 1, 0xFF);
-	glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);  // draw 1s on test fail (always)
+	glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
 
-	// draw stencil pattern
 	glStencilMask(0xFF);
-	glClear(GL_STENCIL_BUFFER_BIT);  // needs mask=0xFF
+	glClear(GL_STENCIL_BUFFER_BIT);
 
-	glUseProgram(m_shader[m_cmode]);
+	glUseProgram(m_stencil_shader[m_cmode]);
 	if(m_wh_dirty)
 	{
 		glUniform1i(m_width_loc[m_cmode],m_width);

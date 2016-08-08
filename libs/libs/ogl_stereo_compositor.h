@@ -20,21 +20,26 @@ public:
 		HorizontalInterlace = 1,
 		CheckerboardInterlace = 2,
 		SideBySide = 3,
-		BottomTop ,
-		QuadBuffered
+		BottomTop =4,
+		AnaglyphRedCyan=5,
+		AnaglyphYellowBlue=6,
+		QuadBuffered=7,
+		MODE_CONT = 8
 	};
 	enum Eye
 	{
 		Left = 0,
 		Right = 1
 	};
-
-	void resize(const int width, const int height);
-
-	void setMode(CompositingMode cm);
+	
 	StereoCompositor(const CompositingMode mode = VerticalInterlace);
+	
+	void resize(const int width, const int height);
+	void setCompositingMode(CompositingMode cm);
 
 	void setEye(const Eye eye);
+	void composite(GLuint left_right_texture_array);
+	
 protected:
 	CompositingMode m_cmode;
 	unsigned int m_width;
@@ -43,12 +48,11 @@ protected:
 	bool m_wh_dirty;
 
 
-	GLuint m_shader[SideBySide];
-
-
-	GLint m_width_loc[SideBySide];
-	GLint m_height_loc[SideBySide];
-
+	GLuint m_stencil_shader[3];
+	GLint m_width_loc[3];
+	GLint m_height_loc[3];
+	
+	GLuint m_post_processing_shader[MODE_CONT];
 	void create_stencil_buffer();
 
 
