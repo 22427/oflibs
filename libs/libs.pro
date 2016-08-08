@@ -40,7 +40,8 @@ HEADERS += \
     libs/vdman.h \
     libs/vmath.h \
     libs/vrpv.h \
-    libs/vr_tools.h
+    libs/vr_tools.h \
+    libs/ogl_stereo_compositor.h
 
 SOURCES += \
     libs/ogl_geo.cpp \
@@ -50,7 +51,8 @@ SOURCES += \
     libs/vd.cpp \
     libs/vdman.cpp \
     libs/vmath.cpp \
-    libs/vrpv.cpp
+    libs/vrpv.cpp \
+    libs/ogl_stereo_compositor.cpp
 
 CONFIG += c++11
 

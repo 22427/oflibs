@@ -1,191 +1,191 @@
 #if 0
 <begin_doc>
-The MIT License (MIT)
-================================================================================
-
-Copyright (c) 2016 Timon Zietlow
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//The MIT License (MIT)
+//================================================================================
+//
+//Copyright (c) 2016 Timon Zietlow
+//
+//Permission is hereby granted, free of charge, to any person obtaining a copy of
+//this software and associated documentation files (the "Software"), to deal in
+//the Software without restriction, including without limitation the rights to
+//use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+//the Software, and to permit persons to whom the Software is furnished to do so,
+//subject to the following conditions:
+//
+//The above copyright notice and this permission notice shall be included in all
+//copies or substantial portions of the Software.
+//
+//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+//FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+//COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+//IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+//CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 
-What is this?
-================================================================================
-The oflibs are a set of usefull classes and tools dealing with all kinds of 
-problems.  
-My personal focus is in 3D-visualisation and VR, so most of these deal with 
-these topics. OFLIBS stands for "**o**ne **f**ile **lib**rarie**s**". The basic 
-idea is to write libraries in a single file, which you just have to include into
-your project, and you are ready to go.
-I find these usefull for fast prototypes and "experimental" code, which is what 
-this collection currently is, so don't expect a well tested, woking toolset, but
-maybe you find the one or two lines of code you were searching ;).
-I'm constantly working whith these tools and I am shure they will get better 
-over time.
-
-Structure
---------------------------------------------------------------------------------
-In oflibs/ you find the finished one file libraries. They are ready to use. The 
-documentation to each library is also inside of the lib. Here is a short list of
-the different modules and libraries:
-
-- ofl_all: All oflibs in one 
-- ofl_ogl_geo - A class reperesenting vertex-data on the GPU
-- ofl_ogl_state - A state-wrapper imulating the "classic" OpenGL-fixed-function 
-  states, including matrix stacks and lighting.
-- ofl_ogl_win - An interface to create an OpenGL-Context with window and reading 
-  events. Currently implemented using glfw.
-- ofl_open_gl_tools: combines the above.
-- ofl_socket: A class wrapping sockets.
-- ofl_stru: Some string utilities. Used by many other oflibs.
-- ofl_track - Tracking: An interface to the ART-DTrack2 tracking system.
-- olf_vd - Vertex Data: A data structure representing geometry on the client 
-  side. This is OpenGL independend. 
-- ofl_vdman - Vertex Data MANufacturer: Allows you to create VertexData using
-  the old begin(..) ... end() paradigma from fixed-function-GL, but is OpenGL
-  independend.
-- ofl_vmath - Vector MATH : Some simple vector operations, but no alternative to 
-  GLM.
-- ofl_vrpv - Virtual Reality Projection and View - A module to genereate view-
-  and projection-matrices for VR systems like PowerWalls or CAVEs
-
-How do oflibs work?
---------------------------------------------------------------------------------
-You use the oflib as a regular header, for example:
-```c_cpp
+//What is this?
+//================================================================================
+//The oflibs are a set of usefull classes and tools dealing with all kinds of 
+//problems.  
+//My personal focus is in 3D-visualisation and VR, so most of these deal with 
+//these topics. OFLIBS stands for "**o**ne **f**ile **lib**rarie**s**". The basic 
+//idea is to write libraries in a single file, which you just have to include into
+//your project, and you are ready to go.
+//I find these usefull for fast prototypes and "experimental" code, which is what 
+//this collection currently is, so don't expect a well tested, woking toolset, but
+//maybe you find the one or two lines of code you were searching ;).
+//I'm constantly working whith these tools and I am shure they will get better 
+//over time.
+//
+//Structure
+//--------------------------------------------------------------------------------
+//In oflibs/ you find the finished one file libraries. They are ready to use. The 
+//documentation to each library is also inside of the lib. Here is a short list of
+//the different modules and libraries:
+//
+//- ofl_all: All oflibs in one 
+//- ofl_ogl_geo - A class reperesenting vertex-data on the GPU
+//- ofl_ogl_state - A state-wrapper imulating the "classic" OpenGL-fixed-function 
+//  states, including matrix stacks and lighting.
+//- ofl_ogl_win - An interface to create an OpenGL-Context with window and reading 
+//  events. Currently implemented using glfw.
+//- ofl_open_gl_tools: combines the above.
+//- ofl_socket: A class wrapping sockets.
+//- ofl_stru: Some string utilities. Used by many other oflibs.
+//- ofl_track - Tracking: An interface to the ART-DTrack2 tracking system.
+//- olf_vd - Vertex Data: A data structure representing geometry on the client 
+//  side. This is OpenGL independend. 
+//- ofl_vdman - Vertex Data MANufacturer: Allows you to create VertexData using
+//  the old begin(..) ... end() paradigma from fixed-function-GL, but is OpenGL
+//  independend.
+//- ofl_vmath - Vector MATH : Some simple vector operations, but no alternative to 
+//  GLM.
+//- ofl_vrpv - Virtual Reality Projection and View - A module to genereate view-
+//  and projection-matrices for VR systems like PowerWalls or CAVEs
+//
+//How do oflibs work?
+//--------------------------------------------------------------------------------
+//You use the oflib as a regular header, for example:
+//```c_cpp
 	#include <ofl_all.h>
-```
-Then in one .cpp-file of your project you include the oflib defining
-`OFL_IMPLEMENTATION` before:
-```c_cpp
-	#define OFL_IMPLEMENTATION
+//```
+//Then in one .cpp-file of your project you include the oflib defining
+//`OFL_IMPLEMENTATION` before:
+//```c_cpp
+//	#define OFL_IMPLEMENTATION
 	#include <ofl_all.h>
-	#undef OFL_IMPLEMENTATION
-```
-That's it :)
-
-Internally the oflib-header is organized in two parts, the declaration-part 
-(that's what you would write into an ordinary header) and the implementation-part 
-(that's what you would write into *.cpp files)
-Example:
-```c_cpp
-	#ifndef OFL_ALL_H
-	#define OFL_ALL_H
-		// ALL DECLARATIONS
-	#endif
-	#ifdef OFL_IMPLEMENTATION
-		// ALL THE IMPLEMENTATIONS
-	#endif
-```
-
-Where can I get more information?
---------------------------------------------------------------------------------
-Inside the oflib files there is the documentation for each module used. 
-In the subdirectory tools/ there are also some more or less simple tools using 
-the oflibs.
-
-
-
-
---------------------------------------------------------------------------------
-
-OGL_STATE: OpenGL State
-================================================================================
-This is a state tracking class, which also provides some stock shaders and
-functions.
-
-###State tracking:
-There is a matrix stack for modelview- and projection-matrix, and a state
-foreight light sources. Just like in OpenGL 1.x
-
-###Stock Shaders:
-There are shaders for texturing, phong shading and distance field alpha
-handling.
-
-Usage
---------------------------------------------------------------------------------
-
-You need to specify an OpenGL header in as OFL_GL_HEADER. for example:  
-
-```
-	#define OFL_GL_HEADER <glad/glad.h>  
-	#define OFL_GL_HEADER <glew.h>
-```
-
-This module also uses GLM ... sorry I was too lazy to implement all
-these functions, and its not feasible anyway.
-
-
-API
---------------------------------------------------------------------------------
-
-###Matrix-Stacks:
-There are two stacks. `PROJECITON` and `MODEL_VIEW`. You can change which is
-modified using the `matrixMode(...)` method.
-with `pushMatrix()` and `popMatrix()` you can either push a copy of the top-most
-matrix onto the stack or pop the top-most matrix from the stack.
-All other matrix modifying methods effect the top-most(current)
-matrix of the selected stack:  
-
-```
-void loadIdentity();//   sets the matrix as identity  
-void translate(..);//    translates the current matrix  
-void rotate(...);//      rotates the current matrix  
-void scale(...);//       scales the current matrix  
-void lookAt(...);//      multiplies the current matrix with a lookAt-matix  
-void ortho(...);//       multiplies the current matrix with an ortho-matix  
-void frustum(...);//     multiplies the current matrix with a frustum-matix  
-void perspective(...);// multiplies the current matrix with a persp.-matix  
-```
-###Lights:
-You can set Light parameters using the `setLight*(...)` methods.
-
-###Stock-shaders:
-You can select different stock shaders by calling `enable(...)` or `disable(...)`
-fordifferent features.
-The features are:
-
-* Texturing: Basic color mapping
-* Lighting: Basic per fragment lighting
-* DFAlpha: Iterpreting the Alpha channel as distance field.
-* NonStockShader: Use the set non stock shader. If this feature is
-enabled all uniforms and attributes will still be set, but your shader
-will be used.
-
+//	#undef OFL_IMPLEMENTATION
+//```
+//That's it :)
+//
+//Internally the oflib-header is organized in two parts, the declaration-part 
+//(that's what you would write into an ordinary header) and the implementation-part 
+//(that's what you would write into *.cpp files)
+//Example:
+//```c_cpp
+//	#ifndef OFL_ALL_H
+//	#define OFL_ALL_H
+//		// ALL DECLARATIONS
+//	#endif
+//	#ifdef OFL_IMPLEMENTATION
+//		// ALL THE IMPLEMENTATIONS
+//	#endif
+//```
+//
+//Where can I get more information?
+//--------------------------------------------------------------------------------
+//Inside the oflib files there is the documentation for each module used. 
+//In the subdirectory tools/ there are also some more or less simple tools using 
+//the oflibs.
+//
+//
+//
 
 --------------------------------------------------------------------------------
 
-VMATH : vector-maths
-================================================================================
-This is a set of classes containing the needed vector-math for the ofl tools.
-It is ment to be an backup data exchange format, if there is no GLM in your
-project.
-Note: Do not use this vector and matrix class. Use GLM or something else!
-GLM is also header only, and does - imho - a great job. These classes are
-only here, so you do not have to use GLM. There are two classes with a very
-limited set of methods: vec4 and mat4 a vector of 4 floats and a 4x4-matrix.
+//OGL_STATE: OpenGL State
+//================================================================================
+//This is a state tracking class, which also provides some stock shaders and
+//functions.
+//
+//###State tracking:
+//There is a matrix stack for modelview- and projection-matrix, and a state
+//foreight light sources. Just like in OpenGL 1.x
+//
+//###Stock Shaders:
+//There are shaders for texturing, phong shading and distance field alpha
+//handling.
+//
+//Usage
+//--------------------------------------------------------------------------------
+//
+//You need to specify an OpenGL header in as OFL_GL_HEADER. for example:  
+//
+//```
+//	#define OFL_GL_HEADER <glad/glad.h>  
+//	#define OFL_GL_HEADER <glew.h>
+//```
+//
+//This module also uses GLM ... sorry I was too lazy to implement all
+//these functions, and its not feasible anyway.
+//
+//
+//API
+//--------------------------------------------------------------------------------
+//
+//###Matrix-Stacks:
+//There are two stacks. `PROJECITON` and `MODEL_VIEW`. You can change which is
+//modified using the `matrixMode(...)` method.
+//with `pushMatrix()` and `popMatrix()` you can either push a copy of the top-most
+//matrix onto the stack or pop the top-most matrix from the stack.
+//All other matrix modifying methods effect the top-most(current)
+//matrix of the selected stack:  
+//
+//```
+//void loadIdentity();//   sets the matrix as identity  
+//void translate(..);//    translates the current matrix  
+//void rotate(...);//      rotates the current matrix  
+//void scale(...);//       scales the current matrix  
+//void lookAt(...);//      multiplies the current matrix with a lookAt-matix  
+//void ortho(...);//       multiplies the current matrix with an ortho-matix  
+//void frustum(...);//     multiplies the current matrix with a frustum-matix  
+//void perspective(...);// multiplies the current matrix with a persp.-matix  
+//```
+//###Lights:
+//You can set Light parameters using the `setLight*(...)` methods.
+//
+//###Stock-shaders:
+//You can select different stock shaders by calling `enable(...)` or `disable(...)`
+//fordifferent features.
+//The features are:
+//
+//* Texturing: Basic color mapping
+//* Lighting: Basic per fragment lighting
+//* DFAlpha: Iterpreting the Alpha channel as distance field.
+//* NonStockShader: Use the set non stock shader. If this feature is
+//enabled all uniforms and attributes will still be set, but your shader
+//will be used.
+//
 
-Usage
 --------------------------------------------------------------------------------
-As mentioned above you should not use these classes for anything but
-exchanging data with oflibs. To enshure, that GLM is used (if you use it in
-your project) include `<glm/glm.hpp>` before you include this file.
 
+//VMATH : vector-maths
+//================================================================================
+//This is a set of classes containing the needed vector-math for the ofl tools.
+//It is ment to be an backup data exchange format, if there is no GLM in your
+//project.
+//Note: Do not use this vector and matrix class. Use GLM or something else!
+//GLM is also header only, and does - imho - a great job. These classes are
+//only here, so you do not have to use GLM. There are two classes with a very
+//limited set of methods: vec4 and mat4 a vector of 4 floats and a 4x4-matrix.
+//
+//Usage
+//--------------------------------------------------------------------------------
+//As mentioned above you should not use these classes for anything but
+//exchanging data with oflibs. To enshure, that GLM is used (if you use it in
+//your project) include `<glm/glm.hpp>` before you include this file.
+//
 
 --------------------------------------------------------------------------------
 
@@ -984,6 +984,8 @@ protected:
 	void setLightSpotCutOff(int light, const float& co);
 	void setLightSpotExponent(int light, const float& ex);
 	void setLightAttenuationFactors(int lignt, const glm::vec4& att);
+
+	void useCurrentShader();
 };
 }
 
@@ -1450,6 +1452,13 @@ void StateSimulator::setLightAttenuationFactors(int light, const glm::vec4& att)
 	m_light[light].setAttenuationFactors(att);
 	setLightUniforms(m_light[light],light,m_current_program);
 	m_set_dirty_lights();
+}
+
+void StateSimulator::useCurrentShader()
+{
+
+	useShader(m_current_program);
+
 }
 }
 

@@ -453,4 +453,11 @@ void StateSimulator::setLightAttenuationFactors(int light, const glm::vec4& att)
 	setLightUniforms(m_light[light],light,m_current_program);
 	m_set_dirty_lights();
 }
+
+void StateSimulator::useCurrentShader()
+{
+
+	useShader(m_current_program);
+
+}
 }
