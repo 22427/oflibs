@@ -100,6 +100,7 @@ class Window
 
 public:
 	Window(WindowPreferences* /*wp*/){}
+	virtual ~Window(){};
 	virtual void swapBuffers() = 0;
 	virtual void enterRenderLoop() = 0;
 	virtual void setTitle(const std::string& title) = 0;
@@ -117,8 +118,8 @@ public:
 	virtual bool renderAFrame(double /*tslf_s*/)
 	{return true;}
 
-	virtual unsigned int getWidth() const = 0;
-	virtual unsigned int getHeight() const  = 0;
+	virtual int getWidth() const = 0;
+	virtual int getHeight() const  = 0;
 };
 
 #include <cstdio>
@@ -144,19 +145,19 @@ protected:
 			int action,
 			int mods)
 	{
-		Window_GLFW* app = (Window_GLFW*) glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventKey(key,action,mods,scancode);
 	}
 
 	static void charmods_callback(GLFWwindow* win, unsigned int c, int mods)
 	{
-		Window_GLFW* app=(Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventCharacter(c,mods);
 	}
 
 	static void cursor_position_callback(GLFWwindow* win, double xpos, double ypos)
 	{
-		Window_GLFW* app=(Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventMouseMove(xpos,ypos);
 	}
 	static void cursor_enter_callback(GLFWwindow* /*win*/, int /*entered*/)
@@ -169,30 +170,30 @@ protected:
 			int action,
 			int mods)
 	{
-		Window_GLFW* app= (Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventMouseButton(button,action,mods);
 	}
 
 	static void scroll_callback(GLFWwindow* win, double xoff, double yoff)
 	{
-		Window_GLFW* app= (Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventMouseScroll(xoff,yoff);
 	}
 
 
 	static void win_resize_callback(GLFWwindow * win, int w , int h)
 	{
-		Window_GLFW* app= (Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventWindowSize(w,h);
 	}
 	static void win_position_callback(GLFWwindow * win, int x , int y)
 	{
-		Window_GLFW* app= (Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventWindowPosition(x,y);
 	}
 	static void win_iconify_callback(GLFWwindow * win, int iconified)
 	{
-		Window_GLFW* app= (Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		if(iconified)
 			app->eventWindow(WIN_ICONIFY);
 		else
@@ -200,12 +201,12 @@ protected:
 	}
 	static void win_close_callback(GLFWwindow * win)
 	{
-		Window_GLFW* app= (Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventWindow(WIN_CLOSE);
 	}
 	static void win_focus_callback(GLFWwindow * win, int got_focus)
 	{
-		Window_GLFW* app = (Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		if(got_focus)
 			app->eventWindow(WIN_GOT_FOCUS);
 		else
@@ -325,7 +326,7 @@ public:
 		}
 	}
 
-	~Window_GLFW()
+	virtual ~Window_GLFW()
 	{
 		glfwDestroyWindow(m_window);
 		glfwTerminate();
@@ -375,21 +376,21 @@ public:
 		}
 	}
 
-	virtual unsigned int getWidth() const
+	virtual int getWidth() const
 	{
 		if(!m_window)
 			return 0;
 		int w;
 		glfwGetWindowSize(m_window,&w,nullptr);
-		return (unsigned int) w;
+		return  w;
 	}
-	virtual unsigned int getHeight() const
+	virtual int getHeight() const
 	{
 		if(!m_window)
 			return 0;
 		int h;
 		glfwGetWindowSize(m_window,nullptr,&h);
-		return (unsigned int) h;
+		return  h;
 	}
 };
 

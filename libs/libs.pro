@@ -11,7 +11,7 @@ oflibs.commands = mkdir -p ../oflibs &&  ./make_libs.sh ./libs ../oflibs
 
 stock_shaders.target = stock_shaders
 stock_shaders.commands =  mkdir -p ../bin/resources && ./libs/resources/make_shaders.sh ../bin/resources
-stock_sjaders.depends += oflibs
+stock_shaders.depends += oflibs
 
 QMAKE_EXTRA_TARGETS += first stock_shaders oflibs
 

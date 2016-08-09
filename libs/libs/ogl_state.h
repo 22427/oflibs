@@ -228,6 +228,7 @@ protected:
 	void pushMatrix();
 	void popMatrix();
 	void loadIdentity();
+	void loadMatrix(const glm::mat4& m);
 	void matrixMode(MatrixMode m);
 	void translate(float x, float y, float z);
 	void translate(const glm::vec3& v);

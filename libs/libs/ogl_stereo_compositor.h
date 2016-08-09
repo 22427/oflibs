@@ -8,6 +8,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include "vmath.h"
 namespace ofl
 {
 class StereoCompositor
@@ -24,7 +25,7 @@ public:
 		AnaglyphRedCyan=5,
 		AnaglyphYellowBlue=6,
 		QuadBuffered=7,
-		MODE_CONT = 8
+		MODE_COUNT = 8
 	};
 	enum Eye
 	{
@@ -40,10 +41,17 @@ public:
 	void setEye(const Eye eye);
 	void composite(GLuint left_right_texture_array);
 	
+	mat4 getAsymetricProjection(
+			Eye eye,
+			float eye_dist,
+			float fovy,
+			float near,
+			float far,
+			float focal_length);
 protected:
 	CompositingMode m_cmode;
-	unsigned int m_width;
-	unsigned int m_height;
+	int m_width;
+	int m_height;
 
 	bool m_wh_dirty;
 
@@ -52,7 +60,7 @@ protected:
 	GLint m_width_loc[3];
 	GLint m_height_loc[3];
 	
-	GLuint m_post_processing_shader[MODE_CONT];
+	GLuint m_post_processing_shader[MODE_COUNT];
 	void create_stencil_buffer();
 
 

@@ -1399,6 +1399,7 @@ protected:
 	void pushMatrix();
 	void popMatrix();
 	void loadIdentity();
+	void loadMatrix(const glm::mat4& m);
 	void matrixMode(MatrixMode m);
 	void translate(float x, float y, float z);
 	void translate(const glm::vec3& v);
@@ -1461,7 +1462,7 @@ public:
 		AnaglyphRedCyan=5,
 		AnaglyphYellowBlue=6,
 		QuadBuffered=7,
-		MODE_CONT = 8
+		MODE_COUNT = 8
 	};
 	enum Eye
 	{
@@ -1477,10 +1478,17 @@ public:
 	void setEye(const Eye eye);
 	void composite(GLuint left_right_texture_array);
 	
+	mat4 getAsymetricProjection(
+			Eye eye,
+			float eye_dist,
+			float fovy,
+			float near,
+			float far,
+			float focal_length);
 protected:
 	CompositingMode m_cmode;
-	unsigned int m_width;
-	unsigned int m_height;
+	int m_width;
+	int m_height;
 
 	bool m_wh_dirty;
 
@@ -1489,7 +1497,7 @@ protected:
 	GLint m_width_loc[3];
 	GLint m_height_loc[3];
 	
-	GLuint m_post_processing_shader[MODE_CONT];
+	GLuint m_post_processing_shader[MODE_COUNT];
 	void create_stencil_buffer();
 
 
@@ -1601,6 +1609,7 @@ class Window
 
 public:
 	Window(WindowPreferences* /*wp*/){}
+	virtual ~Window(){};
 	virtual void swapBuffers() = 0;
 	virtual void enterRenderLoop() = 0;
 	virtual void setTitle(const std::string& title) = 0;
@@ -1618,8 +1627,8 @@ public:
 	virtual bool renderAFrame(double /*tslf_s*/)
 	{return true;}
 
-	virtual unsigned int getWidth() const = 0;
-	virtual unsigned int getHeight() const  = 0;
+	virtual int getWidth() const = 0;
+	virtual int getHeight() const  = 0;
 };
 
 #include <cstdio>
@@ -1645,19 +1654,19 @@ protected:
 			int action,
 			int mods)
 	{
-		Window_GLFW* app = (Window_GLFW*) glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventKey(key,action,mods,scancode);
 	}
 
 	static void charmods_callback(GLFWwindow* win, unsigned int c, int mods)
 	{
-		Window_GLFW* app=(Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventCharacter(c,mods);
 	}
 
 	static void cursor_position_callback(GLFWwindow* win, double xpos, double ypos)
 	{
-		Window_GLFW* app=(Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventMouseMove(xpos,ypos);
 	}
 	static void cursor_enter_callback(GLFWwindow* /*win*/, int /*entered*/)
@@ -1670,30 +1679,30 @@ protected:
 			int action,
 			int mods)
 	{
-		Window_GLFW* app= (Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventMouseButton(button,action,mods);
 	}
 
 	static void scroll_callback(GLFWwindow* win, double xoff, double yoff)
 	{
-		Window_GLFW* app= (Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventMouseScroll(xoff,yoff);
 	}
 
 
 	static void win_resize_callback(GLFWwindow * win, int w , int h)
 	{
-		Window_GLFW* app= (Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventWindowSize(w,h);
 	}
 	static void win_position_callback(GLFWwindow * win, int x , int y)
 	{
-		Window_GLFW* app= (Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventWindowPosition(x,y);
 	}
 	static void win_iconify_callback(GLFWwindow * win, int iconified)
 	{
-		Window_GLFW* app= (Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		if(iconified)
 			app->eventWindow(WIN_ICONIFY);
 		else
@@ -1701,12 +1710,12 @@ protected:
 	}
 	static void win_close_callback(GLFWwindow * win)
 	{
-		Window_GLFW* app= (Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		app->eventWindow(WIN_CLOSE);
 	}
 	static void win_focus_callback(GLFWwindow * win, int got_focus)
 	{
-		Window_GLFW* app = (Window_GLFW*)glfwGetWindowUserPointer(win);
+		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
 		if(got_focus)
 			app->eventWindow(WIN_GOT_FOCUS);
 		else
@@ -1826,7 +1835,7 @@ public:
 		}
 	}
 
-	~Window_GLFW()
+	virtual ~Window_GLFW()
 	{
 		glfwDestroyWindow(m_window);
 		glfwTerminate();
@@ -1876,21 +1885,21 @@ public:
 		}
 	}
 
-	virtual unsigned int getWidth() const
+	virtual int getWidth() const
 	{
 		if(!m_window)
 			return 0;
 		int w;
 		glfwGetWindowSize(m_window,&w,nullptr);
-		return (unsigned int) w;
+		return  w;
 	}
-	virtual unsigned int getHeight() const
+	virtual int getHeight() const
 	{
 		if(!m_window)
 			return 0;
 		int h;
 		glfwGetWindowSize(m_window,nullptr,&h);
-		return (unsigned int) h;
+		return  h;
 	}
 };
 
@@ -2628,6 +2637,14 @@ void StateSimulator::loadIdentity()
 	m_upload_matrix();
 	m_set_dirty_mats();
 }
+
+void StateSimulator::loadMatrix(const mat4 &m)
+{
+	m_matrix[m_matrixMode].top() = m;
+	m_upload_matrix();
+	m_set_dirty_mats();
+}
+
 void StateSimulator::matrixMode(MatrixMode m)
 {
 	m_matrixMode = m;
@@ -2904,38 +2921,71 @@ void ofl::StereoCompositor::resize(const int width, const int height)
 
 void ofl::StereoCompositor::setCompositingMode(ofl::StereoCompositor::CompositingMode cm)
 {
+	switch (m_cmode)
+	{
+	case SideBySide:
+	case BottomTop:
+		glViewport(0,0,m_width,m_height);
+		break;
+	case VerticalInterlace:
+	case HorizontalInterlace:
+	case CheckerboardInterlace:
+		glDisable(GL_STENCIL_TEST);
+		break;
+	case QuadBuffered:
+		glDrawBuffer(GL_BACK);
+		break;
+	case AnaglyphRedCyan:
+	case AnaglyphYellowBlue:
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		break;
+	case MODE_COUNT:break;
+	}
 	m_cmode = cm;
+
+	switch (m_cmode)
+	{
+		case VerticalInterlace:
+		case HorizontalInterlace:
+		case CheckerboardInterlace:
+		glEnable(GL_STENCIL_TEST);
+		break;
+	default:break;
+	}
 	m_wh_dirty = true;
 }
 
 ofl::StereoCompositor::StereoCompositor(const ofl::StereoCompositor::CompositingMode mode)
-	:m_cmode(mode), m_width(0), m_height(0), m_wh_dirty(true)
+	:m_cmode(MODE_COUNT), m_width(0), m_height(0), m_wh_dirty(true)
 {
-	glEnable(GL_STENCIL_TEST);
+	setCompositingMode(mode);
+
 	const char* fragment_shader =
 			"#version 330\n"
 			"out vec4 clr; "
 			"void main()"
 			"{clr = vec4(1);}";
-	int len = strlen(fragment_shader);
+	int len = static_cast<int>(strlen(fragment_shader));
 	const char* codes[] = {
 
 		"#version 330\n"
 		"uniform int width; uniform int height;\n"
 		"void main()\n"
 		"{\n"
-		"	float num = 2*(gl_VertexID%2)-1;\n"
-		"	float w = 2*float((gl_VertexID/2)*2)/width-1;\n"
-		"	gl_Position = vec4(w,num,0,1);\n"
-		"}",
-
+		"float ow = 0.5/float(width);"
+		"	float num = 2*float(gl_VertexID%2)-1;\n"
+		"	float h = 2*float((gl_VertexID/2)*2)/width-1;\n"
+		"	gl_Position = vec4(ow+h,num,0,1);\n"
+		"}\n"
+		,
 		"#version 330\n"
 		"uniform int width; uniform int height;\n"
 		"void main()\n"
 		"{\n"
+		" float oh = 0.5/float(height);"
 		"	float num = 2*float(gl_VertexID%2)-1;\n"
 		"	float h = 2*float((gl_VertexID/2)*2)/height-1;\n"
-		"	gl_Position = vec4(num,h,0,1);\n"
+		"	gl_Position = vec4(num,h+oh,0,1);\n"
 		"}\n"
 		,
 		"#version 330\n"
@@ -2956,7 +3006,7 @@ ofl::StereoCompositor::StereoCompositor(const ofl::StereoCompositor::Compositing
 	{
 		m_stencil_shader[i] =glCreateProgram();
 		vs = glCreateShader(GL_VERTEX_SHADER);
-		len = strlen(codes[i]);
+		len = static_cast<int>(strlen(codes[i]));
 		glShaderSource(vs,1,&codes[i],&len);
 		glCompileShader(vs);
 		GLint compiled;
@@ -2970,10 +3020,10 @@ ofl::StereoCompositor::StereoCompositor(const ofl::StereoCompositor::Compositing
 			glGetShaderiv(vs, GL_INFO_LOG_LENGTH , &blen);
 			if (blen > 1)
 			{
-				GLchar* compiler_log = (GLchar*)malloc(blen);
-				glGetShaderInfoLog(vs, blen, &slen, compiler_log);
-				printf("compiler_log: %s\n", compiler_log);
-				free (compiler_log);
+				GLchar* log = new GLchar[blen];
+				glGetShaderInfoLog(vs, blen, &slen, log);
+				printf("stencil shader log:\n%s\n", log);
+				delete[] log;
 			}
 		}
 
@@ -2993,12 +3043,12 @@ ofl::StereoCompositor::StereoCompositor(const ofl::StereoCompositor::Compositing
 			"{\n"
 			"	tex_coord.x = float(gl_VertexID%2);\n"
 			"	tex_coord.y = float(gl_VertexID>>1);\n"
-			"	gl_Position = vec4(tex_coord,0,1);\n"
+			"	gl_Position = vec4(tex_coord*2-vec2(1,1),0,1);\n"
 
 			"}\n";
 
 	vs = glCreateShader(GL_VERTEX_SHADER);
-	len = strlen(pp_vs_code);
+	len = static_cast<int>(strlen(pp_vs_code));
 	glShaderSource(vs,1,&pp_vs_code,&len);
 	glCompileShader(vs);
 
@@ -3101,11 +3151,11 @@ ofl::StereoCompositor::StereoCompositor(const ofl::StereoCompositor::Compositing
 		"}"
 	};
 
-	for(int i =0 ; i < MODE_CONT ;i++)
+	for(int i =0 ; i < MODE_COUNT ;i++)
 	{
 		m_post_processing_shader[i] =glCreateProgram();
 		fs = glCreateShader(GL_FRAGMENT_SHADER);
-		len = strlen(pp_codes[i]);
+		len = static_cast<int>(strlen(pp_codes[i]));
 		glShaderSource(fs,1,&pp_codes[i],&len);
 		glCompileShader(fs);
 		GLint compiled;
@@ -3119,10 +3169,10 @@ ofl::StereoCompositor::StereoCompositor(const ofl::StereoCompositor::Compositing
 			glGetShaderiv(fs, GL_INFO_LOG_LENGTH , &blen);
 			if (blen > 1)
 			{
-				GLchar* compiler_log = (GLchar*)malloc(blen);
-				glGetShaderInfoLog(fs, blen, &slen, compiler_log);
-				printf("compiler_log: %s\n", compiler_log);
-				free (compiler_log);
+				GLchar* log = new GLchar[blen];
+				glGetShaderInfoLog(vs, blen, &slen, log);
+				printf("pp shader log:\n%s\n", log);
+				delete[] log;
 			}
 		}
 
@@ -3153,28 +3203,30 @@ void ofl::StereoCompositor::setEye(const ofl::StereoCompositor::Eye eye)
 		if(m_wh_dirty)
 			create_stencil_buffer();
 		glStencilFunc(GL_EQUAL, eye, 0xFF);
-
 		break;
 	case QuadBuffered:
 		glDrawBuffer(GL_BACK_LEFT+ eye);
-
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		break;
 	case AnaglyphRedCyan:
 		if(eye==Left)
 			glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
 		else
 			glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_FALSE);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		break;
 	case AnaglyphYellowBlue:
 		if(eye==Left)
 			glColorMask(GL_TRUE, GL_TRUE, GL_FALSE, GL_FALSE);
 		else
 			glColorMask(GL_FALSE, GL_FALSE, GL_TRUE, GL_FALSE);
-
-	default:
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		break;
+	case MODE_COUNT:break;
+
 
 	}
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 }
 
 void ofl::StereoCompositor::composite(GLuint left_right_texture_array)
@@ -3190,15 +3242,33 @@ void ofl::StereoCompositor::composite(GLuint left_right_texture_array)
 	glDrawArrays(GL_TRIANGLE_STRIP,0,4);
 }
 
+mat4 ofl::StereoCompositor::getAsymetricProjection(
+		ofl::StereoCompositor::Eye eye,
+		float eye_dist,
+		float fovy,
+		float near,
+		float far,
+		float focal_length)
+{
+	float ar = static_cast<float>(m_width)/m_height;
+	float top = near * tanf(fovy/ 2.0f);
+	float bottom = -top;
+	float eye_sep = eye_dist * (static_cast<float>(eye)*2.0f-1.0f);
+	float delta = 0.5f * eye_sep * near / focal_length;
+	float left = -ar * top - delta;
+	float right = ar * top - delta;
+	return frustum(left,right,bottom,top,near,far);
+}
+
 void ofl::StereoCompositor::create_stencil_buffer()
 {	
-	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	//glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 	glDepthMask(GL_FALSE);
 	glStencilFunc(GL_NEVER, 1, 0xFF);
 	glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
 
 	glStencilMask(0xFF);
-	glClear(GL_STENCIL_BUFFER_BIT);
+	glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glUseProgram(m_stencil_shader[m_cmode]);
 	if(m_wh_dirty)

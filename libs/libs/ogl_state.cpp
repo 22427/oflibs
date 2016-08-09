@@ -246,6 +246,14 @@ void StateSimulator::loadIdentity()
 	m_upload_matrix();
 	m_set_dirty_mats();
 }
+
+void StateSimulator::loadMatrix(const mat4 &m)
+{
+	m_matrix[m_matrixMode].top() = m;
+	m_upload_matrix();
+	m_set_dirty_mats();
+}
+
 void StateSimulator::matrixMode(MatrixMode m)
 {
 	m_matrixMode = m;

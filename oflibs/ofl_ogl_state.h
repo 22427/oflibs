@@ -956,6 +956,7 @@ protected:
 	void pushMatrix();
 	void popMatrix();
 	void loadIdentity();
+	void loadMatrix(const glm::mat4& m);
 	void matrixMode(MatrixMode m);
 	void translate(float x, float y, float z);
 	void translate(const glm::vec3& v);
@@ -1247,6 +1248,14 @@ void StateSimulator::loadIdentity()
 	m_upload_matrix();
 	m_set_dirty_mats();
 }
+
+void StateSimulator::loadMatrix(const mat4 &m)
+{
+	m_matrix[m_matrixMode].top() = m;
+	m_upload_matrix();
+	m_set_dirty_mats();
+}
+
 void StateSimulator::matrixMode(MatrixMode m)
 {
 	m_matrixMode = m;
