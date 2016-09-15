@@ -117,11 +117,11 @@
 //API
 //--------------------------------------------------------------------------------
 //
-//###Nodes
+//###Node
 //A Node is an Object, that processes data. Nodes are connected via Joints. A pair
 //of Joints represents a queue/dequeue interaface. Each node works assyncronous.
 //
-//####Transformer
+//####TransformNode
 //A Transformer is like a Source and a Sink glued together. On one side
 //It is a sink for items of type A (left) and on the other side it is a Source of
 //items of type B. So a Transformer would, for example, read Images on the left
@@ -441,7 +441,7 @@ public:
 		B->setOutput(A);
 	}
 
-	void start()
+	virtual void start()
 	{
 		if(!m_running.test_and_set())
 		{
@@ -450,7 +450,7 @@ public:
 				m_out->start();
 		}
 	}
-	void stop(){m_running.clear();}
+	virtual void stop(){m_running.clear();}
 };
 
 
@@ -501,7 +501,7 @@ public:
  * @brief The Node class is something, that has a Joint, and will work on
  * the data, then give it to the Joints output.
  */
-template <typename T>
+template <typename T,class J = QueuedJoint<T>>
 class Node
 {
 
@@ -509,7 +509,7 @@ protected:
 	/**
 	* @brief The Processor has only one joint.
 	*/
-	QueuedJoint<T> m_joint;
+	J m_joint;
 
 	std::thread m_thread;
 	std::atomic_flag m_in_loop;

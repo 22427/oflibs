@@ -88,7 +88,7 @@ public:
 		B->setOutput(A);
 	}
 
-	void start()
+	virtual void start()
 	{
 		if(!m_running.test_and_set())
 		{
@@ -97,7 +97,7 @@ public:
 				m_out->start();
 		}
 	}
-	void stop(){m_running.clear();}
+	virtual void stop(){m_running.clear();}
 };
 
 
@@ -148,7 +148,7 @@ public:
  * @brief The Node class is something, that has a Joint, and will work on
  * the data, then give it to the Joints output.
  */
-template <typename T>
+template <typename T,class J = QueuedJoint<T>>
 class Node
 {
 
@@ -156,7 +156,7 @@ protected:
 	/**
 	* @brief The Processor has only one joint.
 	*/
-	QueuedJoint<T> m_joint;
+	J m_joint;
 
 	std::thread m_thread;
 	std::atomic_flag m_in_loop;

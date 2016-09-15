@@ -104,9 +104,6 @@ int main(int , char** )
 	s.getRight()->insert(flt);
 
 	src.start();
-//	plt.start();
-//	s.start();
-//	fplt.start();
 
 	src.join();
 	plt.join();
