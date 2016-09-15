@@ -25,7 +25,8 @@ DISTFILES += \
     libs/vmath.md \
     libs/vrpv.md \
     libs/vd.md \
-    libs/ogl_win.md
+    libs/ogl_win.md \
+    libs/processing_graph.md
 
 HEADERS += \
     libs/all.h \
@@ -41,7 +42,9 @@ HEADERS += \
     libs/vmath.h \
     libs/vrpv.h \
     libs/vr_tools.h \
-    libs/ogl_stereo_compositor.h
+    libs/ogl_stereo_compositor.h \
+    libs/sem_queue.h \
+    libs/processing_graph.h
 
 SOURCES += \
     libs/ogl_geo.cpp \
