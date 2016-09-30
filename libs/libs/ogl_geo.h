@@ -34,6 +34,7 @@ protected:
 	GLuint m_ibo;
 	GLuint m_primitive;
 	GLsizei m_vertice_count;
+	GLenum m_index_type;
 
 public:
 	/**
@@ -79,12 +80,12 @@ public:
 			{
 				glPatchParameteri(GL_PATCH_VERTICES, patchsize);
 				glDrawElements(GL_PATCHES, m_vertice_count,
-							   GL_UNSIGNED_INT, nullptr);
+							   m_index_type, nullptr);
 			}
 			else
 			{
 				glDrawElements(m_primitive, m_vertice_count,
-							   GL_UNSIGNED_INT, nullptr);
+							   m_index_type, nullptr);
 			}
 		}
 		else
@@ -97,7 +98,7 @@ public:
 			const ofl::Vertex v;
 
 
-#define addr_diff(a,b) ((void*)((char*)a-(char*) b))
+#define addr_diff(a,b) (reinterpret_cast<void*>(reinterpret_cast<const char*>(a)-reinterpret_cast<const char*>(b)))
 		glVertexAttribPointer(ALOC_POSITION, 3, GL_FLOAT, GL_FALSE,
 							  vertex_size, addr_diff(&(v.pos()),&v));
 		glEnableVertexAttribArray(ALOC_POSITION);
@@ -121,7 +122,7 @@ public:
 			glDrawElements(
 						m_primitive,
 						m_vertice_count,
-						GL_UNSIGNED_INT,
+						m_index_type,
 						nullptr);
 		}
 	}

@@ -1,5 +1,5 @@
 #include "ogl_geo.h"
-
+#include <climits>
 namespace ofl
 {
 
@@ -34,14 +34,39 @@ void Geometry::uploadData(VertexData *vd)
 
 	const size_t vertex_size = sizeof(Vertex);
 
+
+
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, vd->indices().size() *
-				 sizeof(unsigned int), vd->indices().data(), GL_STATIC_DRAW);
+	if(vd->indices().size() < USHRT_MAX)
+	{
+		m_index_type = GL_UNSIGNED_SHORT;
+
+		std::vector<GLushort> sid;
+		sid.reserve(vd->indices().size());
+		for(const uint32_t& i: vd->indices())
+		{
+			sid.push_back(static_cast<GLushort>(i));
+		}
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+			static_cast<GLsizeiptr>(sizeof(GLushort)*sid.size()),
+			sid.data(), GL_STATIC_DRAW);
+	}
+	else
+	{
+		m_index_type = GL_UNSIGNED_INT;
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+			static_cast<GLsizeiptr>(sizeof(GLuint)*vd->indices().size()),
+			vd->indices().data(), GL_STATIC_DRAW);
+	}
+
+
+
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
 	glBufferData(GL_ARRAY_BUFFER,
-				 vertex_size* vd->data().size(),
+				 static_cast<GLsizeiptr>(vertex_size* vd->data().size()),
 				 vd->data().data(),
 				 GL_STATIC_DRAW);
 
@@ -51,7 +76,7 @@ void Geometry::uploadData(VertexData *vd)
 
 	if (m_vao)
 	{
-#define addr_diff(a,b) ((void*)((char*)a-(char*) b))
+#define addr_diff(a,b) (reinterpret_cast<void*>(reinterpret_cast<const char*>(a)-reinterpret_cast<const char*>(b)))
 		glVertexAttribPointer(ALOC_POSITION, 3, GL_FLOAT, GL_FALSE,
 							  vertex_size, addr_diff(&(v.pos()),&v));
 		glEnableVertexAttribArray(ALOC_POSITION);
@@ -75,7 +100,7 @@ void Geometry::uploadData(VertexData *vd)
 	}
 
 	m_primitive = vd->primitive();
-	m_vertice_count = vd->indices().size();
+	m_vertice_count =  static_cast<GLsizei>(vd->indices().size());
 }
 
 Geometry::~Geometry()

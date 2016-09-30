@@ -10,10 +10,12 @@
 using namespace ofl;
 using namespace ofl;
 
-class MeshViewer : public ofl::VertexDataTools, public ofl::Window_GLFW, public ofl::StateSimulator
+class MeshViewer :
+		public ofl::VertexDataTools,
+		public ofl::Window_GLFW,
+		public ofl::StateSimulator
 {
 	bool render_on;
-	ShaderWrap* render_sw;
 	Geometry* to_show;
 	float to_show_angle;
 	unsigned int fno;
@@ -28,11 +30,14 @@ public:
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-		glClearColor(0.25,0.225,0.2,1);
+		glClearColor(0.25f,0.225f,0.2f,1.0f);
 
 		matrixMode(PROJECTION);
 		loadIdentity();
-		perspective(45,(float)getWidth()/(float)getHeight(),0.001,10);
+		perspective(45.0f,
+					static_cast<float>(getWidth())/
+					static_cast<float>(getHeight()),
+					0.001f,10.0f);
 		enable(Lighting);
 		cam_pos = vec3(0,0.5,3);
 		matrixMode(MODELVIEW);
@@ -74,8 +79,8 @@ public:
 
 		origin = (bb_min+bb_max)*0.5f;
 		origin.y = bb_min.y;
-#define fmax(x,y) std::max(fabs(x),fabs(y))
-		scaling =  1.0/(fmax(
+#define fmax(x,y) (x>y? x:y)
+		scaling =  1.0f/(fmax(
 					fmax(fmax(bb_min.x,bb_min.y),fmax(bb_max.x,bb_max.y)),
 					fmax(bb_max.z,bb_min.z)));
 #undef fmax
@@ -85,13 +90,9 @@ public:
 	}
 
 
-	virtual void eventWindow(int event)
-	{
-		if(event == WIN_CLOSE)
-			render_on = false;
-	}
+	virtual void eventWindow(int event);
 
-	virtual bool renderAFrame(double tslf_s)
+	bool renderAFrame(double tslf_s)
 	{
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -109,7 +110,7 @@ public:
 		return render_on;
 
 	}
-	virtual void eventCharacter(unsigned int c, int )
+	void eventCharacter(unsigned int c, int )
 	{
 		if(c == 'q')
 			render_on = false;
@@ -134,7 +135,7 @@ public:
 		else if(c == 'W')
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
-	virtual void eventMouseScroll(double /*x*/, double y)
+	void eventMouseScroll(double /*x*/, double y)
 	{
 		matrixMode(MODELVIEW);
 		loadIdentity();
@@ -145,12 +146,14 @@ public:
 		cam_pos = cam_dir*len;
 		lookAt(cam_pos.x,cam_pos.y,cam_pos.z,0,0.5,0,0,1,0);
 	}
-	virtual void eventWindowSize(int w, int h)
+	void eventWindowSize(int w, int h)
 	{
 		glViewport(0,0,w,h);
 		this->matrixMode(PROJECTION);
 		loadIdentity();
-		perspective(45,(float)w/(float)h,0.01,100);
+
+		perspective(45.0f,static_cast<float>(w)/static_cast<float>(h),0.001f,10.0f);
+
 
 	}
 };
@@ -169,3 +172,9 @@ int main(int argc, char** argv)
 
 #define OFL_IMPLEMENTATION
 #include <ofl_open_gl_tools.h>
+
+void MeshViewer::eventWindow(int event)
+{
+	if(event == WIN_CLOSE)
+		render_on = false;
+}
