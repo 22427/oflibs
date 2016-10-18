@@ -644,7 +644,9 @@ public:
 	TransformNode() :
 		m_left([this](){this->start();m_right.start();}),
 		m_right([this](){m_left.start();})
-	{}
+	{
+		m_in_loop.clear();
+	}
 	virtual ~TransformNode(){}
 
 	virtual Joint<T>* getLeft(){return &m_left;}
@@ -652,7 +654,10 @@ public:
 
 	virtual void start()
 	{
-		m_thread = new std::thread(&TransformNode::m_loop,this);
+		if(!m_in_loop.test_and_set())
+		{
+			m_thread = new std::thread(&TransformNode::m_loop,this);
+		}
 	}
 
 	virtual void join()

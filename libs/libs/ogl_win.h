@@ -100,8 +100,9 @@ class Window
 
 public:
 	Window(WindowPreferences* /*wp*/){}
-	virtual ~Window(){};
+	virtual ~Window();
 	virtual void swapBuffers() = 0;
+	virtual void makeCurrent() = 0;
 	virtual void enterRenderLoop() = 0;
 	virtual void setTitle(const std::string& title) = 0;
 	virtual void setFullscreen(bool fs) = 0;
@@ -121,6 +122,8 @@ public:
 	virtual int getWidth() const = 0;
 	virtual int getHeight() const  = 0;
 };
+Window::~Window(){}
+
 
 #include <cstdio>
 #include <glad/glad.h>
@@ -319,24 +322,23 @@ public:
 			glfwSetWindowIconifyCallback(m_window,win_iconify_callback);
 			glfwSetWindowSizeCallback(m_window, win_resize_callback);
 
-			if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
+			if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
 			{
 				printf("Failed to initialize OpenGL context\n");
 			}
 		}
 	}
 
-	virtual ~Window_GLFW()
-	{
-		glfwDestroyWindow(m_window);
-		glfwTerminate();
-	}
+	virtual ~Window_GLFW();
 
 	virtual void swapBuffers()
 	{
 		glfwSwapBuffers(m_window);
 	}
-
+	virtual void makeCurrent()
+	{
+		glfwMakeContextCurrent(m_window);
+	}
 	virtual void enterRenderLoop()
 	{
 		bool contin = true;
@@ -393,5 +395,12 @@ public:
 		return  h;
 	}
 };
+
+Window_GLFW::~Window_GLFW()
+{
+	glfwDestroyWindow(m_window);
+	glfwTerminate();
+}
+
 
 }

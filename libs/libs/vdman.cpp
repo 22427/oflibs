@@ -156,7 +156,7 @@ void VertexDataManufacturer::vertex(const vec4& vertex)
 {
 	const vec3  vert = vec3(vertex.x,vertex.y,vertex.z);
 	Vertex v(vert, m_normal_state, m_color_state, tex_coord_state);
-	uint32_t id = 0;
+	uint id = 0;
 
 	if (this->vertex_ids.find(v) != vertex_ids.end())
 	{
@@ -164,7 +164,7 @@ void VertexDataManufacturer::vertex(const vec4& vertex)
 	}
 	else
 	{
-		id = this->current_mesh->data().size();
+		id = static_cast<uint>(this->current_mesh->data().size());
 		this->current_mesh->push_back(v);
 		vertex_ids[v] = id;
 	}
@@ -187,7 +187,7 @@ void VertexDataManufacturer::vertex(const Vertex& vertex)
 	}
 	else
 	{
-		id = current_mesh->data().size();
+		id = static_cast<uint>(current_mesh->data().size());
 		current_mesh->push_back(v);
 		vertex_ids[v] = id;
 	}
@@ -236,33 +236,33 @@ VertexData* VertexDataManufacturer::createBox(
 
 	vec3 n(0, 0, 1);
 	this->addQuad(a, b, d, c,
-				  vec2(0.4, 0.0),vec2(0.7,0.0), vec2(0.7,0.3), vec2(0.4,0.3),
-				  n,n,n,n);
+		vec2(0.4f, 0.0f),vec2(0.7f,0.0f), vec2(0.7f,0.3f), vec2(0.4f,0.3f),
+				n, n, n, n);
 
 	n = vec3(1, 0, 0);
 	this->addQuad(b, f, h, d,
-				  vec2(1.0, 0.3),vec2(1.0, 0.6), vec2(0.7, 0.6), vec2(0.7, 0.3),
-				  n, n, n, n);
+		vec2(1.0f, 0.3f),vec2(1.0f, 0.6f), vec2(0.7f, 0.6f), vec2(0.7f, 0.3f),
+				n, n, n, n);
 
 	n = vec3(0, 0, -1);
 	this->addQuad(f, e, g, h,
-				  vec2(0.7, 0.9),vec2(0.4, 0.9), vec2(0.4, 0.6), vec2(0.7, 0.6),
-				  n, n, n, n);
+		vec2(0.7f, 0.9f),vec2(0.4f, 0.9f), vec2(0.4f, 0.6f), vec2(0.7f, 0.6f),
+				n, n, n, n);
 
 	n = vec3(-1, 0, 0);
 	this->addQuad(e, a, c, g,
-				  vec2(0.1, 0.6),vec2(0.1, 0.3), vec2(0.4, 0.3), vec2(0.4, 0.6),
-				  n, n, n, n);
+		vec2(0.1f, 0.6f),vec2(0.1f, 0.3f), vec2(0.4f, 0.3f), vec2(0.4f, 0.6f),
+				n, n, n, n);
 
 	n = vec3(0, 1, 0);
 	this->addQuad(c, d, h, g,
-				  vec2(0.4, 0.3),vec2(0.7, 0.3), vec2(0.7, 0.6), vec2(0.4, 0.6),
-				  n, n, n, n);
+		vec2(0.4f, 0.3f),vec2(0.7f, 0.3f), vec2(0.7f, 0.6f), vec2(0.4f, 0.6f),
+				n, n, n, n);
 
 	n = vec3(0, -1, 0);
 	this->addQuad(a, b, f, e,
-				  vec2(0.0, 0.7),vec2(0.3, 0.7), vec2(0.3, 1.0), vec2(0.0, 1.0),
-				  n, n, n, n);
+		 vec2(0.0f, 0.7f),vec2(0.3f, 0.7f), vec2(0.3f, 1.0f), vec2(0.0f, 1.0f),
+				n, n, n, n);
 
 	auto res = this->finish();
 	this->calculateTangents(res);
@@ -293,10 +293,14 @@ VertexData* VertexDataManufacturer::createPlane(
 						vec3((x + 1)*d_w, (y + 0)*d_h, 0) + offset,
 						vec3((x + 1)*d_w, (y + 1)*d_h, 0) + offset,
 						vec3((x + 0)*d_w, (y + 1)*d_h, 0) + offset,
-						vec2((float)(x + 0) / tess_w, (float)(y + 0) / tess_h),
-						vec2((float)(x + 1) / tess_w, (float)(y + 0) / tess_h),
-						vec2((float)(x + 1) / tess_w, (float)(y + 1) / tess_h),
-						vec2((float)(x + 0) / tess_w, (float)(y + 1) / tess_h));
+						vec2(static_cast<float>(x + 0) / tess_w,
+							 static_cast<float>(y + 0) / tess_h),
+						vec2(static_cast<float>(x + 1) / tess_w,
+							 static_cast<float>(y + 0) / tess_h),
+						vec2(static_cast<float>(x + 1) / tess_w,
+							 static_cast<float>(y + 1) / tess_h),
+						vec2(static_cast<float>(x + 0) / tess_w,
+							 static_cast<float>(y + 1) / tess_h));
 		}
 	}
 
@@ -395,7 +399,7 @@ VertexData* VertexDataManufacturer::createUVSphere(
 
 			float tex_offset = 0.0f;
 			if (st >= stacks / 2u)
-				tex_offset = M_SQRT2*0.5f;
+				tex_offset = static_cast<float>(M_SQRT2)*0.5f;
 
 
 			/*Compute positions and texCoords for the current quad:*/
@@ -409,7 +413,7 @@ VertexData* VertexDataManufacturer::createUVSphere(
 			for (int i = 0; i < 4;i++)
 				uv[i] = colorTexCoordFramPosition(pos[i], tex_offset);
 
-			/* Draw a quad unless you are about do draw the last and the firrst
+			/* Draw a quad unless you are about do draw the last and the first
 			   stack.
 			*/
 			if (st != 0 && st< stacks - 1)
@@ -559,10 +563,10 @@ VertexData* VertexDataManufacturer::createCone(
 		float rlow = baseRadius + st*radius_step;
 		float rhigh = baseRadius + (st + 1)*radius_step;
 
-		float uv_r_low = ((1.0f) - ((float)st / stacks));
+		float uv_r_low = ((1.0f) - (static_cast<float>(st) / stacks));
 		uv_r_low = (0.5f - inner_radius) * uv_r_low + inner_radius;
 
-		float uv_r_high = ((1.0f) - ((1.0f + (float)st) / stacks));
+		float uv_r_high = ((1.0f) - ((1.0f + static_cast<float>(st)) / stacks));
 		uv_r_high = (0.5f - inner_radius) * uv_r_high + inner_radius;;
 
 		for (unsigned int i = 0; i < slices; i++) // slices
@@ -635,8 +639,8 @@ VertexData* VertexDataManufacturer::createDisk(
 
 			for (int i = 0; i < 4; i++)
 			{
-				uv[i] = vec2(pos[i].x / (2 * outerRadius) + 0.5,
-							 pos[i].y / (2 * outerRadius) + 0.5);
+				uv[i] = vec2(pos[i].x / (2.0f * outerRadius) + 0.5f,
+							 pos[i].y / (2.0f * outerRadius) + 0.5f);
 			}
 
 			if (st != 0)

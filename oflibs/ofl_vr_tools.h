@@ -242,7 +242,7 @@ namespace ofl
  */
 class Socket
 {
-
+	struct addrinfo * a_info;
 #ifdef _WIN32
 	SOCKET sock_handle;
 	static bool wsa_setup;
@@ -272,8 +272,7 @@ class Socket
 	}
 #endif
 
-	struct addrinfo * a_info;
-	bool connected;
+
 
 public:
 
@@ -334,7 +333,7 @@ public:
 		}
 	}
 
-	~Socket()
+	virtual ~Socket()
 	{
 		close();
 	}
@@ -514,7 +513,8 @@ public:
 	{
 
 		int status =  ::getpeername(this->sock_handle,
-									(struct sockaddr*) addr,addrlen);
+									reinterpret_cast<struct sockaddr*>( addr),
+									addrlen);
 		if(status < 0)
 		{
 			plotError(std::string("getpeername() failed"));

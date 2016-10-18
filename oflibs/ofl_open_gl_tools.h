@@ -1247,15 +1247,60 @@ inline std::string to_string(const Feature f)
 	case Lighting: return "lighting";
 	case DFAlpha: return "DF-alpha";
 	case NonStockShader: return "non stock shader";
-
-	default:
-		break;
+	case FEATURE_STATE_COUNT:return "FEATURE_STATE_COUNT";
 	}
 	return "";
 }
 
 
+const static std::string shader_stock_fs_base =  R"code(
+// The base function.
+void main()
+{
+	vec4 baseColor = calcBaseColor();
+	vec4 color = calcColor(baseColor);
+	color.a = calcAlpha(baseColor);
+	FRAG_COLOR = color;"
+}
+)code";
 
+const static std::string shader_stock_fs_uniforms =  R"code(
+// The uniforms for all stock fragment shaders.
+#if __VERSION__ >= 130
+	#define IN in
+	#define OUT out
+	#define TEXTURE2D texture
+	out vec4 FRAG_COLOR;
+#else
+	#define IN varying
+	#define OUT varying
+	#define FRAG_COLOR gl_FragColor
+	#define TEXTURE2D texture2D
+#endif
+
+IN vec4 clr;
+IN vec2 tex;
+IN vec4 pos_es;
+IN vec3 nrm_es;
+uniform sampler2D cmap;
+
+struct Light
+{
+	vec4 pos;
+	vec4 ambi; // ambi.w == spot_exp
+	vec4 diff; // diff.w == spec.w == spot_cuttoff
+	vec4 spec;
+	vec4 atten;
+};
+
+struct Material
+{
+	 vec4 emiss;
+	float shininess;
+};
+uniform Light light[8];
+
+)code";
 
 
 
@@ -1610,8 +1655,9 @@ class Window
 
 public:
 	Window(WindowPreferences* /*wp*/){}
-	virtual ~Window(){};
+	virtual ~Window();
 	virtual void swapBuffers() = 0;
+	virtual void makeCurrent() = 0;
 	virtual void enterRenderLoop() = 0;
 	virtual void setTitle(const std::string& title) = 0;
 	virtual void setFullscreen(bool fs) = 0;
@@ -1631,6 +1677,8 @@ public:
 	virtual int getWidth() const = 0;
 	virtual int getHeight() const  = 0;
 };
+Window::~Window(){}
+
 
 #include <cstdio>
 #include <glad/glad.h>
@@ -1829,24 +1877,23 @@ public:
 			glfwSetWindowIconifyCallback(m_window,win_iconify_callback);
 			glfwSetWindowSizeCallback(m_window, win_resize_callback);
 
-			if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
+			if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
 			{
 				printf("Failed to initialize OpenGL context\n");
 			}
 		}
 	}
 
-	virtual ~Window_GLFW()
-	{
-		glfwDestroyWindow(m_window);
-		glfwTerminate();
-	}
+	virtual ~Window_GLFW();
 
 	virtual void swapBuffers()
 	{
 		glfwSwapBuffers(m_window);
 	}
-
+	virtual void makeCurrent()
+	{
+		glfwMakeContextCurrent(m_window);
+	}
 	virtual void enterRenderLoop()
 	{
 		bool contin = true;
@@ -1903,6 +1950,13 @@ public:
 		return  h;
 	}
 };
+
+Window_GLFW::~Window_GLFW()
+{
+	glfwDestroyWindow(m_window);
+	glfwTerminate();
+}
+
 
 }
 
@@ -3406,19 +3460,23 @@ std::string Tokenizer::whitespaces = " \t\n\v\f\r";
 #include <fstream>
 #include <map>
 
+
+#define atoff(s) static_cast<float>(atof(s))
+#define atoiu(s) static_cast<uint32_t>(atoi(s))
+
 using namespace ofl;
 namespace ofl {
 
 bool Vertex::operator ==(const Vertex &o)
 {
 	bool to_ret = true;
-	float* data = (float*)this;
-	const float* odata = (const float*)&o;
+	float* data = reinterpret_cast<float*>(this);
+	const float* odata = reinterpret_cast<const float*>(&o);
 	const float eps = std::numeric_limits<float>::epsilon();
 	float d;
 	for (uint i = 0; i < sizeof(Vertex)/sizeof(float); i++)
 	{
-		d = fabs(odata[i] - data[i]);
+		d = fabsf(odata[i] - data[i]);
 		to_ret = to_ret && d <= eps;
 	}
 	return to_ret;
@@ -3426,18 +3484,18 @@ bool Vertex::operator ==(const Vertex &o)
 
 bool Vertex::operator <(const Vertex &o) const
 {
-	float* data = (float*)this;
-	const float* odata = (const float*)&o;
+	const float* data = reinterpret_cast<const float*>(this);
+	const float* odata = reinterpret_cast<const float*>(&o);
 	for (uint i = 0; i < sizeof(Vertex)/sizeof(float); i++)
 	{
 		const float& a = data[i];
 		const float& b = odata[i];
 		if (a < b)
 			return true;
-		else if (a == b)
-			continue;
-		else
+		else if (a > b)
 			return false;
+		else
+			continue;
 	}
 	return false;
 }
@@ -3525,11 +3583,12 @@ void handle_v(VertexData* vd, std::map<Vertex,int>& v_loc, const Vertex& v)
 	}
 	else
 	{
-		v_id =  vd->push_back(v);
+		v_id =  static_cast<int>(vd->push_back(v));
 		v_loc[v] = v_id;
 	}
-	vd->push_back(v_id);
+	vd->push_back(static_cast<const uint32_t>(v_id));
 }
+
 VertexData *VertexDataTools::readOBJ(const std::string &path)
 {
 
@@ -3576,18 +3635,18 @@ VertexData *VertexDataTools::readOBJ(const std::string &path)
 
 		if (type == "v")
 		{
-			positions.push_back(vec3(atof(arg[0]),atof(arg[1]),
-					atof(arg[2])));
+			positions.push_back(vec3(atoff(arg[0]),atoff(arg[1]),
+					atoff(arg[2])));
 		}
 		else if (type == "vn")
 		{
-			normals.push_back(vec3(atof(arg[0]), atof(arg[1]),
-					atof(arg[2])));
+			normals.push_back(vec3(atoff(arg[0]), atoff(arg[1]),
+					atoff(arg[2])));
 		}
 		else if (type == "vt")
 		{
-			tex_coords.push_back(vec2(atof(arg[0]),
-								 atof(arg[1])));
+			tex_coords.push_back(vec2(atoff(arg[0]),
+								 atoff(arg[1])));
 		}
 		else if (type == "f")
 		{
@@ -3604,7 +3663,7 @@ VertexData *VertexDataTools::readOBJ(const std::string &path)
 					for (int i = 0; i < 3; i++)
 					{
 
-						int p_id  = atoi(arg[i]) - 1;
+						uint32_t p_id  = atoiu(arg[i]) - 1;
 
 						v.pos() = positions[p_id];
 						handle_v(vd,v_loc,v);
@@ -3615,8 +3674,8 @@ VertexData *VertexDataTools::readOBJ(const std::string &path)
 					for (int i = 0; i < 3; i++)
 					{
 						tkn.reset(std::string(arg[i]));
-						int  p_id = atoi(tkn.getToken('/')) - 1;
-						int t_id = atoi(tkn.getRest()) - 1;
+						uint  p_id = atoiu(tkn.getToken('/')) - 1;
+						uint t_id = atoiu(tkn.getRest()) - 1;
 						v.pos() = positions[p_id];
 						v.setTexcoord(tex_coords[t_id]);
 						handle_v(vd,v_loc,v);
@@ -3627,9 +3686,9 @@ VertexData *VertexDataTools::readOBJ(const std::string &path)
 					for (int i = 0; i < 3; i++)
 					{
 						tkn.reset(std::string(arg[i]));
-						int  p_id = atoi(tkn.getToken('/')) - 1;
+						uint  p_id = atoiu(tkn.getToken('/')) - 1;
 						tkn.getToken('/');
-						int  n_id = atoi(tkn.getRest()) - 1;
+						uint  n_id = atoiu(tkn.getRest()) - 1;
 
 						v.pos() = positions[p_id];
 						v.nrm() = normals[n_id];
@@ -3642,9 +3701,9 @@ VertexData *VertexDataTools::readOBJ(const std::string &path)
 					for (int i = 0; i < 3; i++)
 					{
 						tkn.reset(std::string(arg[i]));
-						int  p_id = atoi(tkn.getToken('/')) - 1;
-						int  t_id = atoi(tkn.getToken('/')) - 1;
-						int  n_id = atoi(tkn.getRest()) - 1;
+						uint  p_id = atoiu(tkn.getToken('/')) - 1;
+						uint  t_id = atoiu(tkn.getToken('/')) - 1;
+						uint  n_id = atoiu(tkn.getRest()) - 1;
 
 						v.pos() = positions[p_id];
 						v.setTexcoord(tex_coords[t_id]);
@@ -3689,8 +3748,8 @@ VertexData *VertexDataTools::readPLY(const std::string &path)
 
 	Tokenizer tkn("");
 	//get the headers information
-	unsigned int vertex_count;
-	unsigned int face_count;
+	int vertex_count = 0;
+	int face_count = 0;
 
 	std::vector<std::string> properties;
 	std::vector<PLY_DATA_TYPE> prop_types;
@@ -3748,7 +3807,7 @@ VertexData *VertexDataTools::readPLY(const std::string &path)
 
 	Vertex vtx;
 
-	for (unsigned int i = 0; i < vertex_count; i++)
+	for (int i = 0; i < vertex_count; i++)
 	{
 		std::getline(fstream, line);
 		tkn.reset(line);
@@ -3757,7 +3816,7 @@ VertexData *VertexDataTools::readPLY(const std::string &path)
 			const auto& prp = properties[j];
 			const auto& typ = prop_types[j];
 
-			auto val = (float)atof(tkn.getToken(' '));
+			float val = static_cast<float>(atof(tkn.getToken(' ')));
 
 			if (typ == plyUCHAR)
 				val /= 255.0f;
@@ -3782,18 +3841,18 @@ VertexData *VertexDataTools::readPLY(const std::string &path)
 	}
 	// read the faces
 
-	for (unsigned int i = 0; i < face_count; i++)
+	for (int i = 0; i < face_count; i++)
 	{
 		std::getline(fstream, line);
 		tkn.reset(line);
 		auto verts_in_this_face = atoi(tkn.getToken(' '));
 
-		int vert0 = atoi(tkn.getToken(' '));
-		int vert1 = atoi(tkn.getToken(' '));
+		uint32_t vert0 = static_cast<uint32_t>(atoi(tkn.getToken(' ')));
+		uint32_t vert1 = static_cast<uint32_t>(atoi(tkn.getToken(' ')));
 
 		for (int i = 2; i < verts_in_this_face; i+=1)
 		{
-			int vert2 = atoi(tkn.getToken(' '));
+			uint32_t vert2 = static_cast<uint32_t>(atoi(tkn.getToken(' ')));
 			vd->push_back(vert0);
 			vd->push_back(vert1);
 			vd->push_back(vert2);
@@ -3812,8 +3871,8 @@ bool VertexDataTools::writeVD(const VertexData *vd, const std::string &path)
 	std::string prefix = "VDFF";
 	uint32_t hline[5];
 
-	int num_attrib = ::log2(ATTRIBUTE_LAST)+1;
-	hline[0] = *((uint32_t*) prefix.c_str());
+	uint32_t num_attrib = static_cast<uint32_t>(::log2(ATTRIBUTE_LAST)+1.0);
+	hline[0] = *(reinterpret_cast<const uint32_t*>(prefix.c_str()));
 	hline[1] = (num_attrib+1)*5*sizeof(uint32_t); //headr size
 	hline[2] = 1; // version
 	hline[3] = num_attrib;
@@ -3822,7 +3881,10 @@ bool VertexDataTools::writeVD(const VertexData *vd, const std::string &path)
 	fwrite(hline,1,5*sizeof(uint32_t),f);
 	const Vertex v = vd->data()[0];
 
-#define addr_diff(a,b) (((char*)a-(char*) b))
+#define addr_diff(a,b) static_cast<unsigned int>(\
+		((reinterpret_cast<const char*>(a)-\
+		  reinterpret_cast<const char*>(b))))
+
 	hline[0] = POSITION;
 	hline[1] = 3;
 	hline[2] = FLOAT;
@@ -3855,10 +3917,10 @@ bool VertexDataTools::writeVD(const VertexData *vd, const std::string &path)
 	fwrite(hline,1,5*sizeof(uint32_t),f);
 #undef addr_diff
 
-	hline[0] = vd->data().size();
-	hline[1] = vd->data().size()*sizeof(Vertex);
-	hline[2] = vd->indices().size();
-	hline[3] =  vd->indices().size() * sizeof(uint32_t);
+	hline[0] = static_cast<uint32_t>(vd->data().size());
+	hline[1] = static_cast<uint32_t>(vd->data().size()*sizeof(Vertex));
+	hline[2] = static_cast<uint32_t>(vd->indices().size());
+	hline[3] = static_cast<uint32_t>(vd->indices().size() * sizeof(uint32_t));
 	hline[4] = UNSIGNED_INT;
 	fwrite(hline,1,5*sizeof(uint32_t),f);
 
@@ -3885,7 +3947,7 @@ bool VertexDataTools::writeOBJ(const VertexData *vd, const std::string &path)
 	int tid = 1;
 	//std::vector<obj_face> faces;
 	const Primitive& prim = vd->primitive();
-	int consumed = 0;
+	uint consumed = 0;
 	if(prim == TRIANGLES)
 		consumed = 3;
 	else if(prim == TRIANGLE_STRIP)
@@ -3894,31 +3956,31 @@ bool VertexDataTools::writeOBJ(const VertexData *vd, const std::string &path)
 		consumed = 4;
 	else if(prim == QUAD_STRIP)
 		consumed = 2;
-	int vs = 4 -consumed%2;
+	uint vs = 4 -consumed%2;
 
 
 	for(unsigned int i = 0 ; i< vd->indices().size();i+=consumed)
 	{
 
-		int v[4];
+		uint v[4];
 		if (consumed >= 3 || i%2 ==1)
 		{
-			for (int j = 0; j < vs; j++)
+			for (uint j = 0; j < vs; j++)
 			{
 				v[j] = vd->indices()[i+j];
 			}
 		}
 		else
 		{
-			for (int j = 0; j < vs; j++)
+			for (uint j = 0; j < vs; j++)
 			{
-				const int idx = j==0? 1 : j==1? 0:j;
+				const uint idx = j==0? 1 : j==1? 0:j;
 				v[j] = vd->indices()[i+idx];
 			}
 		}
 
 		obj_face face;
-		for (int j = 0; j < vs; j++)
+		for (uint j = 0; j < vs; j++)
 		{
 			const Vertex& vtx = vd->data()[v[j]];
 			if(pos2id.find(vtx.pos()) == pos2id.end())
@@ -3958,7 +4020,7 @@ bool VertexDataTools::writeOBJ(const VertexData *vd, const std::string &path)
 			}
 		}
 		fprintf(f,"f");
-		for (int j = 0; j < vs; j++)
+		for (uint j = 0; j < vs; j++)
 		{
 			fprintf(f," %d/%d/%d",face.v[j].p,face.v[j].t,face.v[j].n);
 		}
@@ -4000,7 +4062,7 @@ bool VertexDataTools::writeToFile(
 		return writeOBJ(vd,p);
 	case PLY:
 		return writePLY(vd,p);
-	default:
+	case FROM_PATH:
 		return false;
 	}
 	return false;
@@ -4027,8 +4089,7 @@ VertexData* VertexDataTools::readFromFile(
 		return readOBJ(path);
 	case PLY:
 		return readPLY(path);
-
-	default:
+	case FROM_PATH:
 		return nullptr;
 	}
 }
@@ -4044,7 +4105,7 @@ void VertexDataTools::calculateNormals(VertexData *vd)
 	Primitive prim = vd->primitive();
 
 
-	int consumed = 0;
+	uint consumed = 0;
 	if(prim == TRIANGLES)
 		consumed = 3;
 	else if(prim == TRIANGLE_STRIP)
@@ -4053,7 +4114,7 @@ void VertexDataTools::calculateNormals(VertexData *vd)
 		consumed = 4;
 	else if(prim == QUAD_STRIP)
 		consumed = 2;
-	int vs = 4 -consumed%2;
+	uint vs = 4 -consumed%2;
 	if (prim != 0)
 	{
 		for (unsigned int i = 0; i < indices.size(); i += consumed)
@@ -4061,16 +4122,16 @@ void VertexDataTools::calculateNormals(VertexData *vd)
 			const vec3* v[4];
 			if (consumed >= 3 || i%2 ==1)
 			{
-				for (int j = 0; j < vs; j++)
+				for (uint j = 0; j < vs; j++)
 				{
 					v[j] = &(verts.at(indices[i+j]).pos());
 				}
 			}
 			else
 			{
-				for (int j = 0; j < vs; j++)
+				for (uint j = 0; j < vs; j++)
 				{
-					const int idx = j==0? 1 : j==1? 0:j;
+					const uint idx = j==0? 1 : j==1? 0:j;
 					v[j] = &(verts.at(indices[i+idx]).pos());
 				}
 			}
@@ -4085,10 +4146,10 @@ void VertexDataTools::calculateNormals(VertexData *vd)
 			}
 			/* calculate normalized normal */
 			vec3 n = normalize(cross(*(v[1])- *(v[0]), *(v[2]) - *(v[0])));
-			float area = 0.5*length(cross(*(v[1])- *(v[0]), *(v[2]) - *(v[0])));
+			float area = 0.5f*length(cross(*(v[1])- *(v[0]), *(v[2]) - *(v[0])));
 
 			/* add the normal to each corner of the triangle */
-			for (int j = 0; j < vs; j++)
+			for (uint j = 0; j < vs; j++)
 			{
 				const vec3 A = *(v[(j+1)%vs])- *(v[j]);
 				const vec3 B = *(v[(j-1)%vs])- *(v[j]);
@@ -4348,7 +4409,7 @@ void VertexDataManufacturer::vertex(const vec4& vertex)
 {
 	const vec3  vert = vec3(vertex.x,vertex.y,vertex.z);
 	Vertex v(vert, m_normal_state, m_color_state, tex_coord_state);
-	uint32_t id = 0;
+	uint id = 0;
 
 	if (this->vertex_ids.find(v) != vertex_ids.end())
 	{
@@ -4356,7 +4417,7 @@ void VertexDataManufacturer::vertex(const vec4& vertex)
 	}
 	else
 	{
-		id = this->current_mesh->data().size();
+		id = static_cast<uint>(this->current_mesh->data().size());
 		this->current_mesh->push_back(v);
 		vertex_ids[v] = id;
 	}
@@ -4379,7 +4440,7 @@ void VertexDataManufacturer::vertex(const Vertex& vertex)
 	}
 	else
 	{
-		id = current_mesh->data().size();
+		id = static_cast<uint>(current_mesh->data().size());
 		current_mesh->push_back(v);
 		vertex_ids[v] = id;
 	}
@@ -4428,33 +4489,33 @@ VertexData* VertexDataManufacturer::createBox(
 
 	vec3 n(0, 0, 1);
 	this->addQuad(a, b, d, c,
-				  vec2(0.4, 0.0),vec2(0.7,0.0), vec2(0.7,0.3), vec2(0.4,0.3),
-				  n,n,n,n);
+		vec2(0.4f, 0.0f),vec2(0.7f,0.0f), vec2(0.7f,0.3f), vec2(0.4f,0.3f),
+				n, n, n, n);
 
 	n = vec3(1, 0, 0);
 	this->addQuad(b, f, h, d,
-				  vec2(1.0, 0.3),vec2(1.0, 0.6), vec2(0.7, 0.6), vec2(0.7, 0.3),
-				  n, n, n, n);
+		vec2(1.0f, 0.3f),vec2(1.0f, 0.6f), vec2(0.7f, 0.6f), vec2(0.7f, 0.3f),
+				n, n, n, n);
 
 	n = vec3(0, 0, -1);
 	this->addQuad(f, e, g, h,
-				  vec2(0.7, 0.9),vec2(0.4, 0.9), vec2(0.4, 0.6), vec2(0.7, 0.6),
-				  n, n, n, n);
+		vec2(0.7f, 0.9f),vec2(0.4f, 0.9f), vec2(0.4f, 0.6f), vec2(0.7f, 0.6f),
+				n, n, n, n);
 
 	n = vec3(-1, 0, 0);
 	this->addQuad(e, a, c, g,
-				  vec2(0.1, 0.6),vec2(0.1, 0.3), vec2(0.4, 0.3), vec2(0.4, 0.6),
-				  n, n, n, n);
+		vec2(0.1f, 0.6f),vec2(0.1f, 0.3f), vec2(0.4f, 0.3f), vec2(0.4f, 0.6f),
+				n, n, n, n);
 
 	n = vec3(0, 1, 0);
 	this->addQuad(c, d, h, g,
-				  vec2(0.4, 0.3),vec2(0.7, 0.3), vec2(0.7, 0.6), vec2(0.4, 0.6),
-				  n, n, n, n);
+		vec2(0.4f, 0.3f),vec2(0.7f, 0.3f), vec2(0.7f, 0.6f), vec2(0.4f, 0.6f),
+				n, n, n, n);
 
 	n = vec3(0, -1, 0);
 	this->addQuad(a, b, f, e,
-				  vec2(0.0, 0.7),vec2(0.3, 0.7), vec2(0.3, 1.0), vec2(0.0, 1.0),
-				  n, n, n, n);
+		 vec2(0.0f, 0.7f),vec2(0.3f, 0.7f), vec2(0.3f, 1.0f), vec2(0.0f, 1.0f),
+				n, n, n, n);
 
 	auto res = this->finish();
 	this->calculateTangents(res);
@@ -4485,10 +4546,14 @@ VertexData* VertexDataManufacturer::createPlane(
 						vec3((x + 1)*d_w, (y + 0)*d_h, 0) + offset,
 						vec3((x + 1)*d_w, (y + 1)*d_h, 0) + offset,
 						vec3((x + 0)*d_w, (y + 1)*d_h, 0) + offset,
-						vec2((float)(x + 0) / tess_w, (float)(y + 0) / tess_h),
-						vec2((float)(x + 1) / tess_w, (float)(y + 0) / tess_h),
-						vec2((float)(x + 1) / tess_w, (float)(y + 1) / tess_h),
-						vec2((float)(x + 0) / tess_w, (float)(y + 1) / tess_h));
+						vec2(static_cast<float>(x + 0) / tess_w,
+							 static_cast<float>(y + 0) / tess_h),
+						vec2(static_cast<float>(x + 1) / tess_w,
+							 static_cast<float>(y + 0) / tess_h),
+						vec2(static_cast<float>(x + 1) / tess_w,
+							 static_cast<float>(y + 1) / tess_h),
+						vec2(static_cast<float>(x + 0) / tess_w,
+							 static_cast<float>(y + 1) / tess_h));
 		}
 	}
 
@@ -4587,7 +4652,7 @@ VertexData* VertexDataManufacturer::createUVSphere(
 
 			float tex_offset = 0.0f;
 			if (st >= stacks / 2u)
-				tex_offset = M_SQRT2*0.5f;
+				tex_offset = static_cast<float>(M_SQRT2)*0.5f;
 
 
 			/*Compute positions and texCoords for the current quad:*/
@@ -4601,7 +4666,7 @@ VertexData* VertexDataManufacturer::createUVSphere(
 			for (int i = 0; i < 4;i++)
 				uv[i] = colorTexCoordFramPosition(pos[i], tex_offset);
 
-			/* Draw a quad unless you are about do draw the last and the firrst
+			/* Draw a quad unless you are about do draw the last and the first
 			   stack.
 			*/
 			if (st != 0 && st< stacks - 1)
@@ -4751,10 +4816,10 @@ VertexData* VertexDataManufacturer::createCone(
 		float rlow = baseRadius + st*radius_step;
 		float rhigh = baseRadius + (st + 1)*radius_step;
 
-		float uv_r_low = ((1.0f) - ((float)st / stacks));
+		float uv_r_low = ((1.0f) - (static_cast<float>(st) / stacks));
 		uv_r_low = (0.5f - inner_radius) * uv_r_low + inner_radius;
 
-		float uv_r_high = ((1.0f) - ((1.0f + (float)st) / stacks));
+		float uv_r_high = ((1.0f) - ((1.0f + static_cast<float>(st)) / stacks));
 		uv_r_high = (0.5f - inner_radius) * uv_r_high + inner_radius;;
 
 		for (unsigned int i = 0; i < slices; i++) // slices
@@ -4827,8 +4892,8 @@ VertexData* VertexDataManufacturer::createDisk(
 
 			for (int i = 0; i < 4; i++)
 			{
-				uv[i] = vec2(pos[i].x / (2 * outerRadius) + 0.5,
-							 pos[i].y / (2 * outerRadius) + 0.5);
+				uv[i] = vec2(pos[i].x / (2.0f * outerRadius) + 0.5f,
+							 pos[i].y / (2.0f * outerRadius) + 0.5f);
 			}
 
 			if (st != 0)

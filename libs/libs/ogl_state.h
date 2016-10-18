@@ -75,15 +75,60 @@ inline std::string to_string(const Feature f)
 	case Lighting: return "lighting";
 	case DFAlpha: return "DF-alpha";
 	case NonStockShader: return "non stock shader";
-
-	default:
-		break;
+	case FEATURE_STATE_COUNT:return "FEATURE_STATE_COUNT";
 	}
 	return "";
 }
 
 
+const static std::string shader_stock_fs_base =  R"code(
+// The base function.
+void main()
+{
+	vec4 baseColor = calcBaseColor();
+	vec4 color = calcColor(baseColor);
+	color.a = calcAlpha(baseColor);
+	FRAG_COLOR = color;"
+}
+)code";
 
+const static std::string shader_stock_fs_uniforms =  R"code(
+// The uniforms for all stock fragment shaders.
+#if __VERSION__ >= 130
+	#define IN in
+	#define OUT out
+	#define TEXTURE2D texture
+	out vec4 FRAG_COLOR;
+#else
+	#define IN varying
+	#define OUT varying
+	#define FRAG_COLOR gl_FragColor
+	#define TEXTURE2D texture2D
+#endif
+
+IN vec4 clr;
+IN vec2 tex;
+IN vec4 pos_es;
+IN vec3 nrm_es;
+uniform sampler2D cmap;
+
+struct Light
+{
+	vec4 pos;
+	vec4 ambi; // ambi.w == spot_exp
+	vec4 diff; // diff.w == spec.w == spot_cuttoff
+	vec4 spec;
+	vec4 atten;
+};
+
+struct Material
+{
+	 vec4 emiss;
+	float shininess;
+};
+uniform Light light[8];
+
+)code";
 
 
 
