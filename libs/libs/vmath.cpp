@@ -1,7 +1,8 @@
 #include "vmath.h"
 
 
-
+namespace ofl
+{
 
 #ifdef GLM_INCLUDED
 
@@ -12,7 +13,7 @@ using namespace  glm;
 
 mat4::mat4(float diag)
 {
-	for(int i =0 ; i< 4;i++)
+	for(unsigned int i =0 ; i< 4;i++)
 	{
 		m_data[i] = vec4(0,0,0,0);
 		m_data[i][i] = diag;
@@ -506,3 +507,4 @@ vec4 read_from_string(std::string& str)
 }
 
 
+}

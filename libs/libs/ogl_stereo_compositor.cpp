@@ -1,5 +1,8 @@
 #include "ogl_stereo_compositor.h"
 #include <glad/glad.h>
+namespace ofl {
+
+
 void ofl::StereoCompositor::resize(const int width, const int height)
 {
 	m_width  = width;
@@ -375,4 +378,5 @@ void ofl::StereoCompositor::create_stencil_buffer()
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glDepthMask(GL_TRUE);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+}
 }

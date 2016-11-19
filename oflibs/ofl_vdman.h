@@ -436,15 +436,23 @@ static inline std::string without_extension(const std::string& p)
  
 #include <string>
 #include <cmath>
+
+
+#ifdef GLM_INCLUDED
+#include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/norm.hpp>
+#endif
+
+
+namespace ofl
+{
 #ifdef GLM_INCLUDED
 typedef glm::vec4 vec4;
 typedef glm::vec3 vec3;
 typedef glm::vec2 vec2;
 typedef glm::mat4 mat4;
 using namespace glm;
-#include <glm/gtc/matrix_inverse.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/norm.hpp>
 #else
 
 
@@ -735,7 +743,7 @@ public:
 };
 
 
-
+}
 
 /** @include vmath.md */
 
@@ -3024,7 +3032,8 @@ void VertexDataManufacturer::addQuad(
 }
 
 
-
+namespace ofl
+{
 
 #ifdef GLM_INCLUDED
 
@@ -3035,7 +3044,7 @@ using namespace  glm;
 
 mat4::mat4(float diag)
 {
-	for(int i =0 ; i< 4;i++)
+	for(unsigned int i =0 ; i< 4;i++)
 	{
 		m_data[i] = vec4(0,0,0,0);
 		m_data[i][i] = diag;
@@ -3529,4 +3538,5 @@ vec4 read_from_string(std::string& str)
 }
 
 
+}
 #endif
