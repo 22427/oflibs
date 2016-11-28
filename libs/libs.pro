@@ -33,7 +33,6 @@ HEADERS += \
     libs/ogl_geo.h \
     libs/ogl_state.h \
     libs/ogl_win.h \
-    libs/open_gl_tools.h \
     libs/socket.h \
     libs/stru.h \
     libs/track.h \
@@ -41,7 +40,6 @@ HEADERS += \
     libs/vdman.h \
     libs/vmath.h \
     libs/vrpv.h \
-    libs/vr_tools.h \
     libs/ogl_stereo_compositor.h \
     libs/sem_queue.h \
     libs/processing_graph.h

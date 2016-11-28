@@ -22,9 +22,9 @@ the different modules and libraries:
 - ofl_ogl_geo - A class reperesenting vertex-data on the GPU
 - ofl_ogl_state - A state-wrapper imulating the "classic" OpenGL-fixed-function 
   states, including matrix stacks and lighting.
-- ofl_ogl_win - An interface to create an OpenGL-Context with window and reading 
-  events. Currently implemented using glfw.
-- ofl_open_gl_tools: combines the above.
+- ofl_ogl_win - An interface to create an OpenGL-Context with window and reading
+events. Currently implemented using glfw.
+- ofl_ogl_stereo_compositor - A simple way to render in stereo image formats.
 - ofl_socket: A class wrapping sockets.
 - ofl_stru: Some string utilities. Used by many other oflibs.
 - ofl_track - Tracking: An interface to the ART-DTrack2 tracking system.
@@ -37,6 +37,8 @@ the different modules and libraries:
   GLM.
 - ofl_vrpv - Virtual Reality Projection and View - A module to genereate view-
   and projection-matrices for VR systems like PowerWalls or CAVEs
+- ofl_processing_graph - A simple processing graph interface for parallel
+processing of streaming data.
 
 How do oflibs work?
 --------------------------------------------------------------------------------
