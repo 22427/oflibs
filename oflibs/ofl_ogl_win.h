@@ -1,5 +1,7 @@
 #if 0
 <begin_doc>
+#ifndef USING_OFL_LICENSE_MD
+#define USING_OFL_LICENSE_MD
 //The MIT License (MIT)
 //================================================================================
 //
@@ -22,8 +24,12 @@
 //IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 //CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#endif //USING_OFL_LICENSE_MD
+
 --------------------------------------------------------------------------------
 
+#ifndef USING_OFL_README_MD
+#define USING_OFL_README_MD
 //What is this?
 //================================================================================
 //The oflibs are a set of usefull classes and tools dealing with all kinds of 
@@ -48,9 +54,9 @@
 //- ofl_ogl_geo - A class reperesenting vertex-data on the GPU
 //- ofl_ogl_state - A state-wrapper imulating the "classic" OpenGL-fixed-function 
 //  states, including matrix stacks and lighting.
+//- ogl_stereo_compositor - A simple way to render in stereo image formats.
 //- ofl_ogl_win - An interface to create an OpenGL-Context with window and reading 
 //  events. Currently implemented using glfw.
-//- ofl_open_gl_tools: combines the above.
 //- ofl_socket: A class wrapping sockets.
 //- ofl_stru: Some string utilities. Used by many other oflibs.
 //- ofl_track - Tracking: An interface to the ART-DTrack2 tracking system.
@@ -102,8 +108,12 @@
 //
 //
 
+#endif //USING_OFL_README_MD
+
 --------------------------------------------------------------------------------
 
+#ifndef USING_OFL_OGL_WIN_MD
+#define USING_OFL_OGL_WIN_MD
 //OGL_WIN: OpenGL Window
 //================================================================================
 //This module will - one day - help to create an OpenGL context, and give access
@@ -111,13 +121,15 @@
 //interface shall be the same in the finished library.
 //
 
+#endif //USING_OFL_OGL_WIN_MD
+
 --------------------------------------------------------------------------------
 
 <end_doc>
 #endif 
 #ifndef USING_OFL_OGL_WIN_H
- #define USING_OFL_OGL_WIN_H
- 
+#define USING_OFL_OGL_WIN_H
+
 #include <string>
 namespace ofl {
 

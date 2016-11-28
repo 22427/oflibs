@@ -1,5 +1,7 @@
 #if 0
 <begin_doc>
+#ifndef USING_OFL_LICENSE_MD
+#define USING_OFL_LICENSE_MD
 //The MIT License (MIT)
 //================================================================================
 //
@@ -22,8 +24,12 @@
 //IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 //CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#endif //USING_OFL_LICENSE_MD
+
 --------------------------------------------------------------------------------
 
+#ifndef USING_OFL_README_MD
+#define USING_OFL_README_MD
 //What is this?
 //================================================================================
 //The oflibs are a set of usefull classes and tools dealing with all kinds of 
@@ -48,9 +54,9 @@
 //- ofl_ogl_geo - A class reperesenting vertex-data on the GPU
 //- ofl_ogl_state - A state-wrapper imulating the "classic" OpenGL-fixed-function 
 //  states, including matrix stacks and lighting.
+//- ogl_stereo_compositor - A simple way to render in stereo image formats.
 //- ofl_ogl_win - An interface to create an OpenGL-Context with window and reading 
 //  events. Currently implemented using glfw.
-//- ofl_open_gl_tools: combines the above.
 //- ofl_socket: A class wrapping sockets.
 //- ofl_stru: Some string utilities. Used by many other oflibs.
 //- ofl_track - Tracking: An interface to the ART-DTrack2 tracking system.
@@ -102,8 +108,12 @@
 //
 //
 
+#endif //USING_OFL_README_MD
+
 --------------------------------------------------------------------------------
 
+#ifndef USING_OFL_VMATH_MD
+#define USING_OFL_VMATH_MD
 //VMATH : vector-maths
 //================================================================================
 //This is a set of classes containing the needed vector-math for the ofl tools.
@@ -121,13 +131,19 @@
 //your project) include `<glm/glm.hpp>` before you include this file.
 //
 
+#endif //USING_OFL_VMATH_MD
+
 --------------------------------------------------------------------------------
 
 <end_doc>
 #endif 
 #ifndef USING_OFL_OGL_STEREO_COMPOSITOR_H
- #define USING_OFL_OGL_STEREO_COMPOSITOR_H
- 
+#define USING_OFL_OGL_STEREO_COMPOSITOR_H
+#ifndef USING_OFL_VMATH_H
+#define USING_OFL_VMATH_H
+#ifndef USING_OFL_STRU_H
+#define USING_OFL_STRU_H
+
 #include <algorithm>
 #include <functional>
 #include <cctype>
@@ -360,6 +376,8 @@ static inline std::string without_extension(const std::string& p)
 }
 }
 
+#endif //USING_OFL_STRU_H
+
 #include <string>
 #include <cmath>
 
@@ -503,7 +521,7 @@ public:
 	vec4 operator / (const vec4& v)const;
 	vec4 operator *(const float f) const;
 	vec4 operator /(const float f)const;
-
+	operator vec3() {return vec3(x,y,z);}
 };
 
 
@@ -575,14 +593,6 @@ float length2(const vec4& a);
 
 float distance(const vec3& a, const vec3& b);
 float distance2(const vec3& a, const vec3& b);
-
-/**
- * @brief cross cross product only using the .xyz part.
- * @param a
- * @param b
- * @return cross(a.xyz,b.xyz)
- */
-vec4 cross(const vec4& a, const vec4& b);
 
 /**
  * @brief cross cross product.
@@ -671,6 +681,8 @@ public:
 
 }
 
+#endif //USING_OFL_VMATH_H
+
 #ifndef OFL_GL_HEADER
 #define OFL_GL_HEADER <glad/glad.h>
 #endif
@@ -739,15 +751,9 @@ protected:
 }
 
 #endif //USING_OFL_OGL_STEREO_COMPOSITOR_H
-#ifndef USING_OFL_STRU_H
- #define USING_OFL_STRU_H
- 
-#endif //USING_OFL_STRU_H
-#ifndef USING_OFL_VMATH_H
- #define USING_OFL_VMATH_H
- 
-#endif //USING_OFL_VMATH_H
 #ifdef OFL_IMPLEMENTATION
+#ifndef USING_OFL_OGL_STEREO_COMPOSITOR_CPP
+#define USING_OFL_OGL_STEREO_COMPOSITOR_CPP
 #include <glad/glad.h>
 namespace ofl {
 
@@ -1130,6 +1136,10 @@ void ofl::StereoCompositor::create_stencil_buffer()
 }
 }
 
+#endif //USING_OFL_OGL_STEREO_COMPOSITOR_CPP
+#ifndef USING_OFL_STRU_CPP
+#define USING_OFL_STRU_CPP
+
 namespace ofl
 {
 Tokenizer::Tokenizer(const std::string& base)
@@ -1217,6 +1227,10 @@ void Tokenizer::reset(const std::string& base)
 
 std::string Tokenizer::whitespaces = " \t\n\v\f\r";
 }
+
+#endif //USING_OFL_STRU_CPP
+#ifndef USING_OFL_VMATH_CPP
+#define USING_OFL_VMATH_CPP
 
 
 namespace ofl
@@ -1621,14 +1635,6 @@ mat4 translate(const mat4&m,const vec4& v)
 
 #endif
 
-vec4 cross(const vec4& a, const vec4& b)
-{
-	return vec4(a.y * b.z - b.y * a.z,
-				a.z * b.x - b.z * a.x,
-				a.x * b.y - b.x * a.y,
-				0);
-}
-
 
 
 bool operator < (const vec4& a, const vec4& b)
@@ -1726,4 +1732,6 @@ vec4 read_from_string(std::string& str)
 
 
 }
+
+#endif //USING_OFL_VMATH_CPP
 #endif

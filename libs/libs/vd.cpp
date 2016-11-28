@@ -636,6 +636,7 @@ VertexData* VertexDataTools::readFromFile(
 	case FROM_PATH:
 		return nullptr;
 	}
+	return nullptr;
 }
 
 void VertexDataTools::calculateNormals(VertexData *vd)
@@ -701,7 +702,7 @@ void VertexDataTools::calculateNormals(VertexData *vd)
 				vec3& r = p2n[*(v[j])];
 				if(vs == 4) // for a quad triangulate first
 				{
-					if(j % 2 != connected)
+					if(static_cast<int>(j % 2) != connected)
 					{
 						const vec3 cr = cross(A,B);
 						area = 0.5f* length(cr);

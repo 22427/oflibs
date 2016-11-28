@@ -5,9 +5,14 @@
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <ofl_open_gl_tools.h>
+#include <ofl_ogl_win.h>
+#include <ofl_vd.h>
+#include <ofl_vdman.h>
+#include <ofl_ogl_state.h>
+#include <ofl_ogl_geo.h>
+#include <ofl_ogl_stereo_compositor.h>
 
-using namespace ofl;
+
 using namespace ofl;
 
 class StereoMeshViewer : public ofl::VertexDataTools, public ofl::Window_GLFW, public ofl::StateSimulator, public StereoCompositor
@@ -212,4 +217,9 @@ int main(int argc, char** argv)
 }
 
 #define OFL_IMPLEMENTATION
-#include <ofl_open_gl_tools.h>
+#include <ofl_ogl_win.h>
+#include <ofl_vd.h>
+#include <ofl_vdman.h>
+#include <ofl_ogl_state.h>
+#include <ofl_ogl_geo.h>
+#include <ofl_ogl_stereo_compositor.h>

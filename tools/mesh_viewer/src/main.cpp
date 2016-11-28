@@ -5,7 +5,12 @@
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 
-#include <ofl_open_gl_tools.h>
+#include <ofl_ogl_win.h>
+#include <ofl_vd.h>
+#include <ofl_vdman.h>
+#include <ofl_ogl_state.h>
+#include <ofl_ogl_geo.h>
+
 
 using namespace ofl;
 using namespace ofl;
@@ -171,7 +176,12 @@ int main(int argc, char** argv)
 }
 
 #define OFL_IMPLEMENTATION
-#include <ofl_open_gl_tools.h>
+#include <ofl_ogl_win.h>
+#include <ofl_vd.h>
+#include <ofl_vdman.h>
+#include <ofl_ogl_state.h>
+#include <ofl_ogl_geo.h>
+
 
 void MeshViewer::eventWindow(int event)
 {

@@ -1,5 +1,7 @@
 #if 0
 <begin_doc>
+#ifndef USING_OFL_LICENSE_MD
+#define USING_OFL_LICENSE_MD
 //The MIT License (MIT)
 //================================================================================
 //
@@ -22,8 +24,12 @@
 //IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 //CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#endif //USING_OFL_LICENSE_MD
+
 --------------------------------------------------------------------------------
 
+#ifndef USING_OFL_README_MD
+#define USING_OFL_README_MD
 //What is this?
 //================================================================================
 //The oflibs are a set of usefull classes and tools dealing with all kinds of 
@@ -48,9 +54,9 @@
 //- ofl_ogl_geo - A class reperesenting vertex-data on the GPU
 //- ofl_ogl_state - A state-wrapper imulating the "classic" OpenGL-fixed-function 
 //  states, including matrix stacks and lighting.
+//- ogl_stereo_compositor - A simple way to render in stereo image formats.
 //- ofl_ogl_win - An interface to create an OpenGL-Context with window and reading 
 //  events. Currently implemented using glfw.
-//- ofl_open_gl_tools: combines the above.
 //- ofl_socket: A class wrapping sockets.
 //- ofl_stru: Some string utilities. Used by many other oflibs.
 //- ofl_track - Tracking: An interface to the ART-DTrack2 tracking system.
@@ -102,8 +108,12 @@
 //
 //
 
+#endif //USING_OFL_README_MD
+
 --------------------------------------------------------------------------------
 
+#ifndef USING_OFL_OGL_GEO_MD
+#define USING_OFL_OGL_GEO_MD
 //OGL_GEO: OpenGL Geometry
 //================================================================================
 //A class representing vertex Attribute data. You can generate a Geometry
@@ -130,8 +140,12 @@
 //
 //
 
+#endif //USING_OFL_OGL_GEO_MD
+
 --------------------------------------------------------------------------------
 
+#ifndef USING_OFL_OGL_STATE_MD
+#define USING_OFL_OGL_STATE_MD
 //OGL_STATE: OpenGL State
 //================================================================================
 //This is a state tracking class, which also provides some stock shaders and
@@ -196,8 +210,12 @@
 //will be used.
 //
 
+#endif //USING_OFL_OGL_STATE_MD
+
 --------------------------------------------------------------------------------
 
+#ifndef USING_OFL_OGL_WIN_MD
+#define USING_OFL_OGL_WIN_MD
 //OGL_WIN: OpenGL Window
 //================================================================================
 //This module will - one day - help to create an OpenGL context, and give access
@@ -205,8 +223,44 @@
 //interface shall be the same in the finished library.
 //
 
+#endif //USING_OFL_OGL_WIN_MD
+
 --------------------------------------------------------------------------------
 
+#ifndef USING_OFL_PROCESSING_GRAPH_MD
+#define USING_OFL_PROCESSING_GRAPH_MD
+//PROCESSING_GRAPH: Processing Graph
+//================================================================================
+//This is a set of classes to build a processing graph.
+//The idea is, that processing data often requires different steps or operations.
+//In order to keep the opeartions interchangeable and reusable, you can use this
+//interface to join different operation nodes together to a processing graph.
+//
+//Each nodes performes asyncronous to the other joints(spanws a thread),
+//so this system makes uses of all available cores.
+//
+//API
+//--------------------------------------------------------------------------------
+//
+//###Node
+//A Node is an Object, that processes data. Nodes are connected via Joints. A pair
+//of Joints represents a queue/dequeue interaface. Each node works assyncronous.
+//
+//####TransformNode
+//A Transformer is like a Source and a Sink glued together. On one side
+//It is a sink for items of type A (left) and on the other side it is a Source of
+//items of type B. So a Transformer would, for example, read Images on the left
+//and write positions of detected features on the right.
+//
+//
+//
+
+#endif //USING_OFL_PROCESSING_GRAPH_MD
+
+--------------------------------------------------------------------------------
+
+#ifndef USING_OFL_TRACK_MD
+#define USING_OFL_TRACK_MD
 //TRACK : Tracking
 //================================================================================
 //This is basically an API to the ART network data stream. The data send by
@@ -233,8 +287,12 @@
 //knonw information is returned.
 //
 
+#endif //USING_OFL_TRACK_MD
+
 --------------------------------------------------------------------------------
 
+#ifndef USING_OFL_VD_MD
+#define USING_OFL_VD_MD
 //VD: Vertex Data
 //================================================================================
 //This module constist of two structures the VertexData and VertexDataTools.
@@ -267,8 +325,12 @@
 //
 //Then comes the data as BLOB
 
+#endif //USING_OFL_VD_MD
+
 --------------------------------------------------------------------------------
 
+#ifndef USING_OFL_VDMAN_MD
+#define USING_OFL_VDMAN_MD
 //VDMAN: VertexData Manufacturer
 //================================================================================
 //This class provides functionality to create VertexData, the same intuitive
@@ -303,8 +365,12 @@
 //
 //
 
+#endif //USING_OFL_VDMAN_MD
+
 --------------------------------------------------------------------------------
 
+#ifndef USING_OFL_VMATH_MD
+#define USING_OFL_VMATH_MD
 //VMATH : vector-maths
 //================================================================================
 //This is a set of classes containing the needed vector-math for the ofl tools.
@@ -322,8 +388,12 @@
 //your project) include `<glm/glm.hpp>` before you include this file.
 //
 
+#endif //USING_OFL_VMATH_MD
+
 --------------------------------------------------------------------------------
 
+#ifndef USING_OFL_VRPV_MD
+#define USING_OFL_VRPV_MD
 //VRPV: Virtual Reality Projection & Viewmatrix
 //================================================================================
 //The toolkit consists of two main components: Screens and ScreenArrangements.
@@ -386,13 +456,23 @@
 //	screen1 (0.0,1.0,0.0) (1.0,1.0,0.0) (0.0,2.0,0.0)
 //```
 
+#endif //USING_OFL_VRPV_MD
+
 --------------------------------------------------------------------------------
 
 <end_doc>
 #endif 
 #ifndef USING_OFL_ALL_H
- #define USING_OFL_ALL_H
- 
+#define USING_OFL_ALL_H
+#ifndef USING_OFL_OGL_GEO_H
+#define USING_OFL_OGL_GEO_H
+#ifndef USING_OFL_VD_H
+#define USING_OFL_VD_H
+#ifndef USING_OFL_VMATH_H
+#define USING_OFL_VMATH_H
+#ifndef USING_OFL_STRU_H
+#define USING_OFL_STRU_H
+
 #include <algorithm>
 #include <functional>
 #include <cctype>
@@ -625,6 +705,8 @@ static inline std::string without_extension(const std::string& p)
 }
 }
 
+#endif //USING_OFL_STRU_H
+
 #include <string>
 #include <cmath>
 
@@ -768,7 +850,7 @@ public:
 	vec4 operator / (const vec4& v)const;
 	vec4 operator *(const float f) const;
 	vec4 operator /(const float f)const;
-
+	operator vec3() {return vec3(x,y,z);}
 };
 
 
@@ -840,14 +922,6 @@ float length2(const vec4& a);
 
 float distance(const vec3& a, const vec3& b);
 float distance2(const vec3& a, const vec3& b);
-
-/**
- * @brief cross cross product only using the .xyz part.
- * @param a
- * @param b
- * @return cross(a.xyz,b.xyz)
- */
-vec4 cross(const vec4& a, const vec4& b);
 
 /**
  * @brief cross cross product.
@@ -935,6 +1009,8 @@ public:
 
 
 }
+
+#endif //USING_OFL_VMATH_H
 
 /** @include vmath.md */
 
@@ -1139,6 +1215,8 @@ public:
 };
 }
 
+#endif //USING_OFL_VD_H
+
 #ifndef OFL_GL_HEADER
 #define OFL_GL_HEADER <glad/glad.h>
 #endif
@@ -1268,6 +1346,10 @@ public:
 };
 
 }
+
+#endif //USING_OFL_OGL_GEO_H
+#ifndef USING_OFL_OGL_STATE_H
+#define USING_OFL_OGL_STATE_H
 #ifndef OFL_GL_HEADER
 #define OFL_GL_HEADER <glad/glad.h>
 #endif
@@ -1575,130 +1657,81 @@ protected:
 
 };
 }
-#include <map>
-#include <vector>
-#include <string>
-#include <fstream>
-#include <sstream>
 
+#endif //USING_OFL_OGL_STATE_H
+#ifndef USING_OFL_OGL_STEREO_COMPOSITOR_H
+#define USING_OFL_OGL_STEREO_COMPOSITOR_H
 
-namespace ofl {
+#ifndef OFL_GL_HEADER
+#define OFL_GL_HEADER <glad/glad.h>
+#endif
 
-
-/**
- * @brief The Screen class is basically an area in world space you want to
- * render to. This might be a powerwall or the side of a cave or a segment
- * in a segmented display.
- */
-class Screen
+#include OFL_GL_HEADER
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
+namespace ofl
 {
-	vec4 m_corners[3];
-	mat4 m_wall_space;
-	mat4 m_inv_wall_space;
+class StereoCompositor
+{
 
 public:
-
-	enum CORNER
+	enum CompositingMode
 	{
-		BL=0,
-		BR,
-		TL
-	} ;
+		VerticalInterlace = 0,
+		HorizontalInterlace = 1,
+		CheckerboardInterlace = 2,
+		SideBySide = 3,
+		BottomTop =4,
+		AnaglyphRedCyan=5,
+		AnaglyphYellowBlue=6,
+		QuadBuffered=7,
+		MODE_COUNT = 8
+	};
+	enum Eye
+	{
+		Left = 0,
+		Right = 1
+	};
+	
+	StereoCompositor(const CompositingMode mode = VerticalInterlace);
+	
+	void resize(const int width, const int height);
+	void setCompositingMode(CompositingMode cm);
 
-	vec4 corner(const int i) const;
-	/**
-	 * @brief Screen Constructor. Consumes three corners of the Screen area
-	 * The last corner is implied.
-	 * @param blc Bottom left corner.
-	 * @param trc Top right corner.
-	 * @param tlc Top left corner.
-	 */
-	Screen(const vec4 blc,const vec4 brc, const vec4& tlc);
+	void setEye(const Eye eye);
+	void composite(GLuint left_right_texture_array);
+	
+	mat4 getAsymetricProjection(
+			Eye eye,
+			float eye_dist,
+			float fovy,
+			float near,
+			float far,
+			float focal_length);
+protected:
+	CompositingMode m_cmode;
+	int m_width;
+	int m_height;
 
-	/**
-	 * @brief calculate_projection_and_view Calculates a projection- and a view
-	 * matrix for a given eye position.
-	 * Note for stereo rendering you have to call this twice, once per eye.
-	 * @param eye The postition of the eye.
-	 * @param near The near distance.
-	 * @param far The far distance.
-	 * @param projection output where the projection matrix will be written to
-	 * @param view output where the view matrix will be written to
-	 */
-	void calculate_projection_and_view(
-			const vec4& eye,
-			const float near,
-			const float far,
-			mat4& projection_matrix,
-			mat4& view_matrix) const;
-};
+	bool m_wh_dirty;
 
-/**
- * @brief The ScreenArrangement class groups Screens together. This might be use
- * full for a cave or a multi-segment-display. Each Screen is accessible via
- * its name or its id, or you just store a pointer to the screen you are
- * interested in. In that case this class is only usefull for loading and
- * storing ScreenArrangements
- */
-class ScreenArrangement
-{
-	std::vector<Screen> m_screens;
-	std::map<std::string,Screen*> m_by_name;
-public:
-	/**
-	 * @brief addScreen Adds a Screen to the arrangement.
-	 * @param scrn The screen you wish to add (will be copied).
-	 * @param name The name of the screen.
-	 * @return a pointer to the interal screen, which can be accessed as long
-	 * as this Object exists.
-	 */
-	Screen* addScreen(const Screen scrn, const std::string& name);
 
-	/**
-	 * @brief getScreen Provides access to a screen via its id. If there is
-	 * no screen with this id a nullptr is returned.
-	 * @param id The id of the screen.
-	 * @return The Screen you asked for or nullptr if it does not exist.
-	 */
-	const Screen* getScreen(const int id)const;
+	GLuint m_stencil_shader[3];
+	GLint m_width_loc[3];
+	GLint m_height_loc[3];
+	
+	GLuint m_post_processing_shader[MODE_COUNT];
+	void create_stencil_buffer();
 
-	/**
-	 * @brief getScreen Provides access to a screen via its name. If there is
-	 * no screen with this name a nullptr is returned.
-	 * @param name name of the screen.
-	 * @return	The Screen you asked for or nullptr if it does not exist.
-	 */
-	const Screen* getScreen(const std::string& name);
 
-	/**
-	 * @brief count_screens Returns the number of screens in this
-	 * ScreenArrangement
-	 * @return #Screens
-	 */
-	unsigned int countScreens() const;
 
-	/**
-	 * @brief addScreens Adds screens from a file to this arrangement.
-	 * The format of the file should be:
-	 * <name0> (blx,bly,blz,blw) (brx,bry,brz,brw) (tlx,tly,tlz,tlw)
-	 * <name1> (blx,bly,blz,blw) (brx,bry,brz,brw) (tlx,tly,tlz,tlw)
-	 * # ...
-	 * # a line starting with # is a comment line.
-	 * @param path to the file.
-	 * @return true if everything went well. false if there was a problem with
-	 * the file.
-	 */
-	bool loadScreens(const std::string& path);
-
-	/**
-	 * @brief saveScreens saves this ScreenArrangement to the disk
-	 * @param path where you want to store this.
-	 * @return true if ecerything went well, false if there was a problem with
-	 * the file.
-	 */
-	bool saveScreens(const std::string& path);
 };
 }
+
+#endif //USING_OFL_OGL_STEREO_COMPOSITOR_H
+#ifndef USING_OFL_OGL_WIN_H
+#define USING_OFL_OGL_WIN_H
 
 #include <string>
 namespace ofl {
@@ -2105,6 +2138,1170 @@ Window_GLFW::~Window_GLFW()
 
 }
 
+#endif //USING_OFL_OGL_WIN_H
+#ifndef USING_OFL_PROCESSING_GRAPH_H
+#define USING_OFL_PROCESSING_GRAPH_H
+#ifndef USING_OFL_SEM_QUEUE_H
+#define USING_OFL_SEM_QUEUE_H
+#include <mutex>
+#include <thread>
+#include <queue>
+#include <condition_variable>
+
+namespace ofl{
+/**
+ * @class SemQueue
+ * @author Timon Zietlow
+ * @date 29/08/16
+ * @brief A semaphore-like-queue.
+ * @details A generic queue which behaves like a semaphore.
+ * If the queue is empty all calls for dequeue will block untill new items
+ * are enqueued. All methods are threadsave!.
+ */
+enum SemQueueErrorCode {
+	EC_OK = 0,
+	EC_IS_EMPTY = 1,
+	EC_TIMEOUT = 2,
+	EC_SHUTDOWN = 4,
+	EC_SHUTDOWN_AND_EMPTY =5,
+
+};
+
+template <typename T> class SemQueue
+{
+	std::queue<T> q;
+	std::condition_variable cv;
+	std::mutex mtx;
+	bool running;
+
+public:
+
+	/** Constructor
+	*/
+	SemQueue() : running(true)
+	{
+	}
+
+	/** Destructor
+	*/
+	~SemQueue()
+	{
+		shutdown();
+	}
+
+	/**
+	 * @brief Adds an item to the queue.
+	 * @param item The item to enqueue.
+	 */
+	void enqueue(T&& item)
+	{
+		std::lock_guard<std::mutex> g(mtx);
+		q.push(std::move(item));
+		cv.notify_one();
+	}
+
+	/**
+	 * @brief  Adds an item to the queue.
+	 * @param item The item to enqueue.
+	 */
+	void enqueue(const T& item)
+	{
+		std::lock_guard<std::mutex> g(mtx);
+		q.push(std::move(item));
+		cv.notify_one();
+	}
+
+	/**
+	 * @brief Tells you whether the queue is empty.
+	 * @return 'true' if the queue is empty, 'false' if the queue is not empty
+	 */
+	bool empty()
+	{
+		std::lock_guard<std::mutex> g(mtx);
+		bool to_ret = q.empty();
+		return to_ret;
+	}
+
+	/**
+	 * @brief Get the first item from the queue.
+	 * If the queue is empty this funcion will block until another item
+	 * is enqueued into the queue, or the SemQueue is shutdown.
+	 * @retval t The first item from the queue
+	 * 'OK' if everything is fine,
+	 * 'SHUTDOWN' if the queue is on shutdown, but there are still items to
+	 *		dequeue,
+	 * 'SHUTDOWN_AND_EMPTY' if the queue  is on shutdown and empty and
+	 * 'IS_EMPTY' if the queue was empty.
+	 */
+	SemQueueErrorCode dequeue(T* t)
+	{
+		std::unique_lock<std::mutex> lock(mtx);
+		if (q.empty())
+			cv.wait(lock, [&]() { return !q.empty() || !running; });
+		if (!running)
+		{
+			if(!q.empty())
+			{
+				*t = q.front();
+				q.pop();
+				return EC_SHUTDOWN;
+			}
+			else
+				return EC_SHUTDOWN_AND_EMPTY;
+
+		}
+
+
+		*t = q.front();
+		q.pop();
+
+		return EC_OK;
+	}
+
+	/**
+	 * @brief Get the first item from the queue or time out.
+	 * @retval t The first item from the queue
+	 * @param ms The time to wait till timeout in ms
+	 * @return
+	 * 'OK' if everything is fine,
+	 * 'TIMEOUT' if the call timed out.
+	 * 'SHUTDOWN' if the queue is on shutdown, but there are still items to
+	 *		dequeue,
+	 * 'SHUTDOWN_AND_EMPTY' if the queue  is on shutdown and empty and
+	 * 'IS_EMPTY' if the queue was empty.
+	 */
+	SemQueueErrorCode dequeue(T* t, uint32_t ms)
+	{
+		std::unique_lock<std::mutex> lock(mtx);
+		auto wres = std::cv_status::no_timeout;
+
+		if (q.empty()) {
+			wres = cv.wait_for(lock, std::chrono::milliseconds(ms));
+		}
+
+		if (wres == std::cv_status::timeout)
+			return EC_TIMEOUT;
+		if (!running)
+		{
+			if(!q.empty())
+			{
+				*t = q.front();
+				q.pop();
+				return EC_SHUTDOWN;
+			}
+			else
+				return EC_SHUTDOWN_AND_EMPTY;
+		}
+
+		*t = q.front();
+		q.pop();
+
+		return EC_OK;
+	}
+
+	/**
+	 * @brief Try to get the first item from the queue.
+	 * @details If the queue is empty this funcion will return immediatley.
+	 * @retval t The first item from the queue
+	 * @return
+	 * 'OK' if everything is fine,
+	 * 'SHUTDOWN' if the queue is on shutdown, but there are still items to
+	 *		dequeue,
+	 * 'SHUTDOWN_AND_EMPTY' if the queue  is on shutdown and empty and
+	 * 'IS_EMPTY' if the queue was empty.
+	 */
+	SemQueueErrorCode try_dequeue(T* t)
+	{
+		std::lock_guard<std::mutex> g(mtx);
+		if (q.empty())
+		{
+			return EC_IS_EMPTY;
+		}
+		if (!running)
+		{
+			if(!q.empty())
+			{
+				*t = q.front();
+				q.pop();
+				return EC_SHUTDOWN;
+			}
+			else
+				return EC_SHUTDOWN_AND_EMPTY;
+		}
+
+		*t = q.front();
+		q.pop();
+		return EC_OK;
+	}
+
+	/**
+	 * @brief Set this queue to shutdown mode
+	 * @details Will wake up all waiting 'dequeue()' calls and make them
+	 * return 'SHUTDOWN' or 'SHUTDOWN_AND_EMPTY'. All coming 'dequeue()' calls
+	 * will return 'SHUTDOWN' or 'SHUTDOWN_AND_EMPTY' immediately, until
+	 * 'start()' is called.
+	 */
+	void shutdown()
+	{
+		std::lock_guard<std::mutex> g(mtx);
+		this->running = false;
+		cv.notify_all();
+	}
+
+	/**
+	 * @brief Set this queue to running mode.
+	 * @details All upcoming 'dequeue()' calls will now block if the queue is
+	 * empty.
+	 */
+	void start()
+	{
+		mtx.lock();
+		this->running = true;
+		mtx.unlock();
+	}
+};
+}
+
+#endif //USING_OFL_SEM_QUEUE_H
+#include <functional>
+#include <atomic>
+#include <thread>
+/**
+ * @brief The Joint class The general connection interface.
+ * A Joint kann receive Items of a given type T, and might
+ * have an output joint.
+ */
+
+
+namespace ofl
+{
+
+template<typename T>
+class Item
+{
+public:
+	Item()
+		  :m_flags(F_NONE)
+	{
+	}
+	enum FLAGS
+	{
+		F_NONE = 0,
+		F_INVALID = 1,
+		F_STOP = 2 // if this flag is set the node will stop working and not use this item.
+	};
+
+	uint32_t& flags(){return  m_flags;}
+	const uint32_t& flags() const {return m_flags;}
+
+	T& payload(){return m_payload;}
+	const T& payload() const{return m_payload;}
+protected:
+	uint32_t m_flags;
+	T m_payload;
+
+
+};
+
+
+
+template<typename T>
+class Joint
+{
+protected:
+	Joint<T>* m_out;
+	std::atomic_flag m_running;
+	std::function<void (void)> m_on_start;
+public:
+	Joint(std::function<void (void)> on_start):
+		m_out(nullptr),m_on_start(on_start)
+	{}
+	virtual ~Joint(){}
+
+	virtual void insert(Item<T> itm) = 0;
+	virtual void grab(Item<T>& itm) = 0;
+
+	void setOutput(Joint<T> * o){m_out = o;}
+	Joint<T>* getOutput(){return m_out;}
+
+	/**
+	 * @brief link Connects this joint to another and vice versa:
+	 * A <------> this
+	 * @param A The other joint.
+	 */
+	void link(Joint<T>* A)
+	{
+		this->setOutput(A);
+		A->setOutput(this);
+	}
+
+	/**
+	 * @brief linkInBetween Links this Joint between two others:
+	 *
+	 * A --->this --->B
+	 * |______________|
+	 *
+	 * @param A The joint this one gets input from and B shall write to
+	 * @param B The joint this one writes to.
+	 */
+	void linkInBetween(Joint<T>* A,Joint<T>* B)
+	{
+		this->setOutput(B);
+		A->setOutput(this);
+		B->setOutput(A);
+	}
+
+	virtual void start()
+	{
+		if(!m_running.test_and_set())
+		{
+			m_on_start();
+			if(m_out)
+				m_out->start();
+		}
+	}
+	virtual void stop(){m_running.clear();}
+};
+
+
+
+
+/**
+ * @brief The QueuedJoint class
+ */
+template <typename T>
+class QueuedJoint : public Joint<T>
+{
+protected:
+	SemQueue<Item<T>> m_queue;
+public:
+	QueuedJoint(std::function<void (void)> on_start)
+		:Joint<T>(on_start)
+	{}
+	virtual ~QueuedJoint(){}
+
+	virtual void insert(Item<T> itm)
+	{
+		if((itm.flags() & Item<T>::F_STOP) && !(this->m_running.test_and_set()))
+		{
+			this->m_running.clear();
+			if(!(itm.flags() & Item<T>::F_INVALID))
+			{
+				itm.flags() ^= Item<T>::F_STOP;
+				m_queue.enqueue(itm);
+			}
+		}
+		else
+			m_queue.enqueue(itm);
+	}
+	virtual void grab(Item<T>& itm)
+	{
+		SemQueueErrorCode ec = m_queue.dequeue(&itm);
+		if(ec & EC_IS_EMPTY)
+			itm.flags() = (itm.flags() | Item<T>::F_INVALID);
+	}
+
+};
+
+
+
+
+
+/**
+ * @brief The Node class is something, that has a Joint, and will work on
+ * the data, then give it to the Joints output.
+ */
+template <typename T,class J = QueuedJoint<T>>
+class Node
+{
+
+protected:
+	/**
+	* @brief The Processor has only one joint.
+	*/
+	J m_joint;
+
+	std::thread m_thread;
+	std::atomic_flag m_in_loop;
+
+
+	virtual void m_loop()
+	{
+		Item<T> t;
+		while(m_in_loop.test_and_set())
+		{
+			m_joint.grab(t);
+			if(t.flags() & Item<T>::F_STOP)
+			{
+				m_in_loop.clear();
+				m_joint.stop();
+			}
+			doSth(t);
+			m_joint.getOutput()->insert(t);
+		}
+
+	}
+public:
+
+	Node() : m_joint([this](){this->start();})
+	{
+	}
+	virtual ~Node(){}
+
+	Joint<T>* getJoint(){return &m_joint;}
+
+	virtual void start()
+	{
+		if(!m_in_loop.test_and_set())
+		{
+			m_joint.start();
+			m_thread = std::thread(&Node::m_loop,this);
+		}
+	}
+
+	virtual void stop()
+	{
+		Item<T> stop;
+		stop.flags() = static_cast<typename Item<T>::FLAGS>(Item<T>::F_STOP |
+													Item<T>::F_INVALID);
+		m_joint.insert(stop);
+	}
+
+	virtual void kill()
+	{
+		m_in_loop.clear();
+		m_joint.stop();
+
+		Item<T> stop;
+		stop.flags() = Item<T>::F_STOP |Item<T>::F_INVALID ;
+		if(m_joint.getOutput())
+		{
+			m_joint.getOutput()->insert(stop);
+		}
+	}
+
+	virtual void join()
+	{
+		if(m_thread.joinable())
+			m_thread.join();
+	}
+	/**
+	 * @brief doSth What you want to do with the items that pass through
+	 * tis processor.
+	 * @param t an item
+	 */
+	virtual void doSth(Item<T>& t) = 0;
+};
+
+
+/**
+ * @brief The TransformNode class is a Node with two different
+ * Types of Joints. One receives the input, which is transformed to the other
+ * Type, which is then given to the right joint.
+ */
+template <typename T, typename Q>
+class TransformNode
+{
+protected:
+	QueuedJoint<T> m_left;
+	QueuedJoint<Q> m_right;
+
+	std::thread* m_thread;
+
+	std::atomic_flag m_in_loop;
+
+
+	virtual void m_loop()
+	{
+		Item<T> t;
+
+		while(m_in_loop.test_and_set())
+		{
+			m_left.grab(t);
+			printf("grabbed t:%d,%d\n",t.flags(),t.payload());
+			if(t.flags() & Item<T>::F_STOP)
+			{
+				m_in_loop.clear();
+				m_left.stop();
+
+
+				Item<Q> s;
+				m_right.stop();
+				s.flags() = Item<Q>::F_STOP | Item<Q>::F_INVALID;
+				if(m_right.getOutput())
+					m_right.getOutput()->insert(s);
+
+			}
+			else if(t.flags() & Item<T>::F_INVALID)
+			{
+				m_in_loop.clear();
+				continue;
+			}
+
+
+			doSth(t);
+
+			if(m_left.getOutput())
+				m_left.getOutput()->insert(t);
+			else
+				m_left.insert(t);
+
+		}
+
+	}
+public:
+
+	TransformNode() :
+		m_left([this](){this->start();m_right.start();}),
+		m_right([this](){m_left.start();})
+	{
+		m_in_loop.clear();
+	}
+	virtual ~TransformNode(){}
+
+	virtual Joint<T>* getLeft(){return &m_left;}
+	virtual Joint<Q>* getRight(){return &m_right;}
+
+	virtual void start()
+	{
+		if(!m_in_loop.test_and_set())
+		{
+			m_thread = new std::thread(&TransformNode::m_loop,this);
+		}
+	}
+
+	virtual void join()
+	{
+		m_thread->join();
+	}
+	/**
+	 * @brief doSth What you want to do with the items.
+	 * you can get outputbuffer with get_one and return them with push_out().
+	 * if you decide not to return them return it with drop();
+	 * @param t an item
+	 */
+	virtual void doSth(Item<T>& t) = 0;
+
+	void push_out(Item<Q>&q)
+	{
+		m_right.getOutput()->insert(q);
+	}
+
+	void drop(Item<Q>&q)
+	{
+		m_right.insert(q);
+	}
+
+	void grab_right(Item<Q>& q)
+	{
+		m_right.grab(q);
+	}
+
+};
+
+
+
+/**
+ * @brief A pipeline shall be used to encapsulate parts of the pipeline :P
+ */
+
+template <typename T, typename Q>
+class ProcessingGraph
+{
+
+public:
+	virtual Joint<T>* getLeft()=0;
+	virtual Joint<Q>* getRight()=0;
+
+	virtual void start() = 0;
+
+	virtual void stop() = 0;
+
+	virtual void join() = 0;
+};
+
+
+
+
+
+}
+
+#endif //USING_OFL_PROCESSING_GRAPH_H
+#ifndef USING_OFL_VRPV_H
+#define USING_OFL_VRPV_H
+#include <map>
+#include <vector>
+#include <string>
+#include <fstream>
+#include <sstream>
+
+
+namespace ofl {
+
+
+/**
+ * @brief The Screen class is basically an area in world space you want to
+ * render to. This might be a powerwall or the side of a cave or a segment
+ * in a segmented display.
+ */
+class Screen
+{
+	vec4 m_corners[3];
+	mat4 m_wall_space;
+	mat4 m_inv_wall_space;
+
+public:
+
+	enum CORNER
+	{
+		BL=0,
+		BR,
+		TL
+	} ;
+
+	vec4 corner(const int i) const;
+	/**
+	 * @brief Screen Constructor. Consumes three corners of the Screen area
+	 * The last corner is implied.
+	 * @param blc Bottom left corner.
+	 * @param trc Top right corner.
+	 * @param tlc Top left corner.
+	 */
+	Screen(const vec4 blc,const vec4 brc, const vec4& tlc);
+
+	/**
+	 * @brief calculate_projection_and_view Calculates a projection- and a view
+	 * matrix for a given eye position.
+	 * Note for stereo rendering you have to call this twice, once per eye.
+	 * @param eye The postition of the eye.
+	 * @param near The near distance.
+	 * @param far The far distance.
+	 * @param projection output where the projection matrix will be written to
+	 * @param view output where the view matrix will be written to
+	 */
+	void calculate_projection_and_view(
+			const vec4& eye,
+			const float near,
+			const float far,
+			mat4& projection_matrix,
+			mat4& view_matrix) const;
+};
+
+/**
+ * @brief The ScreenArrangement class groups Screens together. This might be use
+ * full for a cave or a multi-segment-display. Each Screen is accessible via
+ * its name or its id, or you just store a pointer to the screen you are
+ * interested in. In that case this class is only usefull for loading and
+ * storing ScreenArrangements
+ */
+class ScreenArrangement
+{
+	std::vector<Screen> m_screens;
+	std::map<std::string,Screen*> m_by_name;
+public:
+	/**
+	 * @brief addScreen Adds a Screen to the arrangement.
+	 * @param scrn The screen you wish to add (will be copied).
+	 * @param name The name of the screen.
+	 * @return a pointer to the interal screen, which can be accessed as long
+	 * as this Object exists.
+	 */
+	Screen* addScreen(const Screen scrn, const std::string& name);
+
+	/**
+	 * @brief getScreen Provides access to a screen via its id. If there is
+	 * no screen with this id a nullptr is returned.
+	 * @param id The id of the screen.
+	 * @return The Screen you asked for or nullptr if it does not exist.
+	 */
+	const Screen* getScreen(const int id)const;
+
+	/**
+	 * @brief getScreen Provides access to a screen via its name. If there is
+	 * no screen with this name a nullptr is returned.
+	 * @param name name of the screen.
+	 * @return	The Screen you asked for or nullptr if it does not exist.
+	 */
+	const Screen* getScreen(const std::string& name);
+
+	/**
+	 * @brief count_screens Returns the number of screens in this
+	 * ScreenArrangement
+	 * @return #Screens
+	 */
+	unsigned int countScreens() const;
+
+	/**
+	 * @brief addScreens Adds screens from a file to this arrangement.
+	 * The format of the file should be:
+	 * <name0> (blx,bly,blz,blw) (brx,bry,brz,brw) (tlx,tly,tlz,tlw)
+	 * <name1> (blx,bly,blz,blw) (brx,bry,brz,brw) (tlx,tly,tlz,tlw)
+	 * # ...
+	 * # a line starting with # is a comment line.
+	 * @param path to the file.
+	 * @return true if everything went well. false if there was a problem with
+	 * the file.
+	 */
+	bool loadScreens(const std::string& path);
+
+	/**
+	 * @brief saveScreens saves this ScreenArrangement to the disk
+	 * @param path where you want to store this.
+	 * @return true if ecerything went well, false if there was a problem with
+	 * the file.
+	 */
+	bool saveScreens(const std::string& path);
+};
+}
+
+#endif //USING_OFL_VRPV_H
+#ifndef USING_OFL_SOCKET_H
+#define USING_OFL_SOCKET_H
+#ifndef _WIN32
+#include <sys/types.h>
+#include <cstring>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <unistd.h>
+#else
+#include <WinSock2.h>
+#include <Ws2tcpip.h>
+#pragma comment(lib, "Ws2_32.lib")
+#endif
+
+#include <iostream>
+
+namespace ofl
+{
+/**
+ * @brief The Socket class is a simple socket abstraction layer, providing
+ * socket functionality for Windows and Unix-Systems alike.
+ */
+class Socket
+{
+	struct addrinfo * a_info;
+#ifdef _WIN32
+	SOCKET sock_handle;
+	static bool wsa_setup;
+	Socket(SOCKET sock_handle)
+	{
+		if (!wsa_setup)
+		{
+			int iResult;
+			WSADATA wsaData;
+			// Initialize Winsock
+			iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+			if (iResult != 0) {
+				printf("WSAStartup failed: %d\n", iResult);
+			}
+			wsa_setup = true;
+		}
+		this->sock_handle = sock_handle;
+		this->a_info = nullptr;
+	}
+#else
+	int sock_handle;
+
+	Socket(int sock_handle)
+	{
+		this->sock_handle = sock_handle;
+		this->a_info = nullptr;
+	}
+#endif
+
+
+
+public:
+
+	void plotError(std::string&& msg)
+	{
+		fprintf(stderr,"[ E ] Socket: %s \n",msg.c_str());
+#ifndef _WIN32
+		fprintf(stderr,"[ E ] Socket: %s \n\t %s",msg.c_str(),strerror(errno));
+#else
+		char buffer[256];
+		strerror_s(buffer, 256, errno);
+		std::cerr << buffer << "\n";
+#endif
+	}
+	Socket(const std::string address, const std::string port,
+		   int type = SOCK_STREAM , int family = AF_UNSPEC)
+	{
+#ifdef _WIN32
+		if (!wsa_setup)
+		{
+			int iResult;
+			WSADATA wsaData;
+			// Initialize Winsock
+			iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+			if (iResult != 0) {
+				printf("WSAStartup failed: %d\n", iResult);
+			}
+			wsa_setup = true;
+		}
+#endif
+		this->a_info = nullptr;
+		struct addrinfo hints;
+		memset(&hints,0,sizeof(hints));
+		hints.ai_family = family;
+		hints.ai_socktype = type;
+		if(address.empty())
+			hints.ai_flags = AI_PASSIVE;
+		int status;
+		const char* addr = address.c_str();
+		if(address.empty())
+			addr = NULL;
+		if((status = getaddrinfo(addr,
+								 port.c_str(),&hints,&a_info)) != 0)
+		{
+			plotError("Socket: getAdressInfo failed");
+		}
+		else
+		{
+			sock_handle = socket(
+						a_info->ai_family,
+						a_info->ai_socktype,
+						a_info->ai_protocol);
+			if(sock_handle < 0)
+			{
+				plotError(std::string("socket() failed"));
+			}
+
+		}
+	}
+
+	virtual ~Socket()
+	{
+		close();
+	}
+
+	Socket(char* address, char* port,
+		   int type = SOCK_STREAM, int family = AF_UNSPEC)
+	{
+
+#ifdef _WIN32
+		if (!wsa_setup)
+		{
+			int iResult;
+			WSADATA wsaData;
+			// Initialize Winsock
+			iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+			if (iResult != 0) {
+				plotError("WSAStartup failed!");
+			}
+			wsa_setup = true;
+		}
+#endif
+		this->a_info = nullptr;
+		struct addrinfo hints;
+		memset(&hints,0,sizeof(hints));
+		hints.ai_family = family;
+		hints.ai_socktype = type;
+		if(!address)
+			hints.ai_flags = AI_PASSIVE;
+		int status;
+		if((status = getaddrinfo(address,port,&hints,&a_info)) != 0)
+		{
+			plotError("Socket: getAdressInfo failed!");
+		}
+		else
+		{
+			sock_handle = socket(
+						a_info->ai_family,
+						a_info->ai_socktype,
+						a_info->ai_protocol);
+			if(sock_handle < 0)
+			{
+				plotError(std::string("socket() failed"));
+			}
+		}
+	}
+	int bind(struct addrinfo* a_info = nullptr)
+	{
+		int status;
+		struct addrinfo* a;
+		if (a_info)
+			a = a_info;
+		else
+			a = this->a_info;
+
+
+		status = ::bind(sock_handle,
+						a->ai_addr,
+						a->ai_addrlen);
+		if(status<0)
+		{
+			plotError(std::string("bind() failed"));
+		}
+		return status;
+	}
+
+	int connect(struct addrinfo* a_info = nullptr)
+	{
+		struct addrinfo* a;
+		if (a_info)
+			a = a_info;
+		else
+			a = this->a_info;
+
+		if(!a)
+		{
+			plotError(" connect() impossible:\n no address"
+						"information. This sockets constructor failed or it \n"
+						"was created by an accept call and is already \n"
+						"connected.");
+			return -1;
+		}
+
+		int status = ::connect(
+					sock_handle,
+					a->ai_addr,
+					a->ai_addrlen);
+
+		if(status < 0)
+		{
+			plotError(std::string("connect() failed"));
+		}
+		return status;
+	}
+
+	int listen(int backlog)
+	{
+		int status = ::listen(sock_handle, backlog);
+
+		if(status < 0)
+		{
+			plotError(std::string("listen() failed"));
+		}
+		return status;
+	}
+
+	Socket* accept()
+	{
+		struct sockaddr_storage opp_addr;
+		socklen_t addr_size = sizeof(opp_addr);
+
+		int new_sock =::accept(
+					this->sock_handle,
+					(struct sockaddr*) &opp_addr,
+					&addr_size);
+		if(new_sock < 0)
+		{
+			plotError(std::string("accept() failed"));
+		}
+		return new Socket(new_sock);
+	}
+
+	int send(const void* data, const size_t data_len, int flags = 0 )
+	{
+#ifndef _WIN32
+	int status =  ::send(this->sock_handle,data,data_len,flags);
+#else
+	int status = ::send(this->sock_handle,(const char*) data, data_len, flags);
+#endif
+		if(status < 0)
+		{
+			plotError(std::string("send() failed"));
+		}
+		return status;
+	}
+
+	int sendAll(const void* data, int data_len, int flags = 0)
+	{
+		int send_data = 0 ;
+		while(send_data < data_len)
+		{
+
+			int status = ::send(this->sock_handle,
+								(const char*)data + send_data, data_len, flags);
+			if(status < 0)
+			{
+				plotError(std::string("send() in sendAll() failed"));
+				return -1;
+			}
+			send_data+= status;
+		}
+		return send_data;
+	}
+	int recv(void * buffer, const size_t len, int flags = 0)
+	{
+#ifndef _WIN32
+		int status = ::recv(this->sock_handle,buffer,len,flags);
+#else
+		int status = ::recv(this->sock_handle, (char*) buffer, len, flags);
+#endif
+		if(status < 0)
+		{
+			plotError(std::string("recv() failed"));
+		}
+		return status;
+	}
+
+	void close()
+	{
+#ifndef _WIN32
+		::close(this->sock_handle);
+#else
+		closesocket(this->sock_handle);
+#endif
+	}
+
+	int getpeername(struct sockaddr_storage* addr, socklen_t* addrlen)
+	{
+
+		int status =  ::getpeername(this->sock_handle,
+									reinterpret_cast<struct sockaddr*>( addr),
+									addrlen);
+		if(status < 0)
+		{
+			plotError(std::string("getpeername() failed"));
+		}
+		return status;
+	}
+
+	virtual int write_data(const void* data, const size_t len)
+	{
+		return this->send(data, len);
+	}
+	virtual int read_data(void* buffer, const size_t  len)
+	{
+		return	this->recv(buffer, len);
+	}
+};
+}
+
+#endif //USING_OFL_SOCKET_H
+#ifndef USING_OFL_TRACK_H
+#define USING_OFL_TRACK_H
+
+#include <sstream>
+#include <vector>
+#include <mutex>
+#include <map>
+#include <thread>
+
+namespace ofl {
+
+class Target
+{
+protected:
+	unsigned int m_id;
+	unsigned int m_frame_no;
+public:
+	unsigned int id()const {return m_id;}
+	unsigned int frame_no()const {return m_frame_no;}
+	Target(unsigned int id = 0, unsigned int frame_no = 0)
+		:m_id(id),m_frame_no(frame_no)
+	{}
+	virtual const vec4& position() const = 0;
+	virtual void transform(const mat4& T) = 0;
+};
+
+
+
+class Target3DOF : public Target
+{
+protected:
+	vec4 m_position;
+
+public:
+	Target3DOF(unsigned int id = 0, unsigned int frame_no = 0,
+			   const vec4& pos =vec4(0)
+			   );
+	virtual void transform(const mat4& T);
+
+	const vec4& position() const;
+};
+
+
+class Target6DOF : public Target3DOF
+{
+protected:
+	mat4 m_orientation;
+public:
+	Target6DOF(unsigned int id = 0,
+			   unsigned int frame_no = 0,
+			   const vec4& pos = vec4(0),
+			   const mat4& orientation = mat4(0));
+	void transform(const mat4& T);
+
+	const mat4& orientation() const;
+};
+
+class TargetFlystick : public Target6DOF
+{
+protected:
+	std::vector<unsigned char> m_button_state;
+public:
+	enum ButtonState
+	{
+		released = 0,
+		pressed,
+	};
+	TargetFlystick(unsigned int id = 0,
+				   unsigned int frame_no =0 ,
+				   std::vector<unsigned char> b = std::vector<unsigned char>(8,0),
+				   const vec4& pos = vec4(0),
+				   const mat4& orientation = mat4(0));
+
+	ButtonState button(const unsigned int id) const;
+};
+
+
+class TrackingData
+{
+	std::vector<Target3DOF> m_t3d;
+	std::mutex m_t3d_mtx;
+	std::map<int,Target6DOF> m_t6d;
+	std::mutex m_t6d_mtx;
+	std::map<int,Target6DOF> m_t6di;
+	std::mutex m_t6di_mtx;
+	std::map<int,TargetFlystick> m_tfly;
+	std::mutex m_tfly_mtx;
+
+	mat4 m_transformation;
+	unsigned int m_curr_frame_no;
+
+	bool m_goon;
+	std::mutex m_goon_mtx;
+
+	std::thread m_thread;
+
+	Socket m_sock;
+
+	void lock_all();
+
+	void unlock_all();
+
+
+	void loop();
+
+public:
+	TrackingData(
+			const std::string& address,
+			const std::string& port);
+	~TrackingData();
+	void start();
+
+	void stop();
+
+	void setTransformation(const mat4& mat);
+
+	std::vector<Target3DOF> get3ds();
+	Target6DOF get6d(const unsigned int id);
+	Target6DOF get6di(const unsigned int id);
+	Target6DOF getFlystick(const unsigned int id);
+
+
+};
+
+}
+
+#endif //USING_OFL_TRACK_H
+#ifndef USING_OFL_VDMAN_H
+#define USING_OFL_VDMAN_H
+
 
 #include <vector>
 #include <map>
@@ -2476,487 +3673,15 @@ public:
 };
 
 }
-#ifndef _WIN32
-#include <sys/types.h>
-#include <cstring>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <unistd.h>
-#else
-#include <WinSock2.h>
-#include <Ws2tcpip.h>
-#pragma comment(lib, "Ws2_32.lib")
-#endif
 
-#include <iostream>
-
-namespace ofl
-{
-/**
- * @brief The Socket class is a simple socket abstraction layer, providing
- * socket functionality for Windows and Unix-Systems alike.
- */
-class Socket
-{
-	struct addrinfo * a_info;
-#ifdef _WIN32
-	SOCKET sock_handle;
-	static bool wsa_setup;
-	Socket(SOCKET sock_handle)
-	{
-		if (!wsa_setup)
-		{
-			int iResult;
-			WSADATA wsaData;
-			// Initialize Winsock
-			iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-			if (iResult != 0) {
-				printf("WSAStartup failed: %d\n", iResult);
-			}
-			wsa_setup = true;
-		}
-		this->sock_handle = sock_handle;
-		this->a_info = nullptr;
-	}
-#else
-	int sock_handle;
-
-	Socket(int sock_handle)
-	{
-		this->sock_handle = sock_handle;
-		this->a_info = nullptr;
-	}
-#endif
-
-
-
-public:
-
-	void plotError(std::string&& msg)
-	{
-		fprintf(stderr,"[ E ] Socket: %s \n",msg.c_str());
-#ifndef _WIN32
-		fprintf(stderr,"[ E ] Socket: %s \n\t %s",msg.c_str(),strerror(errno));
-#else
-		char buffer[256];
-		strerror_s(buffer, 256, errno);
-		std::cerr << buffer << "\n";
-#endif
-	}
-	Socket(const std::string address, const std::string port,
-		   int type = SOCK_STREAM , int family = AF_UNSPEC)
-	{
-#ifdef _WIN32
-		if (!wsa_setup)
-		{
-			int iResult;
-			WSADATA wsaData;
-			// Initialize Winsock
-			iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-			if (iResult != 0) {
-				printf("WSAStartup failed: %d\n", iResult);
-			}
-			wsa_setup = true;
-		}
-#endif
-		this->a_info = nullptr;
-		struct addrinfo hints;
-		memset(&hints,0,sizeof(hints));
-		hints.ai_family = family;
-		hints.ai_socktype = type;
-		if(address.empty())
-			hints.ai_flags = AI_PASSIVE;
-		int status;
-		const char* addr = address.c_str();
-		if(address.empty())
-			addr = NULL;
-		if((status = getaddrinfo(addr,
-								 port.c_str(),&hints,&a_info)) != 0)
-		{
-			plotError("Socket: getAdressInfo failed");
-		}
-		else
-		{
-			sock_handle = socket(
-						a_info->ai_family,
-						a_info->ai_socktype,
-						a_info->ai_protocol);
-			if(sock_handle < 0)
-			{
-				plotError(std::string("socket() failed"));
-			}
-
-		}
-	}
-
-	virtual ~Socket()
-	{
-		close();
-	}
-
-	Socket(char* address, char* port,
-		   int type = SOCK_STREAM, int family = AF_UNSPEC)
-	{
-
-#ifdef _WIN32
-		if (!wsa_setup)
-		{
-			int iResult;
-			WSADATA wsaData;
-			// Initialize Winsock
-			iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-			if (iResult != 0) {
-				plotError("WSAStartup failed!");
-			}
-			wsa_setup = true;
-		}
-#endif
-		this->a_info = nullptr;
-		struct addrinfo hints;
-		memset(&hints,0,sizeof(hints));
-		hints.ai_family = family;
-		hints.ai_socktype = type;
-		if(!address)
-			hints.ai_flags = AI_PASSIVE;
-		int status;
-		if((status = getaddrinfo(address,port,&hints,&a_info)) != 0)
-		{
-			plotError("Socket: getAdressInfo failed!");
-		}
-		else
-		{
-			sock_handle = socket(
-						a_info->ai_family,
-						a_info->ai_socktype,
-						a_info->ai_protocol);
-			if(sock_handle < 0)
-			{
-				plotError(std::string("socket() failed"));
-			}
-		}
-	}
-	int bind(struct addrinfo* a_info = nullptr)
-	{
-		int status;
-		struct addrinfo* a;
-		if (a_info)
-			a = a_info;
-		else
-			a = this->a_info;
-
-
-		status = ::bind(sock_handle,
-						a->ai_addr,
-						a->ai_addrlen);
-		if(status<0)
-		{
-			plotError(std::string("bind() failed"));
-		}
-		return status;
-	}
-
-	int connect(struct addrinfo* a_info = nullptr)
-	{
-		struct addrinfo* a;
-		if (a_info)
-			a = a_info;
-		else
-			a = this->a_info;
-
-		if(!a)
-		{
-			plotError(" connect() impossible:\n no address"
-						"information. This sockets constructor failed or it \n"
-						"was created by an accept call and is already \n"
-						"connected.");
-			return -1;
-		}
-
-		int status = ::connect(
-					sock_handle,
-					a->ai_addr,
-					a->ai_addrlen);
-
-		if(status < 0)
-		{
-			plotError(std::string("connect() failed"));
-		}
-		return status;
-	}
-
-	int listen(int backlog)
-	{
-		int status = ::listen(sock_handle, backlog);
-
-		if(status < 0)
-		{
-			plotError(std::string("listen() failed"));
-		}
-		return status;
-	}
-
-	Socket* accept()
-	{
-		struct sockaddr_storage opp_addr;
-		socklen_t addr_size = sizeof(opp_addr);
-
-		int new_sock =::accept(
-					this->sock_handle,
-					(struct sockaddr*) &opp_addr,
-					&addr_size);
-		if(new_sock < 0)
-		{
-			plotError(std::string("accept() failed"));
-		}
-		return new Socket(new_sock);
-	}
-
-	int send(const void* data, const size_t data_len, int flags = 0 )
-	{
-#ifndef _WIN32
-	int status =  ::send(this->sock_handle,data,data_len,flags);
-#else
-	int status = ::send(this->sock_handle,(const char*) data, data_len, flags);
-#endif
-		if(status < 0)
-		{
-			plotError(std::string("send() failed"));
-		}
-		return status;
-	}
-
-	int sendAll(const void* data, int data_len, int flags = 0)
-	{
-		int send_data = 0 ;
-		while(send_data < data_len)
-		{
-
-			int status = ::send(this->sock_handle,
-								(const char*)data + send_data, data_len, flags);
-			if(status < 0)
-			{
-				plotError(std::string("send() in sendAll() failed"));
-				return -1;
-			}
-			send_data+= status;
-		}
-		return send_data;
-	}
-	int recv(void * buffer, const size_t len, int flags = 0)
-	{
-#ifndef _WIN32
-		int status = ::recv(this->sock_handle,buffer,len,flags);
-#else
-		int status = ::recv(this->sock_handle, (char*) buffer, len, flags);
-#endif
-		if(status < 0)
-		{
-			plotError(std::string("recv() failed"));
-		}
-		return status;
-	}
-
-	void close()
-	{
-#ifndef _WIN32
-		::close(this->sock_handle);
-#else
-		closesocket(this->sock_handle);
-#endif
-	}
-
-	int getpeername(struct sockaddr_storage* addr, socklen_t* addrlen)
-	{
-
-		int status =  ::getpeername(this->sock_handle,
-									reinterpret_cast<struct sockaddr*>( addr),
-									addrlen);
-		if(status < 0)
-		{
-			plotError(std::string("getpeername() failed"));
-		}
-		return status;
-	}
-
-	virtual int write_data(const void* data, const size_t len)
-	{
-		return this->send(data, len);
-	}
-	virtual int read_data(void* buffer, const size_t  len)
-	{
-		return	this->recv(buffer, len);
-	}
-};
-}
-
-#include <sstream>
-#include <vector>
-#include <mutex>
-#include <map>
-#include <thread>
-
-namespace ofl {
-
-class Target
-{
-protected:
-	unsigned int m_id;
-	unsigned int m_frame_no;
-public:
-	unsigned int id()const {return m_id;}
-	unsigned int frame_no()const {return m_frame_no;}
-	Target(unsigned int id = 0, unsigned int frame_no = 0)
-		:m_id(id),m_frame_no(frame_no)
-	{}
-	virtual const vec4& position() const = 0;
-	virtual void transform(const mat4& T) = 0;
-};
-
-
-
-class Target3DOF : public Target
-{
-protected:
-	vec4 m_position;
-
-public:
-	Target3DOF(unsigned int id = 0, unsigned int frame_no = 0,
-			   const vec4& pos =vec4(0)
-			   );
-	virtual void transform(const mat4& T);
-
-	const vec4& position() const;
-};
-
-
-class Target6DOF : public Target3DOF
-{
-protected:
-	mat4 m_orientation;
-public:
-	Target6DOF(unsigned int id = 0,
-			   unsigned int frame_no = 0,
-			   const vec4& pos = vec4(0),
-			   const mat4& orientation = mat4(0));
-	void transform(const mat4& T);
-
-	const mat4& orientation() const;
-};
-
-class TargetFlystick : public Target6DOF
-{
-protected:
-	std::vector<unsigned char> m_button_state;
-public:
-	enum ButtonState
-	{
-		released = 0,
-		pressed,
-	};
-	TargetFlystick(unsigned int id = 0,
-				   unsigned int frame_no =0 ,
-				   std::vector<unsigned char> b = std::vector<unsigned char>(8,0),
-				   const vec4& pos = vec4(0),
-				   const mat4& orientation = mat4(0));
-
-	ButtonState button(const unsigned int id) const;
-};
-
-
-class TrackingData
-{
-	std::vector<Target3DOF> m_t3d;
-	std::mutex m_t3d_mtx;
-	std::map<int,Target6DOF> m_t6d;
-	std::mutex m_t6d_mtx;
-	std::map<int,Target6DOF> m_t6di;
-	std::mutex m_t6di_mtx;
-	std::map<int,TargetFlystick> m_tfly;
-	std::mutex m_tfly_mtx;
-
-	mat4 m_transformation;
-	unsigned int m_curr_frame_no;
-
-	bool m_goon;
-	std::mutex m_goon_mtx;
-
-	std::thread m_thread;
-
-	Socket m_sock;
-
-	void lock_all();
-
-	void unlock_all();
-
-
-	void loop();
-
-public:
-	TrackingData(
-			const std::string& address,
-			const std::string& port);
-	~TrackingData();
-	void start();
-
-	void stop();
-
-	void setTransformation(const mat4& mat);
-
-	std::vector<Target3DOF> get3ds();
-	Target6DOF get6d(const unsigned int id);
-	Target6DOF get6di(const unsigned int id);
-	Target6DOF getFlystick(const unsigned int id);
-
-
-};
-
-}
+#endif //USING_OFL_VDMAN_H
 
 
 
 #endif //USING_OFL_ALL_H
-#ifndef USING_OFL_OGL_GEO_H
- #define USING_OFL_OGL_GEO_H
- 
-#endif //USING_OFL_OGL_GEO_H
-#ifndef USING_OFL_OGL_STATE_H
- #define USING_OFL_OGL_STATE_H
- 
-#endif //USING_OFL_OGL_STATE_H
-#ifndef USING_OFL_OGL_WIN_H
- #define USING_OFL_OGL_WIN_H
- 
-#endif //USING_OFL_OGL_WIN_H
-#ifndef USING_OFL_SOCKET_H
- #define USING_OFL_SOCKET_H
- 
-#endif //USING_OFL_SOCKET_H
-#ifndef USING_OFL_STRU_H
- #define USING_OFL_STRU_H
- 
-#endif //USING_OFL_STRU_H
-#ifndef USING_OFL_TRACK_H
- #define USING_OFL_TRACK_H
- 
-#endif //USING_OFL_TRACK_H
-#ifndef USING_OFL_VD_H
- #define USING_OFL_VD_H
- 
-#endif //USING_OFL_VD_H
-#ifndef USING_OFL_VDMAN_H
- #define USING_OFL_VDMAN_H
- 
-#endif //USING_OFL_VDMAN_H
-#ifndef USING_OFL_VMATH_H
- #define USING_OFL_VMATH_H
- 
-#endif //USING_OFL_VMATH_H
-#ifndef USING_OFL_VRPV_H
- #define USING_OFL_VRPV_H
- 
-#endif //USING_OFL_VRPV_H
 #ifdef OFL_IMPLEMENTATION
+#ifndef USING_OFL_OGL_GEO_CPP
+#define USING_OFL_OGL_GEO_CPP
 #include <climits>
 namespace ofl
 {
@@ -3072,6 +3797,10 @@ Geometry::~Geometry()
 }
 
 }
+
+#endif //USING_OFL_OGL_GEO_CPP
+#ifndef USING_OFL_OGL_STATE_CPP
+#define USING_OFL_OGL_STATE_CPP
 #include <vector>
 #include <string>
 #include <fstream>
@@ -3594,6 +4323,395 @@ void StateSimulator::useCurrentShader()
 }
 }
 
+#endif //USING_OFL_OGL_STATE_CPP
+#ifndef USING_OFL_OGL_STEREO_COMPOSITOR_CPP
+#define USING_OFL_OGL_STEREO_COMPOSITOR_CPP
+#include <glad/glad.h>
+namespace ofl {
+
+
+void ofl::StereoCompositor::resize(const int width, const int height)
+{
+	m_width  = width;
+	m_height = height;
+	m_wh_dirty = true;
+}
+
+void ofl::StereoCompositor::setCompositingMode(ofl::StereoCompositor::CompositingMode cm)
+{
+	switch (m_cmode)
+	{
+	case SideBySide:
+	case BottomTop:
+		glViewport(0,0,m_width,m_height);
+		break;
+	case VerticalInterlace:
+	case HorizontalInterlace:
+	case CheckerboardInterlace:
+		glDisable(GL_STENCIL_TEST);
+		break;
+	case QuadBuffered:
+		glDrawBuffer(GL_BACK);
+		break;
+	case AnaglyphRedCyan:
+	case AnaglyphYellowBlue:
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		break;
+	case MODE_COUNT:break;
+	}
+	m_cmode = cm;
+
+	switch (m_cmode)
+	{
+		case VerticalInterlace:
+		case HorizontalInterlace:
+		case CheckerboardInterlace:
+		glEnable(GL_STENCIL_TEST);
+		break;
+	default:break;
+	}
+	m_wh_dirty = true;
+}
+
+ofl::StereoCompositor::StereoCompositor(const ofl::StereoCompositor::CompositingMode mode)
+	:m_cmode(MODE_COUNT), m_width(0), m_height(0), m_wh_dirty(true)
+{
+	setCompositingMode(mode);
+
+	const char* fragment_shader =
+			"#version 330\n"
+			"out vec4 clr; "
+			"void main()"
+			"{clr = vec4(1);}";
+	int len = static_cast<int>(strlen(fragment_shader));
+	const char* codes[] = {
+
+		"#version 330\n"
+		"uniform int width; uniform int height;\n"
+		"void main()\n"
+		"{\n"
+		"float ow = 0.5/float(width);"
+		"	float num = 2*float(gl_VertexID%2)-1;\n"
+		"	float h = 2*float((gl_VertexID/2)*2)/width-1;\n"
+		"	gl_Position = vec4(ow+h,num,0,1);\n"
+		"}\n"
+		,
+		"#version 330\n"
+		"uniform int width; uniform int height;\n"
+		"void main()\n"
+		"{\n"
+		" float oh = 0.5/float(height);"
+		"	float num = 2*float(gl_VertexID%2)-1;\n"
+		"	float h = 2*float((gl_VertexID/2)*2)/height-1;\n"
+		"	gl_Position = vec4(num,h+oh,0,1);\n"
+		"}\n"
+		,
+		"#version 330\n"
+		"uniform int width; uniform int height;\n"
+		"void main()\n"
+		"{\n"
+		"	float num = 2*float(gl_VertexID%2)-1;\n"
+		"	float h = 2*float((gl_VertexID/2)*2)/height-1;\n"
+		"	gl_Position = vec4(num,h,0,1);\n"
+		"}"
+	};
+	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+	GLuint vs = 0;
+	glShaderSource(fs,1,&fragment_shader,&len);
+	glCompileShader(fs);
+
+	for(int i =0 ; i < SideBySide ;i++)
+	{
+		m_stencil_shader[i] =glCreateProgram();
+		vs = glCreateShader(GL_VERTEX_SHADER);
+		len = static_cast<int>(strlen(codes[i]));
+		glShaderSource(vs,1,&codes[i],&len);
+		glCompileShader(vs);
+		GLint compiled;
+
+		glGetShaderiv(vs, GL_COMPILE_STATUS, &compiled);
+		if (!compiled)
+		{
+			GLint blen = 0;
+			GLsizei slen = 0;
+
+			glGetShaderiv(vs, GL_INFO_LOG_LENGTH , &blen);
+			if (blen > 1)
+			{
+				GLchar* log = new GLchar[blen];
+				glGetShaderInfoLog(vs, blen, &slen, log);
+				printf("stencil shader log:\n%s\n", log);
+				delete[] log;
+			}
+		}
+
+		glAttachShader(m_stencil_shader[i],vs);
+		glAttachShader(m_stencil_shader[i],fs);
+		glLinkProgram(m_stencil_shader[i]);
+
+		m_width_loc[i] = glGetUniformLocation(m_stencil_shader[i],"width");
+		m_height_loc[i] = glGetUniformLocation(m_stencil_shader[i],"height");
+	}
+
+
+	const char* pp_vs_code =
+			"#version 330\n"
+			"out vec2 tex_coord;\n"
+			"void main()\n"
+			"{\n"
+			"	tex_coord.x = float(gl_VertexID%2);\n"
+			"	tex_coord.y = float(gl_VertexID>>1);\n"
+			"	gl_Position = vec4(tex_coord*2-vec2(1,1),0,1);\n"
+
+			"}\n";
+
+	vs = glCreateShader(GL_VERTEX_SHADER);
+	len = static_cast<int>(strlen(pp_vs_code));
+	glShaderSource(vs,1,&pp_vs_code,&len);
+	glCompileShader(vs);
+
+	const char* pp_codes[] = {
+		// Vertical-------------------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr; \n"
+		"layout(binding = 99) uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	float eye = float(int(gl_FragCoord.x)%2);"
+		"	clr=texture(textures, vec3(tex_coord,eye));"
+		"}",
+		// Horizontal-----------------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr; \n"
+		"layout(binding = 99) uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	float eye = float(int(gl_FragCoord.y)%2);"
+		"	clr=texture(textures, vec3(tex_coord,eye));"
+		"}",
+		// checker--------------------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr; \n"
+		"layout(binding = 99) uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	float eye = float(int(gl_FragCoord.x+gl_FragCoord.y)%2);"
+		"	clr=texture(textures, vec3(tex_coord,eye));"
+		"}",
+		// sbs -----------------------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr; \n"
+		"layout(binding = 99) uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	float eye = int(2.0*tex_coord.x);\n"
+		"	vec3 texc = vec3(tex_coord,eye);"
+		"	texc.x = mod(2.0*tex_coord.x,1.0);"
+		"	clr=texture(textures, texc);"
+		"}",
+
+		// bt -----------------------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr; \n"
+		"layout(binding = 99) uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	float eye = int(2.0*tex_coord.y);"
+		"	vec3 texc = vec3(tex_coord,eye);"
+		"	texc.y = mod(2.0*tex_coord.y,1.0);"
+		"	clr=texture(textures, texc);"
+		"}",
+
+		// anaglyph red cyan --------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr; \n"
+		"layout(binding = 99) uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	vec4 l = texture(textures, vec3(tex_coord,0));\n"
+		"	vec4 r = texture(textures, vec3(tex_coord,1));\n"
+		"	float rg = 0.2126* r.r + 0.7152* r.g + 0.0722* r.b;\n"
+		"	float lg = 0.2126* l.r + 0.7152* l.g + 0.0722* l.b;\n"
+		"	clr= vec4(lg,rg,rg,1.0);"
+		"}",
+
+		// anaglyph yellow blue ------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr; \n"
+		"layout(binding = 99) uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	vec4 l = texture(textures, vec3(tex_coord,0));\n"
+		"	vec4 r = texture(textures, vec3(tex_coord,1));\n"
+		"	float rg = 0.2126* r.r + 0.7152* r.g + 0.0722* r.b;\n"
+		"	float lg = 0.2126* l.r + 0.7152* l.g + 0.0722* l.b;\n"
+		"	clr= vec4(lg,lg,rg,1.0);"
+		"}",
+
+		// quad buffering ------------------------------------------------------
+		"#version 330\n"
+		"in vec2 tex_coord;\n"
+		"layout(location = 0) out vec4 clr_l; \n"
+		"layout(location = 1) out vec4 clr_r; \n"
+
+		"layout(binding = 99)  uniform sampler2DArray textures;\n"
+		"void main()\n"
+		"{\n"
+		"	clr_l = texture(textures, vec3(tex_coord,0));\n"
+		"	clr_r = texture(textures, vec3(tex_coord,1));\n"
+		"}"
+	};
+
+	for(int i =0 ; i < MODE_COUNT ;i++)
+	{
+		m_post_processing_shader[i] =glCreateProgram();
+		fs = glCreateShader(GL_FRAGMENT_SHADER);
+		len = static_cast<int>(strlen(pp_codes[i]));
+		glShaderSource(fs,1,&pp_codes[i],&len);
+		glCompileShader(fs);
+		GLint compiled;
+
+		glGetShaderiv(fs, GL_COMPILE_STATUS, &compiled);
+		if (!compiled)
+		{
+			GLint blen = 0;
+			GLsizei slen = 0;
+
+			glGetShaderiv(fs, GL_INFO_LOG_LENGTH , &blen);
+			if (blen > 1)
+			{
+				GLchar* log = new GLchar[blen];
+				glGetShaderInfoLog(vs, blen, &slen, log);
+				printf("pp shader log:\n%s\n", log);
+				delete[] log;
+			}
+		}
+
+		glAttachShader(m_post_processing_shader[i],vs);
+		glAttachShader(m_post_processing_shader[i],fs);
+		glLinkProgram(m_post_processing_shader[i]);
+		glUseProgram(m_post_processing_shader[i]);
+		glUniform1i(glGetUniformLocation(m_post_processing_shader[i],"textures")
+					,12);
+	}
+
+}
+
+
+void ofl::StereoCompositor::setEye(const ofl::StereoCompositor::Eye eye)
+{
+	switch (m_cmode)
+	{
+	case SideBySide:
+		glViewport(m_width/2*eye,0,m_width/2,m_height);
+		break;
+	case BottomTop:
+		glViewport(0,m_height/2*eye,m_width,m_height/2);
+		break;
+	case VerticalInterlace:
+	case HorizontalInterlace:
+	case CheckerboardInterlace:
+		if(m_wh_dirty)
+			create_stencil_buffer();
+		glStencilFunc(GL_EQUAL, eye, 0xFF);
+		break;
+	case QuadBuffered:
+		glDrawBuffer(GL_BACK_LEFT+ eye);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		break;
+	case AnaglyphRedCyan:
+		if(eye==Left)
+			glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
+		else
+			glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_FALSE);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		break;
+	case AnaglyphYellowBlue:
+		if(eye==Left)
+			glColorMask(GL_TRUE, GL_TRUE, GL_FALSE, GL_FALSE);
+		else
+			glColorMask(GL_FALSE, GL_FALSE, GL_TRUE, GL_FALSE);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		break;
+	case MODE_COUNT:break;
+
+
+	}
+
+}
+
+void ofl::StereoCompositor::composite(GLuint left_right_texture_array)
+{
+	glActiveTexture(GL_TEXTURE0+12);
+	glBindTexture(GL_TEXTURE_2D_ARRAY,left_right_texture_array);
+	if(m_cmode == QuadBuffered)
+	{
+		const GLenum buffs[]={GL_BACK_LEFT, GL_BACK_RIGHT};
+		glDrawBuffers(2,buffs);
+	}
+	glUseProgram(m_post_processing_shader[m_cmode]);
+	glDrawArrays(GL_TRIANGLE_STRIP,0,4);
+}
+
+mat4 ofl::StereoCompositor::getAsymetricProjection(
+		ofl::StereoCompositor::Eye eye,
+		float eye_dist,
+		float fovy,
+		float near,
+		float far,
+		float focal_length)
+{
+	float ar = static_cast<float>(m_width)/m_height;
+	float top = near * tanf(fovy/ 2.0f);
+	float bottom = -top;
+	float eye_sep = eye_dist * (static_cast<float>(eye)*2.0f-1.0f);
+	float delta = 0.5f * eye_sep * near / focal_length;
+	float left = -ar * top - delta;
+	float right = ar * top - delta;
+	return frustum(left,right,bottom,top,near,far);
+}
+
+void ofl::StereoCompositor::create_stencil_buffer()
+{	
+	//glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	glDepthMask(GL_FALSE);
+	glStencilFunc(GL_NEVER, 1, 0xFF);
+	glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
+
+	glStencilMask(0xFF);
+	glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glUseProgram(m_stencil_shader[m_cmode]);
+	if(m_wh_dirty)
+	{
+		glUniform1i(m_width_loc[m_cmode],m_width);
+		glUniform1i(m_height_loc[m_cmode],m_height);
+		m_wh_dirty = false;
+	}
+	if(m_cmode == VerticalInterlace)
+		glDrawArrays(GL_LINES,0,m_width);
+	else if(m_cmode == HorizontalInterlace)
+		glDrawArrays(GL_LINES,0,m_height);
+	else if(m_cmode == CheckerboardInterlace)
+		glDrawArrays(GL_LINES,0,1);
+
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glDepthMask(GL_TRUE);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+}
+}
+
+#endif //USING_OFL_OGL_STEREO_COMPOSITOR_CPP
+#ifndef USING_OFL_STRU_CPP
+#define USING_OFL_STRU_CPP
+
 namespace ofl
 {
 Tokenizer::Tokenizer(const std::string& base)
@@ -3681,6 +4799,10 @@ void Tokenizer::reset(const std::string& base)
 
 std::string Tokenizer::whitespaces = " \t\n\v\f\r";
 }
+
+#endif //USING_OFL_STRU_CPP
+#ifndef USING_OFL_TRACK_CPP
+#define USING_OFL_TRACK_CPP
 
 using namespace ofl;
 Target3DOF::Target3DOF(unsigned int id, unsigned int frame_no, const vec4 &pos)
@@ -3964,6 +5086,10 @@ Target6DOF TrackingData::getFlystick(const unsigned int id)
 	return m_tfly[id];
 }
 
+
+#endif //USING_OFL_TRACK_CPP
+#ifndef USING_OFL_VD_CPP
+#define USING_OFL_VD_CPP
 #include <cstdio>
 #include <fstream>
 #include <map>
@@ -4600,6 +5726,7 @@ VertexData* VertexDataTools::readFromFile(
 	case FROM_PATH:
 		return nullptr;
 	}
+	return nullptr;
 }
 
 void VertexDataTools::calculateNormals(VertexData *vd)
@@ -4665,7 +5792,7 @@ void VertexDataTools::calculateNormals(VertexData *vd)
 				vec3& r = p2n[*(v[j])];
 				if(vs == 4) // for a quad triangulate first
 				{
-					if(j % 2 != connected)
+					if(static_cast<int>(j % 2) != connected)
 					{
 						const vec3 cr = cross(A,B);
 						area = 0.5f* length(cr);
@@ -4760,6 +5887,10 @@ void VertexDataTools::calculateTangents(VertexData *vd)
 
 
 }
+
+#endif //USING_OFL_VD_CPP
+#ifndef USING_OFL_VDMAN_CPP
+#define USING_OFL_VDMAN_CPP
 #include <fstream>
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -5577,6 +6708,10 @@ void VertexDataManufacturer::addQuad(
 
 }
 
+#endif //USING_OFL_VDMAN_CPP
+#ifndef USING_OFL_VMATH_CPP
+#define USING_OFL_VMATH_CPP
+
 
 namespace ofl
 {
@@ -5980,14 +7115,6 @@ mat4 translate(const mat4&m,const vec4& v)
 
 #endif
 
-vec4 cross(const vec4& a, const vec4& b)
-{
-	return vec4(a.y * b.z - b.y * a.z,
-				a.z * b.x - b.z * a.x,
-				a.x * b.y - b.x * a.y,
-				0);
-}
-
 
 
 bool operator < (const vec4& a, const vec4& b)
@@ -6086,6 +7213,10 @@ vec4 read_from_string(std::string& str)
 
 }
 
+#endif //USING_OFL_VMATH_CPP
+#ifndef USING_OFL_VRPV_CPP
+#define USING_OFL_VRPV_CPP
+
 namespace ofl {
 
 
@@ -6105,7 +7236,7 @@ Screen::Screen(const vec4 blc, const vec4 brc, const vec4 &tlc)
 
 	vec4 x = normalize(m_corners[BR]-m_corners[BL]);
 	vec4 y = normalize(m_corners[TL]-m_corners[BL]);
-	vec4 z = cross(x,y);
+	vec4 z = vec4(cross(x,y),0.0f);
 
 
 	m_wall_space = mat4(x,y,z,vec4(0,0,0,1));
@@ -6222,4 +7353,6 @@ bool ScreenArrangement::saveScreens(const std::string &path)
 	return true;
 }
 }
+
+#endif //USING_OFL_VRPV_CPP
 #endif

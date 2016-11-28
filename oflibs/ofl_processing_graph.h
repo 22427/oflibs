@@ -1,5 +1,7 @@
 #if 0
 <begin_doc>
+#ifndef USING_OFL_LICENSE_MD
+#define USING_OFL_LICENSE_MD
 //The MIT License (MIT)
 //================================================================================
 //
@@ -22,8 +24,12 @@
 //IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 //CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#endif //USING_OFL_LICENSE_MD
+
 --------------------------------------------------------------------------------
 
+#ifndef USING_OFL_README_MD
+#define USING_OFL_README_MD
 //What is this?
 //================================================================================
 //The oflibs are a set of usefull classes and tools dealing with all kinds of 
@@ -48,9 +54,9 @@
 //- ofl_ogl_geo - A class reperesenting vertex-data on the GPU
 //- ofl_ogl_state - A state-wrapper imulating the "classic" OpenGL-fixed-function 
 //  states, including matrix stacks and lighting.
+//- ogl_stereo_compositor - A simple way to render in stereo image formats.
 //- ofl_ogl_win - An interface to create an OpenGL-Context with window and reading 
 //  events. Currently implemented using glfw.
-//- ofl_open_gl_tools: combines the above.
 //- ofl_socket: A class wrapping sockets.
 //- ofl_stru: Some string utilities. Used by many other oflibs.
 //- ofl_track - Tracking: An interface to the ART-DTrack2 tracking system.
@@ -102,8 +108,12 @@
 //
 //
 
+#endif //USING_OFL_README_MD
+
 --------------------------------------------------------------------------------
 
+#ifndef USING_OFL_PROCESSING_GRAPH_MD
+#define USING_OFL_PROCESSING_GRAPH_MD
 //PROCESSING_GRAPH: Processing Graph
 //================================================================================
 //This is a set of classes to build a processing graph.
@@ -130,17 +140,22 @@
 //
 //
 
+#endif //USING_OFL_PROCESSING_GRAPH_MD
+
 --------------------------------------------------------------------------------
 
 <end_doc>
 #endif 
 #ifndef USING_OFL_PROCESSING_GRAPH_H
- #define USING_OFL_PROCESSING_GRAPH_H
- #include <mutex>
+#define USING_OFL_PROCESSING_GRAPH_H
+#ifndef USING_OFL_SEM_QUEUE_H
+#define USING_OFL_SEM_QUEUE_H
+#include <mutex>
 #include <thread>
 #include <queue>
 #include <condition_variable>
 
+namespace ofl{
 /**
  * @class SemQueue
  * @author Timon Zietlow
@@ -151,12 +166,11 @@
  * are enqueued. All methods are threadsave!.
  */
 enum SemQueueErrorCode {
-	OK = 0,
-	NO_ERROR = OK,
-	IS_EMPTY = 1,
-	TIMEOUT = 2,
-	SHUTDOWN = 4,
-	SHUTDOWN_AND_EMPTY =5,
+	EC_OK = 0,
+	EC_IS_EMPTY = 1,
+	EC_TIMEOUT = 2,
+	EC_SHUTDOWN = 4,
+	EC_SHUTDOWN_AND_EMPTY =5,
 
 };
 
@@ -237,10 +251,10 @@ public:
 			{
 				*t = q.front();
 				q.pop();
-				return SHUTDOWN;
+				return EC_SHUTDOWN;
 			}
 			else
-				return SHUTDOWN_AND_EMPTY;
+				return EC_SHUTDOWN_AND_EMPTY;
 
 		}
 
@@ -248,7 +262,7 @@ public:
 		*t = q.front();
 		q.pop();
 
-		return OK;
+		return EC_OK;
 	}
 
 	/**
@@ -273,23 +287,23 @@ public:
 		}
 
 		if (wres == std::cv_status::timeout)
-			return TIMEOUT;
+			return EC_TIMEOUT;
 		if (!running)
 		{
 			if(!q.empty())
 			{
 				*t = q.front();
 				q.pop();
-				return SHUTDOWN;
+				return EC_SHUTDOWN;
 			}
 			else
-				return SHUTDOWN_AND_EMPTY;
+				return EC_SHUTDOWN_AND_EMPTY;
 		}
 
 		*t = q.front();
 		q.pop();
 
-		return OK;
+		return EC_OK;
 	}
 
 	/**
@@ -308,7 +322,7 @@ public:
 		std::lock_guard<std::mutex> g(mtx);
 		if (q.empty())
 		{
-			return IS_EMPTY;
+			return EC_IS_EMPTY;
 		}
 		if (!running)
 		{
@@ -316,15 +330,15 @@ public:
 			{
 				*t = q.front();
 				q.pop();
-				return SHUTDOWN;
+				return EC_SHUTDOWN;
 			}
 			else
-				return SHUTDOWN_AND_EMPTY;
+				return EC_SHUTDOWN_AND_EMPTY;
 		}
 
 		*t = q.front();
 		q.pop();
-		return OK;
+		return EC_OK;
 	}
 
 	/**
@@ -353,6 +367,9 @@ public:
 		mtx.unlock();
 	}
 };
+}
+
+#endif //USING_OFL_SEM_QUEUE_H
 #include <functional>
 #include <atomic>
 #include <thread>
@@ -487,7 +504,7 @@ public:
 	virtual void grab(Item<T>& itm)
 	{
 		SemQueueErrorCode ec = m_queue.dequeue(&itm);
-		if(ec & IS_EMPTY)
+		if(ec & EC_IS_EMPTY)
 			itm.flags() = (itm.flags() | Item<T>::F_INVALID);
 	}
 
@@ -717,9 +734,5 @@ public:
 }
 
 #endif //USING_OFL_PROCESSING_GRAPH_H
-#ifndef USING_OFL_SEM_QUEUE_H
- #define USING_OFL_SEM_QUEUE_H
- 
-#endif //USING_OFL_SEM_QUEUE_H
 #ifdef OFL_IMPLEMENTATION
 #endif

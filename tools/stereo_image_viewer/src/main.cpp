@@ -5,7 +5,13 @@
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 
-#include <ofl_open_gl_tools.h>
+#include <ofl_ogl_win.h>
+#include <ofl_vd.h>
+#include <ofl_vdman.h>
+#include <ofl_ogl_state.h>
+#include <ofl_ogl_geo.h>
+#include <ofl_ogl_stereo_compositor.h>
+
 #include "stb_image.h"
 
 using namespace ofl;
@@ -82,8 +88,14 @@ int main(int argc, char** argv)
 }
 
 #define OFL_IMPLEMENTATION
-#include <ofl_open_gl_tools.h>
+#include <ofl_ogl_win.h>
+#include <ofl_vd.h>
+#include <ofl_vdman.h>
+#include <ofl_ogl_state.h>
+#include <ofl_ogl_geo.h>
+#include <ofl_ogl_stereo_compositor.h>
 #undef OFL_IMPLEMENTATION
+
 GLuint StereoImageViewer::load_images_to_texture(const std::string &left,
 												 const std::string &right)
 {

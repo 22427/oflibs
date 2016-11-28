@@ -134,7 +134,7 @@ public:
 	virtual void grab(Item<T>& itm)
 	{
 		SemQueueErrorCode ec = m_queue.dequeue(&itm);
-		if(ec & IS_EMPTY)
+		if(ec & EC_IS_EMPTY)
 			itm.flags() = (itm.flags() | Item<T>::F_INVALID);
 	}
 

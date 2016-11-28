@@ -4,6 +4,7 @@
 #include <queue>
 #include <condition_variable>
 
+namespace ofl{
 /**
  * @class SemQueue
  * @author Timon Zietlow
@@ -14,12 +15,11 @@
  * are enqueued. All methods are threadsave!.
  */
 enum SemQueueErrorCode {
-	OK = 0,
-	NO_ERROR = OK,
-	IS_EMPTY = 1,
-	TIMEOUT = 2,
-	SHUTDOWN = 4,
-	SHUTDOWN_AND_EMPTY =5,
+	EC_OK = 0,
+	EC_IS_EMPTY = 1,
+	EC_TIMEOUT = 2,
+	EC_SHUTDOWN = 4,
+	EC_SHUTDOWN_AND_EMPTY =5,
 
 };
 
@@ -100,10 +100,10 @@ public:
 			{
 				*t = q.front();
 				q.pop();
-				return SHUTDOWN;
+				return EC_SHUTDOWN;
 			}
 			else
-				return SHUTDOWN_AND_EMPTY;
+				return EC_SHUTDOWN_AND_EMPTY;
 
 		}
 
@@ -111,7 +111,7 @@ public:
 		*t = q.front();
 		q.pop();
 
-		return OK;
+		return EC_OK;
 	}
 
 	/**
@@ -136,23 +136,23 @@ public:
 		}
 
 		if (wres == std::cv_status::timeout)
-			return TIMEOUT;
+			return EC_TIMEOUT;
 		if (!running)
 		{
 			if(!q.empty())
 			{
 				*t = q.front();
 				q.pop();
-				return SHUTDOWN;
+				return EC_SHUTDOWN;
 			}
 			else
-				return SHUTDOWN_AND_EMPTY;
+				return EC_SHUTDOWN_AND_EMPTY;
 		}
 
 		*t = q.front();
 		q.pop();
 
-		return OK;
+		return EC_OK;
 	}
 
 	/**
@@ -171,7 +171,7 @@ public:
 		std::lock_guard<std::mutex> g(mtx);
 		if (q.empty())
 		{
-			return IS_EMPTY;
+			return EC_IS_EMPTY;
 		}
 		if (!running)
 		{
@@ -179,15 +179,15 @@ public:
 			{
 				*t = q.front();
 				q.pop();
-				return SHUTDOWN;
+				return EC_SHUTDOWN;
 			}
 			else
-				return SHUTDOWN_AND_EMPTY;
+				return EC_SHUTDOWN_AND_EMPTY;
 		}
 
 		*t = q.front();
 		q.pop();
-		return OK;
+		return EC_OK;
 	}
 
 	/**
@@ -216,3 +216,4 @@ public:
 		mtx.unlock();
 	}
 };
+}

@@ -9,6 +9,8 @@ do
 		filename=$(basename "$f")
 		extension="${filename##*.}"
 		filename="${filename%.*}"
+		echo "Gernerating ofl_${filename}.h ... "
 		../bin/ofl_creator $f > $TARGET/ofl_${filename}.h
+		echo "... done!"
 done
 

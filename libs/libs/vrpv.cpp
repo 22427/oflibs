@@ -19,7 +19,7 @@ Screen::Screen(const vec4 blc, const vec4 brc, const vec4 &tlc)
 
 	vec4 x = normalize(m_corners[BR]-m_corners[BL]);
 	vec4 y = normalize(m_corners[TL]-m_corners[BL]);
-	vec4 z = cross(x,y);
+	vec4 z = vec4(cross(x,y),0.0f);
 
 
 	m_wall_space = mat4(x,y,z,vec4(0,0,0,1));

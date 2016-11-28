@@ -29,6 +29,13 @@ public:
 		if(printed)
 			return;
 
+		std::string name = paths::filename(file_name);
+		std::string extension = paths::extension(file_name);
+		std::transform(name.begin(), name.end(),name.begin(),::toupper);
+		std::transform(extension.begin(), extension.end(),extension.begin(),::toupper);
+
+		printf("#ifndef USING_OFL_%s_%s\n#define USING_OFL_%s_%s\n",name.c_str(),extension.c_str(),name.c_str(),extension.c_str());
+
 		for(AFile* f : uses)
 			f->print();
 		std::ifstream f(path);
@@ -60,7 +67,12 @@ public:
 			f->done(this);
 		}
 
+
+		printf("\n#endif //USING_OFL_%s_%s\n",name.c_str(),extension.c_str());
+
+
 		printed = true;
+
 	}
 
 	bool exists ()
@@ -192,9 +204,9 @@ int main(int argc, char** argv)
 	{
 		std::string name = paths::filename(f->file_name);
 		std::transform(name.begin(), name.end(),name.begin(),::toupper);
-		printf("#ifndef USING_OFL_%s_H\n #define USING_OFL_%s_H\n ",name.c_str(),name.c_str());
+	//	printf("#ifndef USING_OFL_%s_H\n #define USING_OFL_%s_H\n ",name.c_str(),name.c_str());
 		f->print();
-		printf("\n#endif //USING_OFL_%s_H\n",name.c_str());
+	//	printf("\n#endif //USING_OFL_%s_H\n",name.c_str());
 	}
 
 

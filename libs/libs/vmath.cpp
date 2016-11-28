@@ -403,14 +403,6 @@ mat4 translate(const mat4&m,const vec4& v)
 
 #endif
 
-vec4 cross(const vec4& a, const vec4& b)
-{
-	return vec4(a.y * b.z - b.y * a.z,
-				a.z * b.x - b.z * a.x,
-				a.x * b.y - b.x * a.y,
-				0);
-}
-
 
 
 bool operator < (const vec4& a, const vec4& b)

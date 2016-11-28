@@ -144,7 +144,7 @@ public:
 	vec4 operator / (const vec4& v)const;
 	vec4 operator *(const float f) const;
 	vec4 operator /(const float f)const;
-
+	operator vec3() {return vec3(x,y,z);}
 };
 
 
@@ -216,14 +216,6 @@ float length2(const vec4& a);
 
 float distance(const vec3& a, const vec3& b);
 float distance2(const vec3& a, const vec3& b);
-
-/**
- * @brief cross cross product only using the .xyz part.
- * @param a
- * @param b
- * @return cross(a.xyz,b.xyz)
- */
-vec4 cross(const vec4& a, const vec4& b);
 
 /**
  * @brief cross cross product.
