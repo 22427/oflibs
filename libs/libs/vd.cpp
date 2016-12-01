@@ -407,6 +407,75 @@ VertexData *VertexDataTools::readPLY(const std::string &path)
 	return vd;
 }
 
+VertexData *VertexDataTools::readOFF(const std::string &path)
+{
+	FILE* f = fopen(path.c_str(),"r");
+	if(!f)
+		return nullptr;
+
+	VertexData* vd = new VertexData();
+	char * line = NULL;
+	size_t len = 0;
+	ssize_t read = 0;
+
+	uint vtx_cnt = 0;
+	uint iv = 0;
+	uint face_cnt = 0;
+	uint it= 0;
+	Vertex v;
+	Tokenizer tkn("");
+	while ((read = getline(&line, &len, f)) != -1)
+	{
+		tkn.setBase(line);
+		tkn.skipWhiteSpaces();
+		tkn.skipOverAll("OFF");
+
+		if(!tkn.getRest() || tkn.getRest()[0] == '#' || tkn.getRest()[0] == 0)
+			continue;
+
+		if(vtx_cnt == 0 && face_cnt == 0)
+		{
+			tkn.getTokenAs(vtx_cnt);
+			tkn.getTokenAs(face_cnt);
+			vd->data().resize(vtx_cnt);
+		}
+		if(iv < vtx_cnt)
+		{
+			tkn.getTokenAs(v.pos().x);
+			tkn.getTokenAs(v.pos().y);
+			tkn.getTokenAs(v.pos().z);
+			vd->push_back(v);
+			iv++;
+		}
+		else if (it < face_cnt)
+		{
+			uint i;
+			tkn.getTokenAs(i);
+			if(it == 0)
+			{
+				if(i == 3)
+					vd->setPrimitive(TRIANGLES);
+				else if(i == 4)
+					vd->setPrimitive(QUADS);
+				vd->indices().reserve(i*face_cnt);
+			}
+
+			for(uint j = 0; j<i;j++)
+			{
+				uint q = 0;
+				tkn.getTokenAs(q);
+				vd->push_back(q);
+			}
+		}
+
+	}
+	tkn.setBase(nullptr);
+	fclose(f);
+	if(line)
+		free(line);
+	return vd;
+}
+
 bool VertexDataTools::writeVD(const VertexData *vd, const std::string &path)
 {
 	FILE* f = fopen(path.c_str(),"wb");
@@ -580,6 +649,41 @@ bool VertexDataTools::writePLY(const VertexData */*vd*/, const std::string &/*pa
 	return false;
 }
 
+bool VertexDataTools::writeOFF(const VertexData *vd, const std::string &path)
+{
+	FILE* f = fopen(path.c_str(),"w");
+	if(!f)
+		return false;
+	uint vpf = 3;
+	switch (vd->primitive())
+	{
+		case QUADS: vpf = 4; break;
+		case TRIANGLES: vpf = 3; break;
+		default: return false;
+	}
+	fprintf(f,"OFF\n%lu %lu %lu\n",vd->data().size(),vd->indices().size()/vpf,0ul);
+
+	for(const Vertex& vtx : vd->data())
+	{
+		const vec3& v = vtx.pos();
+		fprintf(f,"%f %f %f\n",v.x,v.y,v.z);
+	}
+
+	const auto& idx = vd->indices();
+	for(uint i = 0 ; i<vd->indices().size(); i+= vpf)
+	{
+
+		fprintf(f,"%d",vpf);
+		for(uint j=0 ; j<vpf;j++)
+		{
+			fprintf(f," %d",idx[i+j]);
+		}
+		fprintf(f,"\n");
+	}
+	fclose(f);
+	return true;
+}
+
 bool VertexDataTools::writeToFile(
 		const VertexData *vd,
 		const std::string &p,
@@ -594,8 +698,10 @@ bool VertexDataTools::writeToFile(
 			f = OBJ;
 		else if(ending == "ply" || ending == "PLY")
 			f = PLY;
-		else if(ending == "vd" || ending == "vd")
+		else if(ending == "vd" || ending == "VD")
 			f = VD;
+		else if(ending == "off" || ending == "OFF")
+			f = OFF;
 	}
 
 	switch (f)
@@ -606,6 +712,8 @@ bool VertexDataTools::writeToFile(
 		return writeOBJ(vd,p);
 	case PLY:
 		return writePLY(vd,p);
+	case OFF:
+		return writeOFF(vd,p);
 	case FROM_PATH:
 		return false;
 	}
@@ -623,8 +731,10 @@ VertexData* VertexDataTools::readFromFile(
 			f = OBJ;
 		else if(ending == "ply" || ending == "PLY")
 			f = PLY;
-		else if(ending == "vd" || ending == "vd")
+		else if(ending == "vd" || ending == "VD")
 			f = VD;
+		else if(ending == "off" || ending == "OFF")
+			f = OFF;
 	}
 	switch (f) {
 	case VD:
@@ -633,6 +743,8 @@ VertexData* VertexDataTools::readFromFile(
 		return readOBJ(path);
 	case PLY:
 		return readPLY(path);
+	case OFF:
+		return readOFF(path);
 	case FROM_PATH:
 		return nullptr;
 	}
@@ -792,8 +904,6 @@ void VertexDataTools::calculateTangents(VertexData *vd)
 
 
 }
-
-
 
 
 }

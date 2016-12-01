@@ -166,19 +166,24 @@ public:
 class VertexDataTools
 {
 protected:
-	VertexData* readVD(const std::string& path);
-	VertexData* readOBJ(const std::string& path);
-	VertexData* readPLY(const std::string& path);
+	public:
+	static VertexData* readVD(const std::string& path);
+	static VertexData* readOBJ(const std::string& path);
+	static VertexData* readPLY(const std::string& path);
+	static VertexData* readOFF(const std::string& path);
 
-	bool writeVD(const VertexData* ofl, const std::string& path);
-	bool writeOBJ(const VertexData* ofl, const std::string& path);
-	bool writePLY(const VertexData* ofl, const std::string& path);
-public:
+	static bool writeVD(const VertexData* vd, const std::string& path);
+	static bool writeOBJ(const VertexData* vd, const std::string& path);
+	static bool writePLY(const VertexData* vd, const std::string& path);
+	static bool writeOFF(const VertexData* vd, const std::string& path);
+
+
 	enum Format
 	{
 		OBJ,
 		PLY,
 		VD,
+		OFF,
 		FROM_PATH
 	};
 	/**
@@ -189,7 +194,7 @@ public:
 	 * be determined from the file ending
 	 * @return true if everything went well, false if there was a problem.
 	 */
-	bool writeToFile(const VertexData* vd,const std::string& path, Format f=FROM_PATH);
+	static bool writeToFile(const VertexData* vd,const std::string& path, Format f=FROM_PATH);
 	
 	/**
 	 * @brief readFromFile reads VertexData from a file
@@ -197,9 +202,11 @@ public:
 	 * @param f The format of the source file
 	 * @return the VertexData read, or a nullptr, if something went wrong.
 	 */
-	VertexData* readFromFile(const std::string& path, Format f = FROM_PATH);
+	static VertexData* readFromFile(const std::string& path, Format f = FROM_PATH);
 
-	void calculateNormals(VertexData* vd);
-	void calculateTangents(VertexData* vd);
+	static void calculateNormals(VertexData* vd);
+	static void calculateTangents(VertexData* vd);
+
+
 };
 }

@@ -73,6 +73,8 @@ public:
 					target_format = PLY;
 				else if(of == "VD" || of == "vd")
 					target_format = VD;
+				else if(of == "OFF" || of == "off")
+					target_format = OFF;
 				else
 				{
 					fprintf(stderr,"Unknown output format '%s' \n",of.c_str());
@@ -108,6 +110,8 @@ public:
 					ext = "ply";
 				else if (target_format == VD)
 					ext = "vd";
+				else if (target_format == OFF)
+					ext = "off";
 				out_path  = paths::without_extension(input_files[i])+"."+ext;
 
 			}
