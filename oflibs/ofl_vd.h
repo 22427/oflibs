@@ -54,9 +54,9 @@
 //- ofl_ogl_geo - A class reperesenting vertex-data on the GPU
 //- ofl_ogl_state - A state-wrapper imulating the "classic" OpenGL-fixed-function 
 //  states, including matrix stacks and lighting.
-//- ogl_stereo_compositor - A simple way to render in stereo image formats.
-//- ofl_ogl_win - An interface to create an OpenGL-Context with window and reading 
-//  events. Currently implemented using glfw.
+//- ofl_ogl_win - An interface to create an OpenGL-Context with window and reading
+//events. Currently implemented using glfw.
+//- ofl_ogl_stereo_compositor - A simple way to render in stereo image formats.
 //- ofl_socket: A class wrapping sockets.
 //- ofl_stru: Some string utilities. Used by many other oflibs.
 //- ofl_track - Tracking: An interface to the ART-DTrack2 tracking system.
@@ -69,6 +69,8 @@
 //  GLM.
 //- ofl_vrpv - Virtual Reality Projection and View - A module to genereate view-
 //  and projection-matrices for VR systems like PowerWalls or CAVEs
+//- ofl_processing_graph - A simple processing graph interface for parallel
+//processing of streaming data.
 //
 //How do oflibs work?
 //--------------------------------------------------------------------------------
@@ -239,6 +241,12 @@ public:
 	static std::string whitespaces;
 	Tokenizer(const std::string& base);
 	~Tokenizer();
+
+	void setBase(char* base)
+	{
+		m_base = base;
+		m_rest = base;
+	}
 	/**
 	 * @brief reset Will free the current base and set a new one.
 	 * @param base The new base.
@@ -313,6 +321,17 @@ template<> inline bool Tokenizer::getTokenAs<int>(
 	char* c = getToken(seps,sep);
 	if(c)
 		res = atoi(c);
+	return c;
+}
+
+template<> inline bool Tokenizer::getTokenAs<uint>(
+		uint& res,
+		const std::string &seps,
+		char *sep )
+{
+	char* c = getToken(seps,sep);
+	if(c)
+		res = static_cast<uint>(atoi(c));
 	return c;
 }
 
@@ -886,19 +905,24 @@ public:
 class VertexDataTools
 {
 protected:
-	VertexData* readVD(const std::string& path);
-	VertexData* readOBJ(const std::string& path);
-	VertexData* readPLY(const std::string& path);
+	public:
+	static VertexData* readVD(const std::string& path);
+	static VertexData* readOBJ(const std::string& path);
+	static VertexData* readPLY(const std::string& path);
+	static VertexData* readOFF(const std::string& path);
 
-	bool writeVD(const VertexData* ofl, const std::string& path);
-	bool writeOBJ(const VertexData* ofl, const std::string& path);
-	bool writePLY(const VertexData* ofl, const std::string& path);
-public:
+	static bool writeVD(const VertexData* vd, const std::string& path);
+	static bool writeOBJ(const VertexData* vd, const std::string& path);
+	static bool writePLY(const VertexData* vd, const std::string& path);
+	static bool writeOFF(const VertexData* vd, const std::string& path);
+
+
 	enum Format
 	{
 		OBJ,
 		PLY,
 		VD,
+		OFF,
 		FROM_PATH
 	};
 	/**
@@ -909,7 +933,7 @@ public:
 	 * be determined from the file ending
 	 * @return true if everything went well, false if there was a problem.
 	 */
-	bool writeToFile(const VertexData* vd,const std::string& path, Format f=FROM_PATH);
+	static bool writeToFile(const VertexData* vd,const std::string& path, Format f=FROM_PATH);
 	
 	/**
 	 * @brief readFromFile reads VertexData from a file
@@ -917,10 +941,12 @@ public:
 	 * @param f The format of the source file
 	 * @return the VertexData read, or a nullptr, if something went wrong.
 	 */
-	VertexData* readFromFile(const std::string& path, Format f = FROM_PATH);
+	static VertexData* readFromFile(const std::string& path, Format f = FROM_PATH);
 
-	void calculateNormals(VertexData* vd);
-	void calculateTangents(VertexData* vd);
+	static void calculateNormals(VertexData* vd);
+	static void calculateTangents(VertexData* vd);
+
+
 };
 }
 
@@ -940,7 +966,8 @@ Tokenizer::Tokenizer(const std::string& base)
 
 Tokenizer::~Tokenizer()
 {
-	delete[] m_base;
+	if(m_base)
+		delete[] m_base;
 }
 
 char* Tokenizer::getToken(char separator)
@@ -1427,6 +1454,75 @@ VertexData *VertexDataTools::readPLY(const std::string &path)
 	return vd;
 }
 
+VertexData *VertexDataTools::readOFF(const std::string &path)
+{
+	FILE* f = fopen(path.c_str(),"r");
+	if(!f)
+		return nullptr;
+
+	VertexData* vd = new VertexData();
+	char * line = NULL;
+	size_t len = 0;
+	ssize_t read = 0;
+
+	uint vtx_cnt = 0;
+	uint iv = 0;
+	uint face_cnt = 0;
+	uint it= 0;
+	Vertex v;
+	Tokenizer tkn("");
+	while ((read = getline(&line, &len, f)) != -1)
+	{
+		tkn.setBase(line);
+		tkn.skipWhiteSpaces();
+		tkn.skipOverAll("OFF");
+
+		if(!tkn.getRest() || tkn.getRest()[0] == '#' || tkn.getRest()[0] == 0)
+			continue;
+
+		if(vtx_cnt == 0 && face_cnt == 0)
+		{
+			tkn.getTokenAs(vtx_cnt);
+			tkn.getTokenAs(face_cnt);
+			vd->data().resize(vtx_cnt);
+		}
+		if(iv < vtx_cnt)
+		{
+			tkn.getTokenAs(v.pos().x);
+			tkn.getTokenAs(v.pos().y);
+			tkn.getTokenAs(v.pos().z);
+			vd->push_back(v);
+			iv++;
+		}
+		else if (it < face_cnt)
+		{
+			uint i;
+			tkn.getTokenAs(i);
+			if(it == 0)
+			{
+				if(i == 3)
+					vd->setPrimitive(TRIANGLES);
+				else if(i == 4)
+					vd->setPrimitive(QUADS);
+				vd->indices().reserve(i*face_cnt);
+			}
+
+			for(uint j = 0; j<i;j++)
+			{
+				uint q = 0;
+				tkn.getTokenAs(q);
+				vd->push_back(q);
+			}
+		}
+
+	}
+	tkn.setBase(nullptr);
+	fclose(f);
+	if(line)
+		free(line);
+	return vd;
+}
+
 bool VertexDataTools::writeVD(const VertexData *vd, const std::string &path)
 {
 	FILE* f = fopen(path.c_str(),"wb");
@@ -1600,6 +1696,41 @@ bool VertexDataTools::writePLY(const VertexData */*vd*/, const std::string &/*pa
 	return false;
 }
 
+bool VertexDataTools::writeOFF(const VertexData *vd, const std::string &path)
+{
+	FILE* f = fopen(path.c_str(),"w");
+	if(!f)
+		return false;
+	uint vpf = 3;
+	switch (vd->primitive())
+	{
+		case QUADS: vpf = 4; break;
+		case TRIANGLES: vpf = 3; break;
+		default: return false;
+	}
+	fprintf(f,"OFF\n%lu %lu %lu\n",vd->data().size(),vd->indices().size()/vpf,0ul);
+
+	for(const Vertex& vtx : vd->data())
+	{
+		const vec3& v = vtx.pos();
+		fprintf(f,"%f %f %f\n",v.x,v.y,v.z);
+	}
+
+	const auto& idx = vd->indices();
+	for(uint i = 0 ; i<vd->indices().size(); i+= vpf)
+	{
+
+		fprintf(f,"%d",vpf);
+		for(uint j=0 ; j<vpf;j++)
+		{
+			fprintf(f," %d",idx[i+j]);
+		}
+		fprintf(f,"\n");
+	}
+	fclose(f);
+	return true;
+}
+
 bool VertexDataTools::writeToFile(
 		const VertexData *vd,
 		const std::string &p,
@@ -1614,8 +1745,10 @@ bool VertexDataTools::writeToFile(
 			f = OBJ;
 		else if(ending == "ply" || ending == "PLY")
 			f = PLY;
-		else if(ending == "vd" || ending == "vd")
+		else if(ending == "vd" || ending == "VD")
 			f = VD;
+		else if(ending == "off" || ending == "OFF")
+			f = OFF;
 	}
 
 	switch (f)
@@ -1626,6 +1759,8 @@ bool VertexDataTools::writeToFile(
 		return writeOBJ(vd,p);
 	case PLY:
 		return writePLY(vd,p);
+	case OFF:
+		return writeOFF(vd,p);
 	case FROM_PATH:
 		return false;
 	}
@@ -1643,8 +1778,10 @@ VertexData* VertexDataTools::readFromFile(
 			f = OBJ;
 		else if(ending == "ply" || ending == "PLY")
 			f = PLY;
-		else if(ending == "vd" || ending == "vd")
+		else if(ending == "vd" || ending == "VD")
 			f = VD;
+		else if(ending == "off" || ending == "OFF")
+			f = OFF;
 	}
 	switch (f) {
 	case VD:
@@ -1653,6 +1790,8 @@ VertexData* VertexDataTools::readFromFile(
 		return readOBJ(path);
 	case PLY:
 		return readPLY(path);
+	case OFF:
+		return readOFF(path);
 	case FROM_PATH:
 		return nullptr;
 	}
@@ -1812,8 +1951,6 @@ void VertexDataTools::calculateTangents(VertexData *vd)
 
 
 }
-
-
 
 
 }

@@ -114,38 +114,6 @@
 
 --------------------------------------------------------------------------------
 
-#ifndef USING_OFL_OGL_GEO_MD
-#define USING_OFL_OGL_GEO_MD
-//OGL_GEO: OpenGL Geometry
-//================================================================================
-//A class representing vertex Attribute data. You can generate a Geometry
-//object from a VertexData-Object, so they are obviously connected.
-//
-//Usage
-//--------------------------------------------------------------------------------
-//You need to specify an OpenGL header in as `OFL_GL_HEADER`. for example:
-//
-//```cpp
-//	#define OFL_GL_HEADER <glad/glad.h>  
-//	#define OFL_GL_HEADER <glew.h>
-//```
-//
-//This module also uses GLM ... sorry I was too lazy to implement all
-//these functions, and its not feasible anyway.
-//
-//API
-//--------------------------------------------------------------------------------
-//You can pass the data on construction or vie the method uploadData(...).
-//The	data is then uploaeded into OpenGL buffer objets and a corresponding
-//VAO is created.
-//Call the draw() method to provoke a glDrawElements() call.
-//
-//
-
-#endif //USING_OFL_OGL_GEO_MD
-
---------------------------------------------------------------------------------
-
 #ifndef USING_OFL_VD_MD
 #define USING_OFL_VD_MD
 //VD: Vertex Data
@@ -209,8 +177,8 @@
 
 <end_doc>
 #endif 
-#ifndef USING_OFL_OGL_GEO_H
-#define USING_OFL_OGL_GEO_H
+#ifndef USING_OFL_MESH_H
+#define USING_OFL_MESH_H
 #ifndef USING_OFL_VD_H
 #define USING_OFL_VD_H
 #ifndef USING_OFL_VMATH_H
@@ -985,258 +953,288 @@ protected:
 }
 
 #endif //USING_OFL_VD_H
-
-#ifndef OFL_GL_HEADER
-#define OFL_GL_HEADER <glad/glad.h>
-#endif
-
-#include OFL_GL_HEADER
+#include <vector>
+#include <map>
+namespace ofl {
 
 
-
-namespace ofl
+class Corner
 {
-
-#ifndef ALOC_POSITION
-#define ALOC_POSITION 0
-#define ALOC_NORMAL 1
-#define ALOC_COLOR 2
-#define ALOC_TEXCOORD 3
-#define ALOC_TANGENT 4
-#endif
-
-/**
- * @brief The Geometry class represents a VAO, with an associated IBO and VBO.
- * It is due to ATIs special interpretation to the reference counting on buffer
- * objects in the case of an IBO, that we have to store the IBO, so I store the
- * VBO as well. It also stores the primitive type and the vertex count.
- */
-class Geometry
-{
-protected:
-	GLuint m_vao;
-	GLuint m_vbo;
-	GLuint m_ibo;
-	GLuint m_primitive;
-	GLsizei m_vertice_count;
-	GLenum m_index_type;
-
 public:
-	/**
-	 * @brief Geometry creates a geometry from VertexData.
-	 * Will create a VBO and a VAO uploading the data from vp.
-	 * The attribute locations will be set to:
-	 * 	position              0  (= ALOC_POSITION )
-	 * 	normal                1  (= ALOC_NORMAL   )
-	 * 	color                 2	 (= ALOC_TEXCOORD )
-	 * 	texture coordinates   3  (= ALOC_COLOR    )
-	 * 	tangent               4  (= ALOC_TANGENT  )
-	 * @param vd The vertex data.
-	 * @param destroy_vd If set true vd will be freed.
-	 */
-	Geometry(ofl::VertexData* ofl, bool destroy_vd = false);
-	Geometry();
+	int opp;
 
-	/**
-	 * @brief uploadData updates all the data storen with data from vp
-	 * @param vp Source of the new data.
-	 */
-	void uploadData(ofl::VertexData* vp);
-
-	/** Destroys the structure and releases all memory allocated on the GPU-
-	 * and CPUside.
-	 */
-	~Geometry();
-
-	/* this geometry draws itself.*/
-	/**
-	 * @brief draw This geometry draws itself.
-	 * If patchsize is set, it will draw with GL_PATCH_VERTICES as primitive,
-	 * and set the patchsize before drawing.
-	 * @param patchsize The patchsize you choose or 0 for the stored primitive
-	 * mode.
-	 */
-	void draw(int patchsize = 0)
-	{
-		if (m_vao)
-		{
-			glBindVertexArray(m_vao);
-			if (patchsize > 0)
-			{
-				glPatchParameteri(GL_PATCH_VERTICES, patchsize);
-				glDrawElements(GL_PATCHES, m_vertice_count,
-							   m_index_type, nullptr);
-			}
-			else
-			{
-				glDrawElements(m_primitive, m_vertice_count,
-							   m_index_type, nullptr);
-			}
-		}
-		else
-		{
-
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
-			glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-
-			const size_t vertex_size = sizeof(ofl::Vertex);
-			const ofl::Vertex v;
-
-
-#define addr_diff(a,b) (reinterpret_cast<void*>(reinterpret_cast<const char*>(a)-reinterpret_cast<const char*>(b)))
-		glVertexAttribPointer(ALOC_POSITION, 3, GL_FLOAT, GL_FALSE,
-							  vertex_size, addr_diff(&(v.pos()),&v));
-		glEnableVertexAttribArray(ALOC_POSITION);
-
-		glVertexAttribPointer(ALOC_NORMAL, 3, GL_FLOAT, GL_FALSE,
-							  vertex_size, addr_diff(&(v.nrm()),&v));
-		glEnableVertexAttribArray(ALOC_NORMAL);
-
-		glVertexAttribPointer(ALOC_COLOR, 4, GL_FLOAT, GL_FALSE,
-							  vertex_size, addr_diff(&(v.clr()),&v));
-		glEnableVertexAttribArray(ALOC_COLOR);
-
-		glVertexAttribPointer(ALOC_TEXCOORD, 2, GL_FLOAT, GL_FALSE,
-							  vertex_size, addr_diff(&(v.tex()),&v));
-		glEnableVertexAttribArray(ALOC_TEXCOORD);
-
-		glVertexAttribPointer(ALOC_TANGENT, 3, GL_FLOAT, GL_FALSE,
-							  vertex_size, addr_diff(&(v.tan()),&v));
-		glEnableVertexAttribArray(ALOC_TANGENT);
-#undef addr_diff
-			glDrawElements(
-						m_primitive,
-						m_vertice_count,
-						m_index_type,
-						nullptr);
-		}
-	}
-
+	Corner(int o = -1) : opp(o){}
+	operator int()const {return opp;}
 };
 
+class Triangle
+{
+	friend class MeshTools;
+	int v[3];
+public:
+	Triangle(const int a=-1, const int b=-1, const int c=-1)
+	{
+		v[0] = a;
+		v[1] = b;
+		v[2] = c;
+	}
+	int& operator()(const uint i){return v[i];}
+	const int& operator()(const uint i) const {return v[i];}
+
+	int& operator()(const int i){return v[i];}
+	const int& operator()(const int i) const {return v[i];}
+
+	int getEdgeStart(int a, int b) const
+	{
+		printf("getEdgeStart %d->%d \n",a,b);
+		for(int i = 0 ; i< 3;i++)
+		{
+			printf("\t %d->%d \n",v[i],v[(i+1)%3]);
+			if(v[i] == a && v[(i+1)%3] == b)
+				return i;
+		}
+		return -1;
+	}
+	bool operator ==(const Triangle& o) const
+	{
+		bool res = true;
+		for(int i = 0 ; i<3; i++)
+			res = res && v[i] == o.v[i];
+		return res;
+	}
+
+
+	/**
+	 * @brief sharedEdgeWith
+	 * @param o
+	 * @param so
+	 * @param st
+	 * @return
+	 */
+	bool sharedEdgeWith(const Triangle o, int& so, int& st) const
+	{
+		for(int i = 0 ; i< 3;i++)
+		{
+			so=o.getEdgeStart(v[(i+1)%3],v[i]);
+			if( so >= 0)
+			{
+				st = i;
+				return true;
+			}
+		}
+		return false;
+	}
+};
+class Mesh
+{
+	// per vertex attributes
+	std::vector<vec3> m_positions;
+	std::vector<Triangle> m_triangles;
+
+	std::vector<int> m_vertex2corner;
+	std::vector<Corner> m_corners;
+
+public:
+	std::vector<int> aTriangles(uint vertex);
+	std::vector<int> aVerts(uint vertex);
+
+	vec3& vertex(const uint i){return m_positions[i];}
+	const vec3& vertex(const uint i)const{return m_positions[i];}
+
+	Triangle& triangle(const uint i){return m_triangles[i];}
+	const Triangle& triangle(const uint i)const{return m_triangles[i];}
+
+	void buildDataStructure();
+
+
+	Mesh(const VertexData* vd);
+	VertexData* toVertexData();
+};
+
+
+class MeshTools
+{
+
+};
 }
 
-#endif //USING_OFL_OGL_GEO_H
+#endif //USING_OFL_MESH_H
 #ifdef OFL_IMPLEMENTATION
-#ifndef USING_OFL_OGL_GEO_CPP
-#define USING_OFL_OGL_GEO_CPP
-#include <climits>
+#ifndef USING_OFL_MESH_CPP
+#define USING_OFL_MESH_CPP
+#include <set>
 namespace ofl
 {
 
-Geometry::Geometry(VertexData* vd, bool destroy_vd)
+int addPos(std::map<vec3,int>& map ,const vec3& pos, std::vector<vec3>& poss)
 {
-
-	m_vbo = m_vao = m_ibo = 0;
-	if (glGenVertexArrays)
-		glGenVertexArrays(1, &m_vao);
-	glGenBuffers(1, &m_ibo);
-	glGenBuffers(1, &m_vbo);
-
-
-	uploadData(vd);
-	if(destroy_vd)
-		delete vd;
-}
-
-Geometry::Geometry()
-{
-	m_vbo = m_vao = m_ibo = 0;
-	if (glGenVertexArrays)
-		glGenVertexArrays(1, &m_vao);
-	glGenBuffers(1, &m_ibo);
-	glGenBuffers(1, &m_vbo);
-}
-
-void Geometry::uploadData(VertexData *vd)
-{
-	if (m_vao)
-		glBindVertexArray(m_vao);
-
-	const size_t vertex_size = sizeof(Vertex);
-
-
-
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
-	if(vd->indices().size() < USHRT_MAX)
+	if(map.find(pos)== map.end())
 	{
-		m_index_type = GL_UNSIGNED_SHORT;
+		map[pos] = static_cast<int>(poss.size());
+		poss.push_back(pos);
+	}
+	return  map[pos];
+}
 
-		std::vector<GLushort> sid;
-		sid.reserve(vd->indices().size());
-		for(const uint32_t& i: vd->indices())
+
+
+Mesh::Mesh(const VertexData *vd)
+{
+	if(vd->primitive() != TRIANGLES)
+		fprintf(stderr,"Mesh can only be created from TRIANGLE based vertex data!\n");
+	std::map<vec3,int> pmap;
+	Triangle tri(0,0,0);
+	const auto& pd = vd->data();
+	const auto& id = vd->indices();
+	for(uint i = 0 ; i < vd->indices().size();i+=3)
+	{
+		for(uint j =0 ; j<3;j++)
+			tri(j) = addPos(pmap,pd[id[i+j]].pos(),m_positions);
+		m_triangles.push_back(tri);
+	}
+	buildDataStructure();
+}
+
+VertexData* Mesh::toVertexData()
+{
+	VertexData* vd = new VertexData;
+	vd->data().reserve(m_positions.size());
+	Vertex v;
+	for(const vec3& p :m_positions)
+	{
+		v.setPosition(p);
+		vd->data().push_back(v);
+	}
+
+	vd->indices().reserve(m_triangles.size()*3);
+	for(const Triangle& t : m_triangles)
+	{
+		for(int i  =0 ; i<3;i++)
+			vd->push_back(static_cast<uint>(t(i)));
+	}
+	return vd;
+}
+
+int corner_add(int c,int a)
+{
+	int  t = c/3;
+	return t*3 + ((c%3)+a)%3;
+};
+
+std::vector<int> Mesh::aTriangles(uint vertex)
+{
+	std::vector<int> res;
+	int c = m_vertex2corner[vertex];
+	int first_t = c/3;
+	int start_c = first_t*3 + ((c%3)+1)%3;
+	res.push_back(first_t);
+
+	int t = first_t+1;
+	c = start_c;
+	bool other_way = false;
+	while (t != first_t)
+	{
+		c = m_corners[c].opp;
+		if(c<0)
 		{
-			sid.push_back(static_cast<GLushort>(i));
+			other_way = true;
+			break;
 		}
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-			static_cast<GLsizeiptr>(sizeof(GLushort)*sid.size()),
-			sid.data(), GL_STATIC_DRAW);
+		t = c/3;
+
+		if(t == first_t)
+			break;
+		res.push_back(t);
+		c = corner_add(c,2);
 	}
-	else
+
+	if(other_way)
 	{
-		m_index_type = GL_UNSIGNED_INT;
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-			static_cast<GLsizeiptr>(sizeof(GLuint)*vd->indices().size()),
-			vd->indices().data(), GL_STATIC_DRAW);
+		int c = m_vertex2corner[vertex];
+		c = corner_add(c,2);
+		while (c >= 0)
+		{
+			c = m_corners[c].opp;
+			if(c<0)
+			{
+				break;
+			}
+			t = c/3;
+			res.push_back(t);
+			c = corner_add(c,1);
+		}
 	}
 
-
-
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-
-	glBufferData(GL_ARRAY_BUFFER,
-				 static_cast<GLsizeiptr>(vertex_size* vd->data().size()),
-				 vd->data().data(),
-				 GL_STATIC_DRAW);
-
-	const Vertex v = vd->data()[0];
-
-
-
-	if (m_vao)
-	{
-#define addr_diff(a,b) (reinterpret_cast<void*>(reinterpret_cast<const char*>(a)-reinterpret_cast<const char*>(b)))
-		glVertexAttribPointer(ALOC_POSITION, 3, GL_FLOAT, GL_FALSE,
-							  vertex_size, addr_diff(&(v.pos()),&v));
-		glEnableVertexAttribArray(ALOC_POSITION);
-
-		glVertexAttribPointer(ALOC_NORMAL, 3, GL_FLOAT, GL_FALSE,
-							  vertex_size, addr_diff(&(v.nrm()),&v));
-		glEnableVertexAttribArray(ALOC_NORMAL);
-
-		glVertexAttribPointer(ALOC_COLOR, 4, GL_FLOAT, GL_FALSE,
-							  vertex_size, addr_diff(&(v.clr()),&v));
-		glEnableVertexAttribArray(ALOC_COLOR);
-
-		glVertexAttribPointer(ALOC_TEXCOORD, 2, GL_FLOAT, GL_FALSE,
-							  vertex_size, addr_diff(&(v.tex()),&v));
-		glEnableVertexAttribArray(ALOC_TEXCOORD);
-
-		glVertexAttribPointer(ALOC_TANGENT, 3, GL_FLOAT, GL_FALSE,
-							  vertex_size, addr_diff(&(v.tan()),&v));
-		glEnableVertexAttribArray(ALOC_TANGENT);
-#undef addr_diff
-	}
-
-	m_primitive = vd->primitive();
-	m_vertice_count =  static_cast<GLsizei>(vd->indices().size());
+	return res;
 }
 
-Geometry::~Geometry()
+
+
+std::vector<int> Mesh::aVerts(uint vertex)
 {
-	if(m_vbo)
-		glDeleteBuffers(1, &m_vbo);
-	if(m_ibo)
-		glDeleteBuffers(1, &m_ibo);
-	if(m_vao)
-		glDeleteVertexArrays(1, &m_vao);
-}
+	std::vector<int> tris = aTriangles(vertex);
+
+	std::vector<int> res;
+	std::set<int> r;
+	for(const int i : tris)
+	{
+		const Triangle& t = triangle(i);
+		for(int j =0 ; j< 3;j++)
+		{
+			r.insert(t(j));
+
+		}
+
+	}
+
+	for(int i: r)
+	{
+		res.push_back(i);
+	}
+
+	return res;
 
 }
 
-#endif //USING_OFL_OGL_GEO_CPP
+void Mesh::buildDataStructure()
+{
+	m_corners.resize(m_triangles.size()*3);
+	m_vertex2corner.resize(m_positions.size(),-1);
+
+	int corners = 0;
+	for(const Triangle& t : m_triangles)
+	{
+		for(int i = 0 ; i<3;i++)
+			if(m_vertex2corner[t(i)]<0) m_vertex2corner[t(i)] = corners+i;
+
+
+		int ot = 0;
+		for(const Triangle& tt : m_triangles)
+		{
+			if(tt==t)
+			{
+				ot+=3;
+				continue;
+			}
+			int ts=0, tts=0;
+			if(t.sharedEdgeWith(tt,tts,ts))
+			{
+				int	opp =  (ot)+(tts+3-1)%3;
+				m_corners[corners+(ts+3-1)%3].opp = opp;
+				m_corners[opp].opp = corners+(ts+3-1)%3;
+
+			}
+			ot+=3;
+		}
+		corners+=3;
+	}
+
+}
+
+
+}
+
+#endif //USING_OFL_MESH_CPP
 #ifndef USING_OFL_STRU_CPP
 #define USING_OFL_STRU_CPP
 

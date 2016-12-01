@@ -3,6 +3,7 @@
  SUBDIRS = \
 			ofl_creator\
 			libs\
+			mesh_avg\
 			mesh_converter\
 			mesh_viewer\
 			stereo_mesh_viewer\
@@ -15,6 +16,7 @@
  # where to find the sub projects - give the folders
 libs.subdir = ./libs
 ofl_creator.subdir  = ./tools/ofl_creator
+mesh_avg.subdir  = ./tools/mesh_avg
 mesh_converter.subdir  = ./tools/mesh_converter
 mesh_viewer.subdir  = ./tools/mesh_viewer
 stereo_mesh_viewer.subdir  = ./tools/stereo_mesh_viewer

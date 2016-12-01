@@ -42,7 +42,8 @@ HEADERS += \
     libs/vrpv.h \
     libs/ogl_stereo_compositor.h \
     libs/sem_queue.h \
-    libs/processing_graph.h
+    libs/processing_graph.h \
+    libs/mesh.h
 
 SOURCES += \
     libs/ogl_geo.cpp \
@@ -53,7 +54,8 @@ SOURCES += \
     libs/vdman.cpp \
     libs/vmath.cpp \
     libs/vrpv.cpp \
-    libs/ogl_stereo_compositor.cpp
+    libs/ogl_stereo_compositor.cpp \
+    libs/mesh.cpp
 
 CONFIG += c++11
 
