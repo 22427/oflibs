@@ -34,10 +34,8 @@ public:
 
 	int getEdgeStart(int a, int b) const
 	{
-		printf("getEdgeStart %d->%d \n",a,b);
 		for(int i = 0 ; i< 3;i++)
 		{
-			printf("\t %d->%d \n",v[i],v[(i+1)%3]);
 			if(v[i] == a && v[(i+1)%3] == b)
 				return i;
 		}
@@ -83,8 +81,8 @@ class Mesh
 	std::vector<Corner> m_corners;
 
 public:
-	std::vector<int> aTriangles(uint vertex);
-	std::vector<int> aVerts(uint vertex);
+	std::vector<int> adjacentTriangles(uint vertex);
+	std::vector<int> adjacentVertices(uint vertex);
 
 	vec3& vertex(const uint i){return m_positions[i];}
 	const vec3& vertex(const uint i)const{return m_positions[i];}
@@ -94,6 +92,11 @@ public:
 
 	void buildDataStructure();
 
+	const std::vector<vec3>& positions()const {return m_positions;}
+	std::vector<vec3>& positions(){return m_positions;}
+
+	const std::vector<Corner>& corners()const {return m_corners;}
+	std::vector<Corner>& corners(){return m_corners;}
 
 	Mesh(const VertexData* vd);
 	VertexData* toVertexData();
@@ -102,6 +105,15 @@ public:
 
 class MeshTools
 {
+	public:
 
+	/**
+	 * @brief getClosestVertex searches for the closest vertex to a given
+	 * position. This is a search in O(number of vertices in the mesh)
+	 * @param m Mesh
+	 * @param p position
+	 * @return The vertex id of the closes vertex or -1 if there are no vertices
+	 */
+	static int getClosestVertex(Mesh* m, const vec3& p);
 };
 }

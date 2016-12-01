@@ -58,7 +58,7 @@ int corner_add(int c,int a)
 	return t*3 + ((c%3)+a)%3;
 };
 
-std::vector<int> Mesh::aTriangles(uint vertex)
+std::vector<int> Mesh::adjacentTriangles(uint vertex)
 {
 	std::vector<int> res;
 	int c = m_vertex2corner[vertex];
@@ -107,9 +107,9 @@ std::vector<int> Mesh::aTriangles(uint vertex)
 
 
 
-std::vector<int> Mesh::aVerts(uint vertex)
+std::vector<int> Mesh::adjacentVertices(uint vertex)
 {
-	std::vector<int> tris = aTriangles(vertex);
+	std::vector<int> tris = adjacentTriangles(vertex);
 
 	std::vector<int> res;
 	std::set<int> r;
@@ -166,6 +166,26 @@ void Mesh::buildDataStructure()
 		corners+=3;
 	}
 
+}
+
+int MeshTools::getClosestVertex(Mesh *m, const vec3 &p)
+{
+	if (m->positions().empty())
+		return -1;
+	float min = distance2(p,m->positions()[0]);
+	int r = -1 ;
+	int i = 0;
+	for(const auto v : m->positions())
+	{
+		const float d = distance2(p,v) ;
+		if(d<min)
+		{
+			r = i ;
+			min = d;
+		}
+		i++;
+	}
+	return r;
 }
 
 
