@@ -61,6 +61,12 @@ public:
 	static std::string whitespaces;
 	Tokenizer(const std::string& base);
 	~Tokenizer();
+
+	void setBase(char* base)
+	{
+		m_base = base;
+		m_rest = base;
+	}
 	/**
 	 * @brief reset Will free the current base and set a new one.
 	 * @param base The new base.
@@ -135,6 +141,17 @@ template<> inline bool Tokenizer::getTokenAs<int>(
 	char* c = getToken(seps,sep);
 	if(c)
 		res = atoi(c);
+	return c;
+}
+
+template<> inline bool Tokenizer::getTokenAs<uint>(
+		uint& res,
+		const std::string &seps,
+		char *sep )
+{
+	char* c = getToken(seps,sep);
+	if(c)
+		res = static_cast<uint>(atoi(c));
 	return c;
 }
 

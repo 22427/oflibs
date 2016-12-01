@@ -11,7 +11,8 @@ Tokenizer::Tokenizer(const std::string& base)
 
 Tokenizer::~Tokenizer()
 {
-	delete[] m_base;
+	if(m_base)
+		delete[] m_base;
 }
 
 char* Tokenizer::getToken(char separator)
