@@ -1,9 +1,10 @@
+
 #include "mesh.h"
 #include <set>
 namespace ofl
 {
 
-int addPos(std::map<vec3,int>& map ,const vec3& pos, std::vector<vec3>& poss)
+int addPos(std::map<vec3,int,compare_vec_3>& map ,const vec3& pos, std::vector<vec3>& poss)
 {
 	if(map.find(pos)== map.end())
 	{
@@ -19,7 +20,7 @@ Mesh::Mesh(const VertexData *vd)
 {
 	if(vd->primitive() != TRIANGLES)
 		fprintf(stderr,"Mesh can only be created from TRIANGLE based vertex data!\n");
-	std::map<vec3,int> pmap;
+	std::map<vec3,int,compare_vec_3> pmap;
 	Triangle tri(0,0,0);
 	const auto& pd = vd->data();
 	const auto& id = vd->indices();
@@ -58,84 +59,34 @@ int corner_add(int c,int a)
 	return t*3 + ((c%3)+a)%3;
 };
 
-std::vector<int> Mesh::adjacentTriangles(uint vertex)
+std::vector<Triangle*> Mesh::adjacentTriangles(int vertex)
 {
-	std::vector<int> res;
-	int c = m_vertex2corner[vertex];
-	int first_t = c/3;
-	int start_c = first_t*3 + ((c%3)+1)%3;
-	res.push_back(first_t);
-
-	int t = first_t+1;
-	c = start_c;
-	bool other_way = false;
-	while (t != first_t)
-	{
-		c = m_corners[c].opp;
-		if(c<0)
-		{
-			other_way = true;
-			break;
-		}
-		t = c/3;
-
-		if(t == first_t)
-			break;
-		res.push_back(t);
-		c = corner_add(c,2);
-	}
-
-	if(other_way)
-	{
-		int c = m_vertex2corner[vertex];
-		c = corner_add(c,2);
-		while (c >= 0)
-		{
-			c = m_corners[c].opp;
-			if(c<0)
-			{
-				break;
-			}
-			t = c/3;
-			res.push_back(t);
-			c = corner_add(c,1);
-		}
-	}
-
-	return res;
+	return std::vector<Triangle*>(m_pos2tris[vertex].begin(), m_pos2tris[vertex].end());
 }
 
 
 
-std::vector<int> Mesh::adjacentVertices(uint vertex)
+std::vector<int> Mesh::adjacentVertices(int vertex)
 {
-	std::vector<int> tris = adjacentTriangles(vertex);
 
-	std::vector<int> res;
-	std::set<int> r;
-	for(const int i : tris)
-	{
-		const Triangle& t = triangle(i);
-		for(int j =0 ; j< 3;j++)
-		{
-			r.insert(t(j));
-
-		}
-
-	}
-
-	for(int i: r)
-	{
-		res.push_back(i);
-	}
-
-	return res;
+	return std::vector<int>(m_pos2pos[vertex].begin(), m_pos2pos[vertex].end());
 
 }
 
 void Mesh::buildDataStructure()
 {
-	m_corners.resize(m_triangles.size()*3);
+	for(auto& t : m_triangles)
+	{
+
+		for(uint i =0 ; i<3;i++)
+		{
+			m_pos2tris[t(i)].insert(&t);
+			m_pos2pos[t(i)].insert(t((i+1)%3));
+			m_pos2pos[t(i)].insert(t((i+2)%3));
+		}
+
+	}
+	/*m_corners.resize(m_triangles.size()*3);
 	m_vertex2corner.resize(m_positions.size(),-1);
 
 	int corners = 0;
@@ -164,7 +115,7 @@ void Mesh::buildDataStructure()
 			ot+=3;
 		}
 		corners+=3;
-	}
+	}*/
 
 }
 
@@ -173,7 +124,7 @@ int MeshTools::getClosestVertex(Mesh *m, const vec3 &p)
 	if (m->positions().empty())
 		return -1;
 	float min = distance2(p,m->positions()[0]);
-	int r = -1 ;
+	int r = 0 ;
 	int i = 0;
 	for(const auto v : m->positions())
 	{
@@ -187,6 +138,70 @@ int MeshTools::getClosestVertex(Mesh *m, const vec3 &p)
 	}
 	return r;
 }
+
+vec3 triangle_cp(
+		const vec3& t1,
+		const vec3& t2,
+		const vec3& t3,
+		const vec3& p)
+{
+	vec3 a = t2-t1;
+	vec3 b = t3-t1;
+	vec3 n = cross(a,b);
+	n = normalize(n);
+
+	mat4 T(vec4(a,0),vec4(b,0),vec4(n,0),vec4(t1,1));
+	mat4 Ti = glm::inverse(T);
+
+	vec3 pt = vec3(Ti * vec4(p,1));
+
+
+	pt.z = 1.0f-pt.x-pt.y;
+
+	if(pt.z < 0)
+	{
+		pt.z = 0;
+		vec3 diag(0.5f*sqrt(2.0f),-0.5f*sqrt(2.0f),0);
+		pt = vec3(0,1,0) + diag* dot(diag,pt-vec3(0,1,0));
+	}
+
+	pt.x = pt.x<0.0f?0.0f : (pt.x > 1? 1.0f: pt.x);
+	pt.y = pt.y<0.0f?0.0f : (pt.y > 1? 1.0f: pt.y);
+
+
+
+
+
+	pt.z = 0;
+	return vec3(T * vec4(pt,1));
+
+}
+vec3 MeshTools::getClosestPoint(Mesh *m, const vec3 &p)
+{
+	int cv = getClosestVertex(m,p);
+	auto tris = m->adjacentTriangles(static_cast<uint>(cv));
+	float min = distance2(m->vertex(cv),p);
+	vec3 res = m->vertex(cv);
+
+	for(const auto tt : tris)
+	{
+		const Triangle &t = *tt;//m->triangle(static_cast<uint>(tt));
+		auto r = triangle_cp(
+					m->vertex(static_cast<uint>(t(0))),
+					m->vertex(static_cast<uint>(t(1))),
+					m->vertex(static_cast<uint>(t(2))),p);
+
+		float d = distance2(p,r);
+		if(d < min)
+		{
+			min = d;
+			res = r;
+		}
+	}
+	return res;
+}
+
+
 
 
 }

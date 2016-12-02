@@ -1,8 +1,10 @@
 #pragma once
+#include <glm/glm.hpp>
 #include "vd.h"
 #include "vmath.h"
 #include <vector>
 #include <map>
+#include <set>
 namespace ofl {
 
 
@@ -77,12 +79,15 @@ class Mesh
 	std::vector<vec3> m_positions;
 	std::vector<Triangle> m_triangles;
 
-	std::vector<int> m_vertex2corner;
-	std::vector<Corner> m_corners;
+	std::map<int, std::set<Triangle*>> m_pos2tris;
+	std::map<int, std::set<int>> m_pos2pos;
+
+	//std::vector<int> m_vertex2corner;
+//	std::vector<Corner> m_corners;
 
 public:
-	std::vector<int> adjacentTriangles(uint vertex);
-	std::vector<int> adjacentVertices(uint vertex);
+	std::vector<Triangle*> adjacentTriangles(int vertex);
+	std::vector<int> adjacentVertices(int vertex);
 
 	vec3& vertex(const uint i){return m_positions[i];}
 	const vec3& vertex(const uint i)const{return m_positions[i];}
@@ -95,11 +100,13 @@ public:
 	const std::vector<vec3>& positions()const {return m_positions;}
 	std::vector<vec3>& positions(){return m_positions;}
 
-	const std::vector<Corner>& corners()const {return m_corners;}
-	std::vector<Corner>& corners(){return m_corners;}
+//	const std::vector<Corner>& corners()const {return m_corners;}
+//	std::vector<Corner>& corners(){return m_corners;}
 
 	Mesh(const VertexData* vd);
 	VertexData* toVertexData();
+	const std::vector<Triangle>& triangles()const{return  m_triangles;}
+	std::vector<Triangle>& triangles(){return  m_triangles;}
 };
 
 
@@ -115,5 +122,7 @@ class MeshTools
 	 * @return The vertex id of the closes vertex or -1 if there are no vertices
 	 */
 	static int getClosestVertex(Mesh* m, const vec3& p);
+
+	static vec3 getClosestPoint(Mesh* m, const vec3& p);
 };
 }
