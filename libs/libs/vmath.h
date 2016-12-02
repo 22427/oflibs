@@ -6,6 +6,7 @@
 
 
 #ifdef GLM_INCLUDED
+#define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/norm.hpp>
@@ -163,6 +164,20 @@ public:
 };
 
 /**
+ * @brief The mat4 class is the backup class if there is no glm in your project
+ */
+class mat3
+{
+	vec3 m_data[3];
+public:
+	mat3(float diag = 1.0f);
+	mat3(const vec3& c0 ,const vec3& c1 ,const vec3& c2);
+	vec3& operator[](int i);
+	const vec3& operator[](int i) const;
+	float* data(){return &(m_data[0].data[0]);}
+};
+
+/**
  * @brief operator * Matrix-Vector multiplication.
  * @param M Matrix M
  * @param v Matrix v
@@ -274,18 +289,37 @@ vec4 read_from_string(std::string& str);
 
 mat4 transpose(const mat4& m);
 
+bool operator<(const vec4& a, const vec4& b);
+bool operator== (const vec4& a, const vec4& b);
 
-bool operator  < (const vec4& a, const vec4& b);
-bool operator == (const vec4& a, const vec4& b);
+inline bool operator<(const vec3& a , const vec3& b)
+{
+	if (fabs(a.x - b.x) < std::numeric_limits<float>::epsilon())
+	{
+		if (fabs(a.y - b.y) < std::numeric_limits<float>::epsilon())
+		{
+			return a.z < b.z;
+		}
+		else
+		{
+			return a.y < b.y;
+		}
+	}
+	else
+	{
+		return a.x < b.x;
+	}
 
-bool operator  < (const vec3& a, const vec3& b);
-bool operator == (const vec3& a, const vec3& b);
+}
+bool operator== (const vec3& a, const vec3& b);
+
+
 /* small coperator class for the map p2n in
 calculateNormals.*/
 class compare_vec_4
 {
 public:
-	bool operator()(const vec4 a, const vec4 b)
+	bool operator()(const vec4& a, const vec4& b)
 	{
 		return 	a < b;
 	}
@@ -295,11 +329,12 @@ public:
 class compare_vec_3
 {
 public:
-	bool operator()(const vec3 a, const vec3 b)
+	bool operator()(const vec3& a, const vec3& b)
 	{
 		return 	a < b;
 	}
 };
+
 
 
 }

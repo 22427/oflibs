@@ -5,7 +5,6 @@ namespace ofl
 {
 
 #ifdef GLM_INCLUDED
-
 using namespace  glm;
 #else
 
@@ -28,6 +27,28 @@ mat4::mat4(const vec4 &c0, const vec4 &c1, const vec4 &c2, const vec4 &c3)
 vec4 &mat4::operator[](int i)	{return m_data[i];}
 
 const vec4 &mat4::operator[](int i) const {return m_data[i];}
+
+
+////// mat3 ////////////////////////////////////////////////////////////////////
+
+mat3::mat3(float diag)
+{
+	for(unsigned int i =0 ; i< 3;i++)
+	{
+		m_data[i] = vec3(0,0,0);
+		m_data[i][i] = diag;
+	}
+}
+
+mat3::mat3(const vec3 &c0, const vec3 &c1, const vec3 &c2)
+{
+	m_data[0] = c0; m_data[1] = c1; m_data[2] = c2;
+}
+
+vec3 &mat3::operator[](int i)	{return m_data[i];}
+
+const vec3 &mat3::operator[](int i) const {return m_data[i];}
+
 
 ////// vec2 ////////////////////////////////////////////////////////////////////
 
@@ -396,11 +417,6 @@ mat4 translate(const mat4&m,const vec4& v)
 	r[3] = m[0] * v[0] + m[1] * v[1] + m[2] * v[2] + m[3];
 	return r;
 }
-
-
-
-
-
 #endif
 
 
@@ -438,7 +454,7 @@ bool operator == (const vec4& a, const vec4& b)
 }
 
 
-bool operator < (const vec3& a, const vec3& b)
+/*bool operator < (const vec3& a, const vec3& b)
 {
 	if (fabs(a.x - b.x) < std::numeric_limits<float>::epsilon())
 	{
@@ -455,7 +471,7 @@ bool operator < (const vec3& a, const vec3& b)
 	{
 		return a.x < b.x;
 	}
-}
+}*/
 bool operator == (const vec3& a, const vec3& b)
 {
 	return fabs(a.x - b.x) < std::numeric_limits<float>::epsilon() &&

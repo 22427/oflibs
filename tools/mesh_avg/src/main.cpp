@@ -1,9 +1,12 @@
 
+
+#include <../../libs/libs/mesh.h>
+
 #include <cstdio>
 #include <fstream>
 #include <set>
 #include <../../libs/libs/vd.h>
-#include <../../libs/libs/mesh.h>
+
 
 
 using namespace ofl;
@@ -11,38 +14,46 @@ using namespace ofl;
 
 int main(int argc, char** argv)
 {
-	VertexData* vd = VertexDataTools::readFromFile("test.off");
-//	Vertex v;
-//	v.setPosition(vec3(0,0,0));
-//	vd.data().push_back(v);
-//	v.setPosition(vec3(1,1,0));
-//	vd.data().push_back(v);
-//	v.setPosition(vec3(-1,1,0));
-//	vd.data().push_back(v);
-//	v.setPosition(vec3(-1,-1,0));
-//	vd.data().push_back(v);
-//	v.setPosition(vec3(1,-1,0));
-//	vd.data().push_back(v);
+	printf("loading a ...\n");
+	VertexData* a = VertexDataTools::readFromFile("a.off");
+	VertexDataTools::writeToFile(a,"ico2.off");
+	printf("loading b ...\n");
+	VertexData* b = VertexDataTools::readFromFile("b.off");
+	printf("loading c ...\n");
+	VertexData* c = VertexDataTools::readFromFile("c.off");
 
-//	vd.push_back(0);
-//	vd.push_back(1);
-//	vd.push_back(2);
+	printf("create meshes...\n");
+	Mesh ms[3] = {Mesh(a),Mesh(b),Mesh(c)};
+	delete a;
+	delete b;
+	delete c;
+	printf("calculate positions ... \n");
 
-//	vd.push_back(0);
-//	vd.push_back(2);
-//	vd.push_back(3);
+	for(uint j = 0 ; j< 1;j++)
+	{
+		uint t = ms[j].positions().size()/79;
+		for(uint i = 0 ; i< ms[j].positions().size(); i++)
+		{
+			vec3& p  = ms[j].positions()[i];
+			vec3 cp;
+			if(i%t==0)
+			{
+				printf("|");
+				fflush(stdout);
+			}
+			cp += MeshTools::getClosestPoint(&ms[(j+1)%3],p)*0.5f;
+			cp += MeshTools::getClosestPoint(&ms[(j+2)%3],p)*0.5f;
+			p=p+ (cp-p)*0.5f;
+		}
+		printf("\n");
+		VertexData* vd = ms[j].toVertexData();
+		VertexDataTools::writeToFile(vd,std::to_string(j)+".off");
+		delete vd;
+	}
 
-//	vd.push_back(0);
-//	vd.push_back(3);
-//	vd.push_back(4);
 
-//	vd.push_back(0);
-//	vd.push_back(4);
-//	vd.push_back(1);
 
-	Mesh m(vd);
-
-	VertexDataTools::writeOFF(vd,"test.off");
+	return 0;
 
 }
 

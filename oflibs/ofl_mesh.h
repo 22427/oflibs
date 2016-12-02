@@ -442,6 +442,7 @@ static inline std::string without_extension(const std::string& p)
 
 
 #ifdef GLM_INCLUDED
+#define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/norm.hpp>
@@ -599,6 +600,20 @@ public:
 };
 
 /**
+ * @brief The mat4 class is the backup class if there is no glm in your project
+ */
+class mat3
+{
+	vec3 m_data[3];
+public:
+	mat3(float diag = 1.0f);
+	mat3(const vec3& c0 ,const vec3& c1 ,const vec3& c2);
+	vec3& operator[](int i);
+	const vec3& operator[](int i) const;
+	float* data(){return &(m_data[0].data[0]);}
+};
+
+/**
  * @brief operator * Matrix-Vector multiplication.
  * @param M Matrix M
  * @param v Matrix v
@@ -710,18 +725,37 @@ vec4 read_from_string(std::string& str);
 
 mat4 transpose(const mat4& m);
 
+bool operator<(const vec4& a, const vec4& b);
+bool operator== (const vec4& a, const vec4& b);
 
-bool operator  < (const vec4& a, const vec4& b);
-bool operator == (const vec4& a, const vec4& b);
+inline bool operator<(const vec3& a , const vec3& b)
+{
+	if (fabs(a.x - b.x) < std::numeric_limits<float>::epsilon())
+	{
+		if (fabs(a.y - b.y) < std::numeric_limits<float>::epsilon())
+		{
+			return a.z < b.z;
+		}
+		else
+		{
+			return a.y < b.y;
+		}
+	}
+	else
+	{
+		return a.x < b.x;
+	}
 
-bool operator  < (const vec3& a, const vec3& b);
-bool operator == (const vec3& a, const vec3& b);
+}
+bool operator== (const vec3& a, const vec3& b);
+
+
 /* small coperator class for the map p2n in
 calculateNormals.*/
 class compare_vec_4
 {
 public:
-	bool operator()(const vec4 a, const vec4 b)
+	bool operator()(const vec4& a, const vec4& b)
 	{
 		return 	a < b;
 	}
@@ -731,11 +765,12 @@ public:
 class compare_vec_3
 {
 public:
-	bool operator()(const vec3 a, const vec3 b)
+	bool operator()(const vec3& a, const vec3& b)
 	{
 		return 	a < b;
 	}
 };
+
 
 
 }
@@ -953,8 +988,10 @@ protected:
 }
 
 #endif //USING_OFL_VD_H
+#include <glm/glm.hpp>
 #include <vector>
 #include <map>
+#include <set>
 namespace ofl {
 
 
@@ -1029,12 +1066,15 @@ class Mesh
 	std::vector<vec3> m_positions;
 	std::vector<Triangle> m_triangles;
 
-	std::vector<int> m_vertex2corner;
-	std::vector<Corner> m_corners;
+	std::map<int, std::set<Triangle*>> m_pos2tris;
+	std::map<int, std::set<int>> m_pos2pos;
+
+	//std::vector<int> m_vertex2corner;
+//	std::vector<Corner> m_corners;
 
 public:
-	std::vector<int> adjacentTriangles(uint vertex);
-	std::vector<int> adjacentVertices(uint vertex);
+	std::vector<Triangle*> adjacentTriangles(int vertex);
+	std::vector<int> adjacentVertices(int vertex);
 
 	vec3& vertex(const uint i){return m_positions[i];}
 	const vec3& vertex(const uint i)const{return m_positions[i];}
@@ -1047,11 +1087,13 @@ public:
 	const std::vector<vec3>& positions()const {return m_positions;}
 	std::vector<vec3>& positions(){return m_positions;}
 
-	const std::vector<Corner>& corners()const {return m_corners;}
-	std::vector<Corner>& corners(){return m_corners;}
+//	const std::vector<Corner>& corners()const {return m_corners;}
+//	std::vector<Corner>& corners(){return m_corners;}
 
 	Mesh(const VertexData* vd);
 	VertexData* toVertexData();
+	const std::vector<Triangle>& triangles()const{return  m_triangles;}
+	std::vector<Triangle>& triangles(){return  m_triangles;}
 };
 
 
@@ -1067,6 +1109,8 @@ class MeshTools
 	 * @return The vertex id of the closes vertex or -1 if there are no vertices
 	 */
 	static int getClosestVertex(Mesh* m, const vec3& p);
+
+	static vec3 getClosestPoint(Mesh* m, const vec3& p);
 };
 }
 
@@ -1074,11 +1118,12 @@ class MeshTools
 #ifdef OFL_IMPLEMENTATION
 #ifndef USING_OFL_MESH_CPP
 #define USING_OFL_MESH_CPP
+
 #include <set>
 namespace ofl
 {
 
-int addPos(std::map<vec3,int>& map ,const vec3& pos, std::vector<vec3>& poss)
+int addPos(std::map<vec3,int,compare_vec_3>& map ,const vec3& pos, std::vector<vec3>& poss)
 {
 	if(map.find(pos)== map.end())
 	{
@@ -1094,7 +1139,7 @@ Mesh::Mesh(const VertexData *vd)
 {
 	if(vd->primitive() != TRIANGLES)
 		fprintf(stderr,"Mesh can only be created from TRIANGLE based vertex data!\n");
-	std::map<vec3,int> pmap;
+	std::map<vec3,int,compare_vec_3> pmap;
 	Triangle tri(0,0,0);
 	const auto& pd = vd->data();
 	const auto& id = vd->indices();
@@ -1133,84 +1178,34 @@ int corner_add(int c,int a)
 	return t*3 + ((c%3)+a)%3;
 };
 
-std::vector<int> Mesh::adjacentTriangles(uint vertex)
+std::vector<Triangle*> Mesh::adjacentTriangles(int vertex)
 {
-	std::vector<int> res;
-	int c = m_vertex2corner[vertex];
-	int first_t = c/3;
-	int start_c = first_t*3 + ((c%3)+1)%3;
-	res.push_back(first_t);
-
-	int t = first_t+1;
-	c = start_c;
-	bool other_way = false;
-	while (t != first_t)
-	{
-		c = m_corners[c].opp;
-		if(c<0)
-		{
-			other_way = true;
-			break;
-		}
-		t = c/3;
-
-		if(t == first_t)
-			break;
-		res.push_back(t);
-		c = corner_add(c,2);
-	}
-
-	if(other_way)
-	{
-		int c = m_vertex2corner[vertex];
-		c = corner_add(c,2);
-		while (c >= 0)
-		{
-			c = m_corners[c].opp;
-			if(c<0)
-			{
-				break;
-			}
-			t = c/3;
-			res.push_back(t);
-			c = corner_add(c,1);
-		}
-	}
-
-	return res;
+	return std::vector<Triangle*>(m_pos2tris[vertex].begin(), m_pos2tris[vertex].end());
 }
 
 
 
-std::vector<int> Mesh::adjacentVertices(uint vertex)
+std::vector<int> Mesh::adjacentVertices(int vertex)
 {
-	std::vector<int> tris = adjacentTriangles(vertex);
 
-	std::vector<int> res;
-	std::set<int> r;
-	for(const int i : tris)
-	{
-		const Triangle& t = triangle(i);
-		for(int j =0 ; j< 3;j++)
-		{
-			r.insert(t(j));
-
-		}
-
-	}
-
-	for(int i: r)
-	{
-		res.push_back(i);
-	}
-
-	return res;
+	return std::vector<int>(m_pos2pos[vertex].begin(), m_pos2pos[vertex].end());
 
 }
 
 void Mesh::buildDataStructure()
 {
-	m_corners.resize(m_triangles.size()*3);
+	for(auto& t : m_triangles)
+	{
+
+		for(uint i =0 ; i<3;i++)
+		{
+			m_pos2tris[t(i)].insert(&t);
+			m_pos2pos[t(i)].insert(t((i+1)%3));
+			m_pos2pos[t(i)].insert(t((i+2)%3));
+		}
+
+	}
+	/*m_corners.resize(m_triangles.size()*3);
 	m_vertex2corner.resize(m_positions.size(),-1);
 
 	int corners = 0;
@@ -1239,7 +1234,7 @@ void Mesh::buildDataStructure()
 			ot+=3;
 		}
 		corners+=3;
-	}
+	}*/
 
 }
 
@@ -1248,7 +1243,7 @@ int MeshTools::getClosestVertex(Mesh *m, const vec3 &p)
 	if (m->positions().empty())
 		return -1;
 	float min = distance2(p,m->positions()[0]);
-	int r = -1 ;
+	int r = 0 ;
 	int i = 0;
 	for(const auto v : m->positions())
 	{
@@ -1262,6 +1257,70 @@ int MeshTools::getClosestVertex(Mesh *m, const vec3 &p)
 	}
 	return r;
 }
+
+vec3 triangle_cp(
+		const vec3& t1,
+		const vec3& t2,
+		const vec3& t3,
+		const vec3& p)
+{
+	vec3 a = t2-t1;
+	vec3 b = t3-t1;
+	vec3 n = cross(a,b);
+	n = normalize(n);
+
+	mat4 T(vec4(a,0),vec4(b,0),vec4(n,0),vec4(t1,1));
+	mat4 Ti = glm::inverse(T);
+
+	vec3 pt = vec3(Ti * vec4(p,1));
+
+
+	pt.z = 1.0f-pt.x-pt.y;
+
+	if(pt.z < 0)
+	{
+		pt.z = 0;
+		vec3 diag(0.5f*sqrt(2.0f),-0.5f*sqrt(2.0f),0);
+		pt = vec3(0,1,0) + diag* dot(diag,pt-vec3(0,1,0));
+	}
+
+	pt.x = pt.x<0.0f?0.0f : (pt.x > 1? 1.0f: pt.x);
+	pt.y = pt.y<0.0f?0.0f : (pt.y > 1? 1.0f: pt.y);
+
+
+
+
+
+	pt.z = 0;
+	return vec3(T * vec4(pt,1));
+
+}
+vec3 MeshTools::getClosestPoint(Mesh *m, const vec3 &p)
+{
+	int cv = getClosestVertex(m,p);
+	auto tris = m->adjacentTriangles(static_cast<uint>(cv));
+	float min = distance2(m->vertex(cv),p);
+	vec3 res = m->vertex(cv);
+
+	for(const auto tt : tris)
+	{
+		const Triangle &t = *tt;//m->triangle(static_cast<uint>(tt));
+		auto r = triangle_cp(
+					m->vertex(static_cast<uint>(t(0))),
+					m->vertex(static_cast<uint>(t(1))),
+					m->vertex(static_cast<uint>(t(2))),p);
+
+		float d = distance2(p,r);
+		if(d < min)
+		{
+			min = d;
+			res = r;
+		}
+	}
+	return res;
+}
+
+
 
 
 }
@@ -1297,7 +1356,7 @@ char* Tokenizer::getToken(char separator)
 		m_rest++;
 	}
 
-	if(*m_rest)
+	while (*m_rest && *m_rest == separator)
 	{
 		*m_rest =0;
 		m_rest++;
@@ -1327,8 +1386,16 @@ char* Tokenizer::getToken(const std::string& separators, char* sep)
 	{
 		m_rest++;
 	}
+
 	if(sep)
 		*sep = *m_rest;
+
+	while (*m_rest && contains(separators,*m_rest))
+	{
+		*m_rest = 0;
+		m_rest++;
+	}
+
 	return to_ret;
 }
 
@@ -1791,7 +1858,7 @@ VertexData *VertexDataTools::readOFF(const std::string &path)
 		tkn.setBase(line);
 		tkn.skipWhiteSpaces();
 		tkn.skipOverAll("OFF");
-
+		tkn.skipWhiteSpaces();
 		if(!tkn.getRest() || tkn.getRest()[0] == '#' || tkn.getRest()[0] == 0)
 			continue;
 
@@ -1799,9 +1866,9 @@ VertexData *VertexDataTools::readOFF(const std::string &path)
 		{
 			tkn.getTokenAs(vtx_cnt);
 			tkn.getTokenAs(face_cnt);
-			vd->data().resize(vtx_cnt);
+			vd->data().reserve(vtx_cnt);
 		}
-		if(iv < vtx_cnt)
+		else if(iv < vtx_cnt)
 		{
 			tkn.getTokenAs(v.pos().x);
 			tkn.getTokenAs(v.pos().y);
@@ -1811,7 +1878,7 @@ VertexData *VertexDataTools::readOFF(const std::string &path)
 		}
 		else if (it < face_cnt)
 		{
-			uint i;
+			uint i = 3;
 			tkn.getTokenAs(i);
 			if(it == 0)
 			{
@@ -1828,6 +1895,7 @@ VertexData *VertexDataTools::readOFF(const std::string &path)
 				tkn.getTokenAs(q);
 				vd->push_back(q);
 			}
+			it++;
 		}
 
 	}
@@ -2279,7 +2347,6 @@ namespace ofl
 {
 
 #ifdef GLM_INCLUDED
-
 using namespace  glm;
 #else
 
@@ -2302,6 +2369,28 @@ mat4::mat4(const vec4 &c0, const vec4 &c1, const vec4 &c2, const vec4 &c3)
 vec4 &mat4::operator[](int i)	{return m_data[i];}
 
 const vec4 &mat4::operator[](int i) const {return m_data[i];}
+
+
+////// mat3 ////////////////////////////////////////////////////////////////////
+
+mat3::mat3(float diag)
+{
+	for(unsigned int i =0 ; i< 3;i++)
+	{
+		m_data[i] = vec3(0,0,0);
+		m_data[i][i] = diag;
+	}
+}
+
+mat3::mat3(const vec3 &c0, const vec3 &c1, const vec3 &c2)
+{
+	m_data[0] = c0; m_data[1] = c1; m_data[2] = c2;
+}
+
+vec3 &mat3::operator[](int i)	{return m_data[i];}
+
+const vec3 &mat3::operator[](int i) const {return m_data[i];}
+
 
 ////// vec2 ////////////////////////////////////////////////////////////////////
 
@@ -2670,11 +2759,6 @@ mat4 translate(const mat4&m,const vec4& v)
 	r[3] = m[0] * v[0] + m[1] * v[1] + m[2] * v[2] + m[3];
 	return r;
 }
-
-
-
-
-
 #endif
 
 
@@ -2712,7 +2796,7 @@ bool operator == (const vec4& a, const vec4& b)
 }
 
 
-bool operator < (const vec3& a, const vec3& b)
+/*bool operator < (const vec3& a, const vec3& b)
 {
 	if (fabs(a.x - b.x) < std::numeric_limits<float>::epsilon())
 	{
@@ -2729,7 +2813,7 @@ bool operator < (const vec3& a, const vec3& b)
 	{
 		return a.x < b.x;
 	}
-}
+}*/
 bool operator == (const vec3& a, const vec3& b)
 {
 	return fabs(a.x - b.x) < std::numeric_limits<float>::epsilon() &&

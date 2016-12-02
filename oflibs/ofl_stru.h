@@ -400,7 +400,7 @@ char* Tokenizer::getToken(char separator)
 		m_rest++;
 	}
 
-	if(*m_rest)
+	while (*m_rest && *m_rest == separator)
 	{
 		*m_rest =0;
 		m_rest++;
@@ -430,8 +430,16 @@ char* Tokenizer::getToken(const std::string& separators, char* sep)
 	{
 		m_rest++;
 	}
+
 	if(sep)
 		*sep = *m_rest;
+
+	while (*m_rest && contains(separators,*m_rest))
+	{
+		*m_rest = 0;
+		m_rest++;
+	}
+
 	return to_ret;
 }
 

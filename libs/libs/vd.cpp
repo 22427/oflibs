@@ -429,7 +429,7 @@ VertexData *VertexDataTools::readOFF(const std::string &path)
 		tkn.setBase(line);
 		tkn.skipWhiteSpaces();
 		tkn.skipOverAll("OFF");
-
+		tkn.skipWhiteSpaces();
 		if(!tkn.getRest() || tkn.getRest()[0] == '#' || tkn.getRest()[0] == 0)
 			continue;
 
@@ -437,9 +437,9 @@ VertexData *VertexDataTools::readOFF(const std::string &path)
 		{
 			tkn.getTokenAs(vtx_cnt);
 			tkn.getTokenAs(face_cnt);
-			vd->data().resize(vtx_cnt);
+			vd->data().reserve(vtx_cnt);
 		}
-		if(iv < vtx_cnt)
+		else if(iv < vtx_cnt)
 		{
 			tkn.getTokenAs(v.pos().x);
 			tkn.getTokenAs(v.pos().y);
@@ -449,7 +449,7 @@ VertexData *VertexDataTools::readOFF(const std::string &path)
 		}
 		else if (it < face_cnt)
 		{
-			uint i;
+			uint i = 3;
 			tkn.getTokenAs(i);
 			if(it == 0)
 			{
@@ -466,6 +466,7 @@ VertexData *VertexDataTools::readOFF(const std::string &path)
 				tkn.getTokenAs(q);
 				vd->push_back(q);
 			}
+			it++;
 		}
 
 	}

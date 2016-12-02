@@ -166,6 +166,7 @@ public:
 int main(int argc, char** argv)
 {
 	ofl::WindowPreferences wp;
+	wp.stereo = false;
 	MeshViewer mv(&wp);
 	std::vector<std::string> args;
 	for(int i = 0 ; i< argc;i++)

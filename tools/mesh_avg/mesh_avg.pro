@@ -23,3 +23,5 @@ INCLUDEPATH += ../../oflibs
 DESTDIR = ../../bin
 OBJECTS_DIR = obj
 
+QMAKE_CXXFLAGS+= -fopenmp
+QMAKE_LFLAGS +=  -fopenmp
