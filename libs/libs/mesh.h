@@ -75,18 +75,20 @@ public:
 };
 class Mesh
 {
+	friend class MeshTools;
 	// per vertex attributes
 	std::vector<vec3> m_positions;
 	std::vector<Triangle> m_triangles;
 
-	std::map<int, std::set<Triangle*>> m_pos2tris;
+
+	std::map<int, std::set<int>> m_pos2tris;
 	std::map<int, std::set<int>> m_pos2pos;
 
 	//std::vector<int> m_vertex2corner;
 //	std::vector<Corner> m_corners;
 
 public:
-	std::vector<Triangle*> adjacentTriangles(int vertex);
+	std::vector<int> adjacentTriangles(int vertex);
 	std::vector<int> adjacentVertices(int vertex);
 
 	vec3& vertex(const uint i){return m_positions[i];}
@@ -102,6 +104,8 @@ public:
 
 //	const std::vector<Corner>& corners()const {return m_corners;}
 //	std::vector<Corner>& corners(){return m_corners;}
+
+	void insertVertex(const vec3& v, const int t);
 
 	Mesh(const VertexData* vd);
 	VertexData* toVertexData();
@@ -122,7 +126,14 @@ class MeshTools
 	 * @return The vertex id of the closes vertex or -1 if there are no vertices
 	 */
 	static int getClosestVertex(Mesh* m, const vec3& p);
+	static int getClosestTriangle(Mesh* m, const vec3& p);
 
 	static vec3 getClosestPoint(Mesh* m, const vec3& p);
+	static vec3 getClosestPoint(Mesh* m, const vec3& p,
+								const std::vector<mat4>& Ts,
+								const std::vector<mat4>& Tis);
+	static Mesh* merge(const Mesh* a, const Mesh*b);
+
+	static Mesh* averageSurfaces(const std::vector<Mesh*> ms);
 };
 }

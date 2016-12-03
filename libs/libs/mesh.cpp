@@ -1,6 +1,7 @@
 
 #include "mesh.h"
 #include <set>
+#include <algorithm>
 namespace ofl
 {
 
@@ -59,9 +60,9 @@ int corner_add(int c,int a)
 	return t*3 + ((c%3)+a)%3;
 };
 
-std::vector<Triangle*> Mesh::adjacentTriangles(int vertex)
+std::vector<int> Mesh::adjacentTriangles(int vertex)
 {
-	return std::vector<Triangle*>(m_pos2tris[vertex].begin(), m_pos2tris[vertex].end());
+	return std::vector<int>(m_pos2tris[vertex].begin(), m_pos2tris[vertex].end());
 }
 
 
@@ -73,19 +74,41 @@ std::vector<int> Mesh::adjacentVertices(int vertex)
 
 }
 
+template<typename T>
+std::set<T> intersect(const std::set<T>& a,const std::set<T>&b )
+{
+	std::set<T> res;
+	for(const auto& t : a)
+	{
+		if(b.find(t) != b.end())
+			res.insert(t);
+	}
+	return res;
+}
+
+
 void Mesh::buildDataStructure()
 {
+	int ct = 0;
 	for(auto& t : m_triangles)
 	{
-
 		for(uint i =0 ; i<3;i++)
 		{
-			m_pos2tris[t(i)].insert(&t);
+			m_pos2tris[t(i)].insert(ct);
 			m_pos2pos[t(i)].insert(t((i+1)%3));
 			m_pos2pos[t(i)].insert(t((i+2)%3));
 		}
+		ct++;
 
 	}
+
+	//	for(auto& t : m_triangles)
+	//	{
+	//		std::set<Triangle*> res = intersect(m_pos2tris[t(0)],m_pos2tris[t(1)]);
+
+	//	}
+
+
 	/*m_corners.resize(m_triangles.size()*3);
 	m_vertex2corner.resize(m_positions.size(),-1);
 
@@ -119,6 +142,35 @@ void Mesh::buildDataStructure()
 
 }
 
+void Mesh::insertVertex(const vec3 &v, const int t)
+{
+	Triangle tt = m_triangles[t];
+	m_positions.push_back(v);
+	int newpos = m_positions.size()-1;
+	Triangle newts[3];
+
+	for(int i = 0 ; i<3;i++)
+	{
+		newts[i](0) = tt(i);
+		newts[i](1) = tt((i+1)%3);
+		newts[i](2) = newpos;
+		m_pos2pos[i].insert(newpos);
+	}
+
+	m_triangles[t] = newts[0];
+	m_triangles.push_back(newts[1]);
+	m_triangles.push_back(newts[2]);
+
+	m_pos2tris[tt(0)].insert(m_triangles.size()-1);
+	m_pos2tris[tt(1)].insert(m_triangles.size()-2);
+
+	m_pos2tris[tt(2)].insert(m_triangles.size()-1);
+	m_pos2tris[tt(2)].insert(m_triangles.size()-2);
+	m_pos2tris[tt(2)].erase(m_pos2tris[tt(2)].find(t));
+
+
+}
+
 int MeshTools::getClosestVertex(Mesh *m, const vec3 &p)
 {
 	if (m->positions().empty())
@@ -139,20 +191,13 @@ int MeshTools::getClosestVertex(Mesh *m, const vec3 &p)
 	return r;
 }
 
+
+
 vec3 triangle_cp(
-		const vec3& t1,
-		const vec3& t2,
-		const vec3& t3,
-		const vec3& p)
+		const vec3& p,
+		const mat4& T,
+		const mat4& Ti)
 {
-	vec3 a = t2-t1;
-	vec3 b = t3-t1;
-	vec3 n = cross(a,b);
-	n = normalize(n);
-
-	mat4 T(vec4(a,0),vec4(b,0),vec4(n,0),vec4(t1,1));
-	mat4 Ti = glm::inverse(T);
-
 	vec3 pt = vec3(Ti * vec4(p,1));
 
 
@@ -169,23 +214,69 @@ vec3 triangle_cp(
 	pt.y = pt.y<0.0f?0.0f : (pt.y > 1? 1.0f: pt.y);
 
 
-
-
-
 	pt.z = 0;
 	return vec3(T * vec4(pt,1));
 
 }
+
+mat4 calcT(const vec3& t1,
+		   const vec3& t2,
+		   const vec3& t3)
+{
+	vec3 a = t2-t1;
+	vec3 b = t3-t1;
+	vec3 n = cross(a,b);
+	n = normalize(n);
+
+	return  mat4(vec4(a,0),vec4(b,0),vec4(n,0),vec4(t1,1));
+}
+vec3 triangle_cp(
+		const vec3& t1,
+		const vec3& t2,
+		const vec3& t3,
+		const vec3& p)
+{
+	mat4 T = calcT(t1,t2,t3);
+	mat4 Ti = glm::inverse(T);
+
+	return triangle_cp(p,T,Ti);
+
+}
+
+int MeshTools::getClosestTriangle(Mesh *m, const vec3 &p)
+{
+	const std::set<int> tris = m->m_pos2tris[getClosestVertex(m,p)];
+
+	float min = std::numeric_limits<float>::max();
+	int res = *(tris.begin());
+	for(const int tt : tris)
+	{
+		const Triangle& t = m->m_triangles[static_cast<uint>(tt)];
+		float d = distance2(triangle_cp(m->vertex(static_cast<uint>(t(0))),
+										m->vertex(static_cast<uint>(t(1))),
+										m->vertex(static_cast<uint>(t(2))),p),p);
+		if(d < min)
+		{
+			min = d;
+			res = tt;
+		}
+	}
+
+	return res;
+
+}
+
+
 vec3 MeshTools::getClosestPoint(Mesh *m, const vec3 &p)
 {
 	int cv = getClosestVertex(m,p);
-	auto tris = m->adjacentTriangles(static_cast<uint>(cv));
+	auto tris = m->adjacentTriangles(cv);
 	float min = distance2(m->vertex(cv),p);
 	vec3 res = m->vertex(cv);
 
 	for(const auto tt : tris)
 	{
-		const Triangle &t = *tt;//m->triangle(static_cast<uint>(tt));
+		const Triangle &t = m->triangle(static_cast<uint>(tt));
 		auto r = triangle_cp(
 					m->vertex(static_cast<uint>(t(0))),
 					m->vertex(static_cast<uint>(t(1))),
@@ -200,6 +291,94 @@ vec3 MeshTools::getClosestPoint(Mesh *m, const vec3 &p)
 	}
 	return res;
 }
+
+vec3 MeshTools::getClosestPoint(Mesh *m, const vec3 &p, const std::vector<mat4> &Ts, const std::vector<mat4> &Tis)
+{
+	int cv = getClosestVertex(m,p);
+	auto tris = m->adjacentTriangles(static_cast<uint>(cv));
+	float min = distance2(m->vertex(cv),p);
+	vec3 res = m->vertex(cv);
+
+	for(const auto tt : tris)
+	{
+		auto r = triangle_cp(p,Ts[tt],Tis[tt]);
+		float d = distance2(p,r);
+		if(d < min)
+		{
+			min = d;
+			res = r;
+		}
+	}
+	return res;
+}
+
+Mesh *MeshTools::merge(const Mesh *a, const Mesh *b)
+{
+	Mesh* res = new Mesh(*a);
+	for(const glm::vec3 p : b->m_positions)
+	{
+		res->insertVertex(p,getClosestTriangle(res,p));
+	}
+	return res;
+}
+
+Mesh *MeshTools::averageSurfaces(const std::vector<Mesh *> ms)
+{
+	std::vector<Mesh *> rs;
+	std::vector<std::vector<mat4>> Ts(ms.size());
+	std::vector<std::vector<mat4>> Tis(ms.size());
+
+
+	for(uint im = 0 ; im< ms.size();im++)
+	{
+		const Mesh* m = ms[im];
+		rs.push_back(new Mesh(*(m)));
+
+		std::vector<mat4>& tTs = Tis[im];
+		std::vector<mat4>& tTis = Tis[im];
+		tTs.resize(m->m_triangles.size());
+		tTis.resize(m->m_triangles.size());
+
+#pragma omp parallel for
+		for(uint it=0 ; it <m->m_triangles.size();it++)
+		{
+			const Triangle& t = m->m_triangles[it];
+			tTs[it] = (calcT(m->vertex(t(0)),m->vertex(t(1)),m->vertex(t(2))));
+			tTis[it] = (inverse(tTs.back()));
+		}
+
+	}
+
+
+
+	for(uint j = 0 ; j< ms.size();j++)
+	{
+#pragma omp parallel for
+		for(uint i = 0 ; i< ms[j]->positions().size(); i++)
+		{
+			const vec3& p  = ms[j]->positions()[i];
+			vec3 cp = p;
+			for( uint k = 0 ; k<ms.size();k++)
+			{
+				if(k!= j)
+					cp+=MeshTools::getClosestPoint(ms[k],p);//,Ts[k],Tis[k]);
+			}
+			rs[j]->positions()[i] = cp/static_cast<float>(ms.size());
+		}
+
+		VertexData* vd = rs[j]->toVertexData();
+		VertexDataTools::writeToFile(vd,std::to_string(j)+".obj");
+		delete vd;
+		delete rs[j];
+	}
+
+
+	return nullptr;
+
+
+}
+
+
 
 
 
