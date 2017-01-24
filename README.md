@@ -1,24 +1,25 @@
 What is this?
 ================================================================================
-The oflibs are a set of usefull classes and tools dealing with all kinds of 
+The oflibs are a set of useful classes and tools dealing with all kinds of 
 problems.  
 My personal focus is in 3D-visualisation and VR, so most of these deal with 
 these topics. OFLIBS stands for "**o**ne **f**ile **lib**rarie**s**". The basic 
 idea is to write libraries in a single file, which you just have to include into
 your project, and you are ready to go.
-I find these usefull for fast prototypes and "experimental" code, which is what 
-this collection currently is, so don't expect a well tested, woking toolset, but
+
+I find these very handy for fast prototypes and "experimental" code, which is what 
+this collection currently is, so don't expect a well tested, working toolset, but
 maybe you find the one or two lines of code you were searching ;).
-I'm constantly working whith these tools and I am shure they will get better 
+I'm constantly working with these tools and I am sure they will get better 
 over time.
 
 Structure
 --------------------------------------------------------------------------------
-In oflibs/ you find the finished one file libraries. They are ready to use. The 
-documentation to each library is also inside of the lib. Here is a short list of
-the different modules and libraries:
+In "dev/" you find the current parts of the oflibs in their disassembled form, 
+which is used to develop the oflibs. There are no finished oflibs in this 
+repository but you can create using the "generate_libs.py" script.
+Here is a short list of the different modules you can generate libraries from:
 
-- ofl_all: All oflibs in one 
 - ofl_ogl_geo - A class reperesenting vertex-data on the GPU
 - ofl_ogl_state - A state-wrapper imulating the "classic" OpenGL-fixed-function 
   states, including matrix stacks and lighting.
@@ -33,8 +34,6 @@ events. Currently implemented using glfw.
 - ofl_vdman - Vertex Data MANufacturer: Allows you to create VertexData using
   the old begin(..) ... end() paradigma from fixed-function-GL, but is OpenGL
   independend.
-- ofl_vmath - Vector MATH : Some simple vector operations, but no alternative to 
-  GLM.
 - ofl_vrpv - Virtual Reality Projection and View - A module to genereate view-
   and projection-matrices for VR systems like PowerWalls or CAVEs
 - ofl_processing_graph - A simple processing graph interface for parallel
@@ -71,9 +70,10 @@ Example:
 
 Where can I get more information?
 --------------------------------------------------------------------------------
-Inside the oflib files there is the documentation for each module used. 
-In the subdirectory tools/ there are also some more or less simple tools using 
+In dev/doc/ you find a small documatation file for each module. In the 
+subdirectory tools/ there are also some more or less simple tools using 
 the oflibs.
+
 
 
 

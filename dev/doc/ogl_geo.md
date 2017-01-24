@@ -5,20 +5,21 @@ object from a VertexData-Object, so they are obviously connected.
 
 Usage
 --------------------------------------------------------------------------------
-You need to specify an OpenGL header in as `OFL_GL_HEADER`. for example:
+You need to specify an OpenGL header in as `OFL_GL_HEADER`. 
+For example:
 
 ```cpp
 	#define OFL_GL_HEADER <glad/glad.h>  
 	#define OFL_GL_HEADER <glew.h>
 ```
 
-This module also uses GLM ... sorry I was too lazy to implement all
-these functions, and its not feasible anyway.
+This module also uses GLM I once started to implement all the matrix vector
+classes but it is useless work since GLM works so fine.
 
 API
 --------------------------------------------------------------------------------
-You can pass the data on construction or vie the method uploadData(...).
-The	data is then uploaeded into OpenGL buffer objets and a corresponding
+You can pass the data on construction or via the method uploadData(...).
+The	data is then uploaded into OpenGL buffer objects and a corresponding
 VAO is created.
 Call the draw() method to provoke a glDrawElements() call.
 
