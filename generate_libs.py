@@ -9,8 +9,8 @@ inc_test = re.compile('#include\s*"([^.]*).([^"]*)"')
 lib_list = []
 collection = "collections"
 implementation_in_header = True
-include_dir = "./dev/include/"
-source_dir = "./dev/src/"
+include_dir = "./dev/"
+source_dir = "./dev/"
 doc_dir = "./dev/doc/"
 
 output_dir = "./libs/"

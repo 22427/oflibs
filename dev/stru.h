@@ -10,7 +10,8 @@
 #include <cstring>
 #include <cmath>
 
-
+#include "dll.h"
+#include "vmath.h"
 namespace ofl
 {
 
@@ -52,20 +53,25 @@ static inline void trim(std::string &s){ltrim(s);rtrim(s);}
  * NOTE: Only _ONE_ character will be set to zero. Even if there are three
  * seperators in a row, only the first one will be set to zero.
  */
-class Tokenizer
+class OFL_DLL_PUBLIC Tokenizer
 {
 protected:
 	char* m_base;
 	char* m_rest;
+	bool m_delete_base;
 public:
 	static std::string whitespaces;
 	Tokenizer(const std::string& base);
+	Tokenizer(char* base);
 	~Tokenizer();
 
-	void setBase(char* base)
+	void set_base(char* base)
 	{
+		if(m_delete_base)
+			free(base);
 		m_base = base;
 		m_rest = base;
+		m_delete_base = false;
 	}
 	/**
 	 * @brief reset Will free the current base and set a new one.
@@ -82,7 +88,7 @@ public:
 	 * @param separator The seperator character
 	 * @return string untill the first appearence of seperator, or nullptr.
 	 */
-	char* getToken(char separator);
+	char* get_token(char separator);
 
 	/**
 	 * @brief Will return the string till and without one! of the seperators!
@@ -91,8 +97,8 @@ public:
 	 * @param sep Will contain the seperator actually found.
 	 * @return string till the first appearence of a seperator, or nullptr.
 	 */
-	char* getToken(const std::string& separators = whitespaces,
-				   char* sep = nullptr);
+	char* get_token(const std::string& separators = whitespaces,
+					char* sep = nullptr);
 
 
 	/**
@@ -103,8 +109,8 @@ public:
 	 * @return
 	 */
 	template<typename T>
-	bool getTokenAs(T& res,const std::string &separators = whitespaces,
-					char *sep = nullptr)
+	bool get_token_as(T& res,const std::string &separators = whitespaces,
+					  char *sep = nullptr)
 	{
 		throw "TYPE NOT SUPPORTED!!!";
 		return false;
@@ -116,80 +122,186 @@ public:
 	 * ".,;..:,;,,.foo...." ---skipOverAll(";.,:")--> "foo...."
 	 * @param separators String contianing all possible seperatos.
 	 */
-	void skipOverAll(const std::string& seps);
+	void skip_over_all(const std::string& seps);
 
 	/**
 	 * @brief skipOverAll Skipps all consecutive appearences of whitespaces.
 	 * Example:
 	 * "           foo...." ---skipWhiteSpaces()--> "foo...."
 	 */
-	void skipWhiteSpaces();
+	void skip_white_spaces();
 
 	/**
 	 * @brief getRest The remaining string,
 	 * @return
 	 */
-	char* getRest(){ return m_rest; }
+	char* get_rest(){ return m_rest; }
+
+
+	/**
+	 * @brief readEscString munches off an escaped string.
+	 * >"hello \"World\" !"< -> >hello "World" !<
+	 * @return
+	 */
+	bool read_esc_string(std::string& res)
+	{
+		std::string r;
+		while(*m_rest != '"')
+			m_rest++;
+		if(!*m_rest)
+			return false;
+		while(*m_rest!= '"' && *m_rest)
+		{
+			if(*m_rest == '\\')
+				m_rest++;
+			r+=*m_rest;
+			m_rest++;
+		}
+
+		if(!*m_rest)
+			return false;
+
+		res = r;
+		return true;
+	}
+
+	/**
+	 * @brief getTokenTillClosing Returns the inlay of an area marked by opening and closing chars:
+	 * "  { 1,2,{3}}" --getTokenTillClosing('{','}')--> " 1,2,{3}"
+	 * @param opening
+	 * @param closing
+	 * @return
+	 */
+	char* get_token_till_closing(char opening, char closing)
+	{
+
+		while(*m_rest && *m_rest!=opening)
+		{
+			m_rest++;
+		}
+		m_rest++;
+		char* res = m_rest;
+		if(!m_rest)
+			return nullptr;
+
+
+		int count = 1;
+		while(count > 0)
+		{
+			m_rest++;
+			if(!*m_rest)
+				return nullptr;
+			if(*m_rest == opening)
+				count++;
+			if(*m_rest == closing)
+				count--;
+		}
+
+		if(!*m_rest)
+			return nullptr;
+		*m_rest = 0;
+		m_rest++;
+		return res;
+	}
 };
 
 
-template<> inline bool Tokenizer::getTokenAs<int>(
+template<> inline bool Tokenizer::get_token_as<int>(
 		int& res,
 		const std::string &seps,
 		char *sep )
 {
-	char* c = getToken(seps,sep);
+	char* c = get_token(seps,sep);
 	if(c)
 		res = atoi(c);
 	return c;
 }
 
-template<> inline bool Tokenizer::getTokenAs<uint>(
+template<> inline bool Tokenizer::get_token_as<uint>(
 		uint& res,
 		const std::string &seps,
 		char *sep )
 {
-	char* c = getToken(seps,sep);
+	char* c = get_token(seps,sep);
 	if(c)
 		res = static_cast<uint>(atoi(c));
 	return c;
 }
 
-template<> inline bool Tokenizer::getTokenAs<float>(
+template<> inline bool Tokenizer::get_token_as<float>(
 		float& res,
 		const std::string &seps ,
 		char *sep )
 {
-	char* c = getToken(seps,sep);
+	char* c = get_token(seps,sep);
 	if(c)
 		res = atof(c);
 	return c;
 }
 
-template<> inline bool Tokenizer::getTokenAs<double>(
+
+template<> inline bool Tokenizer::get_token_as<double>(
 		double& res,
 		const std::string &seps ,
 		char *sep )
 {
-	char* c = getToken(seps,sep);
+	char* c = get_token(seps,sep);
 	if(c)
 		res = atof(c);
 	return c;
 }
 
-template<> inline bool Tokenizer::getTokenAs<bool>(
+template<> inline bool Tokenizer::get_token_as<bool>(
 		bool& res,
 		const std::string &seps ,
 		char *sep )
 {
-	char* c=  getToken(seps,sep);
+	char* c=  get_token(seps,sep);
 	if(c)
 		res = strcmp(c,"false");
 	return c;
 }
 
 
+template<> inline bool Tokenizer::get_token_as<glm::vec4>(
+		glm::vec4& res,
+		const std::string &seps,
+		char *sep )
+{
+	// should look like "(x,y,z,w)"
+	char* c = get_token(seps,sep);
+	if(!c)
+		return  false;
+
+	Tokenizer t(c);
+
+	t.get_token('(');
+	bool r =  t.get_token_as(res.x,",") && t.get_token_as(res.y,",") && t.get_token_as(res.z,",") && t.get_token_as(res.w,")");
+	t.set_base(nullptr);
+	return r;
 }
+
+
+template<> inline bool Tokenizer::get_token_as<glm::mat4>(
+		glm::mat4& res,
+		const std::string &seps,
+		char *sep )
+{
+	// should look like "((x,y,z,w),(x,y,z,w),(x,y,z,w),(x,y,z,w))"
+	char* c = get_token(seps,sep);
+	if(!c)
+		return  false;
+
+	Tokenizer t(c);
+
+	t.get_token('(');
+	bool r =  t.get_token_as(res[0],",") && t.get_token_as(res[1],",") && t.get_token_as(res[2],",") && t.get_token_as(res[3],")");
+	t.set_base(nullptr);
+	return r;
+}
+
+
+
 namespace paths
 {
 
@@ -246,5 +358,7 @@ static inline std::string without_extension(const std::string& p)
 		return p;
 	auto loc = p.find_last_of('.');
 	return p.substr(0,loc);
+}
+
 }
 }

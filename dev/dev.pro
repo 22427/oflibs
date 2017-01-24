@@ -5,7 +5,8 @@ CONFIG   -= app_bundle
 
 
 
-INCLUDEPATH += deps/glad/include
+INCLUDEPATH += dep/
+SOURCES += dep/glad/glad.c
 
 DISTFILES += \
     doc/ogl_geo.md \
@@ -19,38 +20,40 @@ DISTFILES += \
     doc/processing_graph.md \
 
 HEADERS += \
-    include/all.h \
-    include/ogl_geo.h \
-    include/ogl_state.h \
-    include/ogl_win.h \
-    include/socket.h \
-    include/stru.h \
-    include/track.h \
-    include/vd.h \
-    include/vdman.h \
-    include/vmath.h \
-    include/vrpv.h \
-    include/ogl_stereo_compositor.h \
-    include/sem_queue.h \
-    include/processing_graph.h \
-    include/mesh.h \
-    include/kd_tree.h \
-    include/protocol.h \
-    include/tnvb.h
+	ogl_geo.h \
+	ogl_state.h \
+	ogl_win.h \
+	socket.h \
+	stru.h \
+	track.h \
+	vd.h \
+	vdman.h \
+	vmath.h \
+	vrpv.h \
+	ogl_stereo_compositor.h \
+	sem_queue.h \
+	processing_graph.h \
+	mesh.h \
+	kd_tree.h \
+	protocol.h \
+	tnvb.h \
+	types.h \
+	dll.h
 
 SOURCES += \
-    src/ogl_geo.cpp \
-    src/ogl_state.cpp \
-    src/stru.cpp \
-    src/track.cpp \
-    src/vd.cpp \
-    src/vdman.cpp \
-    src/vmath.cpp \
-    src/vrpv.cpp \
-    src/ogl_stereo_compositor.cpp \
-    src/mesh.cpp \
-    src/kd_tree.cpp \
-    src/tnvb.cpp
+	ogl_geo.cpp \
+	ogl_state.cpp \
+	stru.cpp \
+	track.cpp \
+	vd.cpp \
+	vdman.cpp \
+	vmath.cpp \
+	vrpv.cpp \
+	ogl_stereo_compositor.cpp \
+	mesh.cpp \
+	kd_tree.cpp \
+	tnvb.cpp \
+	types.cpp
 
 CONFIG += c++11
 

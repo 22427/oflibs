@@ -7,15 +7,23 @@ Tokenizer::Tokenizer(const std::string& base)
 	this->m_base = new char[base.length() + 1];
 	memcpy(this->m_base, base.data(), base.length() + 1);
 	this->m_rest = this->m_base;
+	m_delete_base = true;
+}
+
+Tokenizer::Tokenizer(char *base)
+{
+	m_delete_base = false;
+	m_base = m_rest = base;
 }
 
 Tokenizer::~Tokenizer()
 {
-	if(m_base)
+	if(m_delete_base && m_base)
 		delete[] m_base;
 }
 
-char* Tokenizer::getToken(char separator)
+
+char* Tokenizer::get_token(char separator)
 {
 	char* to_ret = m_rest;
 
@@ -46,7 +54,7 @@ bool contains(const std::string& str, const char c)
 	}
 	return false;
 }
-char* Tokenizer::getToken(const std::string& separators, char* sep)
+char* Tokenizer::get_token(const std::string& separators, char* sep)
 {
 	char* to_ret = m_rest;
 
@@ -71,14 +79,14 @@ char* Tokenizer::getToken(const std::string& separators, char* sep)
 }
 
 
-void Tokenizer::skipOverAll(const std::string& seps)
+void Tokenizer::skip_over_all(const std::string& seps)
 {
 	while(*m_rest && contains(seps,*m_rest))
 	{
 		m_rest++;
 	}
 }
-void Tokenizer::skipWhiteSpaces()
+void Tokenizer::skip_white_spaces()
 {
 	while(*m_rest && isspace(*m_rest))
 		m_rest++;
@@ -87,7 +95,9 @@ void Tokenizer::skipWhiteSpaces()
 
 void Tokenizer::reset(const std::string& base)
 {
-	delete[] this->m_base;
+	if(m_delete_base && m_base)
+		delete[] m_base;
+	m_delete_base  = true;
 	this->m_base = new char[base.length() + 1];
 	memcpy(this->m_base, base.data(), base.length() + 1);
 	this->m_rest = this->m_base;

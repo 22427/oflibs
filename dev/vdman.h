@@ -11,54 +11,68 @@
 #include <vector>
 
 #include "vd.h"
+#include "dll.h"
 
 /** @include vdman.md */
 
 namespace ofl
 {
-
-class VertexDataManufacturer : public ofl::VertexDataTools
+class OFL_DLL_PUBLIC VertexDataManufactory
 {
 
 private:
 
+	vec4 m_attribute_state[AttributeID::ATTRIB_COUNT];
+	Primitive m_input_primitive;
 
-	/**
-	 * @brief m_normal_state Current normal state. With any call of .vertex(..)
-	 * a vertex is created with this as a normal.
-	 */
-	vec3 m_normal_state;
-	/**
-	 * @brief m_color_state Current normal state. With any call of .vertex(..)
-	 * a vertex is created with this as a color.
-	 */
-	vec4 m_color_state;
-	/**
-	 * @brief m_tex_coord_state Current normal state. With any call of
-	 * .vertex(..) a vertex is created with this as a texture coordinate.
-	 */
-	vec3 tex_coord_state;
 
-	/**
-	 * @brief m_input_primitive The primitive mode chosen by begin(..).
-	 */
-	ofl::Primitive m_input_primitive;
+	VertexConfiguration m_cfg;
 
-private:
+	Type m_index_type;
+
+	Vertex m_v;
+
 	/** Datastructures supporting the begin/end/finish operations.*/
 	// A map to check if given vertex already exists and where it is.
-	std::map<ofl::Vertex, unsigned int> vertex_ids;
-	ofl::VertexData* current_mesh;
+	std::map<Vertex, unsigned int> m_vertex_ids;
+	VertexData* m_current_mesh;
 
 	// A primitive buffer to deal with quads.
 	std::vector<unsigned int> primitive_buffer;
 
-	void handlePrimitiveBuffer();
+	void handle_primitive_buffer();
+
+
+
 
 public:
 
-	VertexDataManufacturer();
-	~VertexDataManufacturer();
+
+
+	VertexDataManufactory():m_v(m_cfg,nullptr)
+	{
+		m_cfg.add_attribute(Attribute(ATTRIB_POSITION,3,FLOAT,false,false));
+		m_cfg.add_attribute(Attribute(ATTRIB_NORMAL,3,FLOAT,false,false));
+		m_cfg.add_attribute(Attribute(ATTRIB_TEXCOORD,2,FLOAT,false,false));
+		m_cfg.add_attribute(Attribute(ATTRIB_TANGENT,3,FLOAT,false,false));
+		m_cfg.add_attribute(Attribute(ATTRIB_COLOR,4,UNSIGNED_BYTE,true,false));
+		m_v = Vertex(m_cfg,nullptr);
+		m_current_mesh = nullptr;
+		m_index_type = UNSIGNED_SHORT;
+	}
+
+	VertexConfiguration vertex_configuration() const {return  m_cfg;}
+	void set_vertex_configuration(const VertexConfiguration& cfg)
+	{
+		m_cfg = cfg;
+		m_v = Vertex(m_cfg,nullptr);
+	}
+
+	const Type& index_type() const {return m_index_type;}
+	Type& index_type() {return m_index_type;}
+
+
+	~VertexDataManufactory();
 
 	/**
 	 * @brief begin  Will set the GeomtryDataLoader in the corresponding
@@ -90,7 +104,7 @@ public:
 		... will return the two triangles with four vertices.
 	 * @param primitive
 	 */
-	void begin(ofl::Primitive primitive);
+	void begin(Primitive primitive);
 
 
 
@@ -102,7 +116,7 @@ public:
 	 * again. Note: You will have to free the geometry by yourself
 	 * @return A Vertex data struct containing the vertex information.
 	 */
-	ofl::VertexData* finish();
+	VertexData* finish();
 
 
 	/**
@@ -141,14 +155,14 @@ public:
 			const float& z = 1.0f);
 
 	/**
-	 * @brief texCoord Sets the texture coordinate state
+	 * @brief tex_coord Sets the texture coordinate state
 	 * @param tc The texture coordinate you want to set.
 	 */
-	void texCoord(const vec3& tc);
-	void texCoord(const vec2& tc);
-	void texCoord(const float& s,
-				  const float& t = 0.0f,
-				  const float& r = 0.0f);
+	void tex_coord(const vec3& tc);
+	void tex_coord(const vec2& tc);
+	void tex_coord(const float& s,
+				   const float& t = 0.0f,
+				   const float& r = 0.0f);
 
 	/**
 	*/
@@ -157,17 +171,17 @@ public:
 	 * for color, normal and texture coordinate.
 	 * @param vertex The position of the vertex
 	 */
-	void vertex(const vec4& vertex);
-	void vertex(const vec2& vertex);
-	void vertex(const vec3& vertex);
+	void vertex(const vec4& v);
+	void vertex(const vec2& v);
+	void vertex(const vec3& v);
 	void vertex(
 			const float& x,
 			const float& y = 0.0f,
 			const float& z = 0.0f,
 			const float& w = 1.0f);
-	void vertex(const float * vertex);
+	void vertex(const float * v);
 
-	void vertex(const ofl::Vertex& vertex);
+	void vertex(const Vertex& vertex);
 
 
 	/**
@@ -191,10 +205,10 @@ public:
 	 * @param d depth of the box
 	 * @return
 	 */
-	ofl::VertexData* createBox(
-			float w = 1.0f,
-			float h = 1.0f,
-			float d = 1.0f);
+	VertexData* create_box(
+			float x = 1.0f,
+			float y = 1.0f,
+			float z = 1.0f);
 
 
 	/** @brief createPlane Will create all vertices and faces needed to render a
@@ -212,7 +226,7 @@ public:
 	 * @return
 	 */
 
-	ofl::VertexData* createPlane(
+	VertexData* create_plane(
 			float w = 1.0f,
 			float h = 1.0f,
 			unsigned int tess_w = 1,
@@ -223,7 +237,7 @@ public:
 	 * @brief createCoordinateSystem Will create a colorfull coordinate system
 	 * @return The coordinate system
 	 */
-	ofl::VertexData* createCoordinateSystem();
+	VertexData* createCoordinateSystem();
 
 
 	/**
@@ -246,7 +260,7 @@ public:
 	 * @param stacks
 	 * @return
 	 */
-	ofl::VertexData* createUVSphere(
+	VertexData* create_uv_sphere(
 			float radius = 1,
 			unsigned int slices = 32,
 			unsigned int stacks = 16);
@@ -273,7 +287,7 @@ public:
 	 * @param stacks segments along the length of the cylinder
 	 * @return
 	 */
-	ofl::VertexData* createCylinder(
+	VertexData* create_cylinder(
 			float radius = 1,
 			float height = 1,
 			unsigned int slices = 32,
@@ -301,7 +315,7 @@ public:
 	 * @param stacks segments along the length of the cone
 	 * @return
 	 */
-	ofl::VertexData* createCone(
+	VertexData* create_cone(
 			float baseRadius = 1,
 			float topRadius = 0,
 			float height = 1,
@@ -327,7 +341,7 @@ public:
 	 * @param loops loops between inner and outer radius
 	 * @return
 	 */
-	ofl::VertexData* createDisk(
+	VertexData* create_disk(
 			float innerRadius = 0,
 			float outerRadius = 1,
 			unsigned int slices = 32,
@@ -337,27 +351,34 @@ public:
 
 	/** Shortcut function to add a vertex with parameters.
 		The same operation like:
-		.texCoord(t);
+		.tex_coord(t);
 		.normal(n);
 		.color(c);
 		.vertex(p);
 	*/
-	void addVertex(vec3 p, vec2 t, vec3 n, vec4 c);
+	void add_vertex(vec3 p, vec2 t, vec3 n, vec4 c);
+
+
+#define qNaN std::numeric_limits<float>::quiet_NaN()
+#define vec2NaN vec2(qNaN,qNaN)
+#define vec3NaN vec3(qNaN,qNaN,qNaN)
+#define vec4NaN vec4(qNaN,qNaN,qNaN,qNaN)
 
 	/** Shortcut function to add a whole triangle with parameters.
 	The same result like:
-	addVertex(p1,t1,n1,c1);
-	addVertex(p2,t2,n2,c2);
-	addVertex(p3,t3,n3,c3);
+	add_vertex(p1,t1,n1,c1);
+	add_vertex(p2,t2,n2,c2);
+	add_vertex(p3,t3,n3,c3);
 	*/
-	void addTriangle(
-			vec3 p1          , vec3 p2          , vec3 p3,
+	void add_triangle(
+			vec3 p1         , vec3 p2         , vec3 p3,
 			vec2 t1= vec2NaN, vec2 t2= vec2NaN, vec2 t3= vec2NaN,
 			vec3 n1= vec3NaN, vec3 n2= vec3NaN, vec3 n3= vec3NaN,
 			vec4 c1= vec4NaN, vec4 c2= vec4NaN, vec4 c3= vec4NaN
 			);
 
-
+	/** Shortcut function to add a whole quad with parameters.
+	*/
 	void addQuad(
 			vec3 p1          , vec3 p2          ,
 			vec3 p3          , vec3 p4          ,
@@ -368,7 +389,10 @@ public:
 			vec4 c1 = vec4NaN, vec4 c2 = vec4NaN,
 			vec4 c3 = vec4NaN, vec4 c4 = vec4NaN
 			);
+#undef qNaN
+#undef vec2NaN
+#undef vec3NaN
+#undef vec4NaN
 
 };
-
 }
