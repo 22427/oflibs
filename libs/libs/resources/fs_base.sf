@@ -1,8 +1,0 @@
-// The base function.
-void main()
-{
-	vec4 baseColor = calcBaseColor();
-	vec4 color = calcColor(baseColor);
-	color.a = calcAlpha(baseColor);
-	FRAG_COLOR = color;
-}

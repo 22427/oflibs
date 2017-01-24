@@ -1,4 +1,0 @@
-float calcAlpha(vec4 baseColor)
-{
-	return baseColor.a;
-}

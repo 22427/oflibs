@@ -1,5 +1,0 @@
-// Just pass the base color on to the clr
-vec4 calcColor(vec4 baseColor)
-{
-	return baseColor;
-}

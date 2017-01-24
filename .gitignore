@@ -15,4 +15,4 @@ bin/*
 *~
 *.db
 Makefile
-
+*.stash

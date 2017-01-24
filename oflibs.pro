@@ -1,9 +1,7 @@
  TEMPLATE = subdirs
 
  SUBDIRS = \
-			ofl_creator\
-			libs\
-			mesh_avg\
+			dev\
 			mesh_converter\
 			mesh_viewer\
 			stereo_mesh_viewer\
@@ -11,12 +9,8 @@
 			processing_graph_example\
 
 
-
-
  # where to find the sub projects - give the folders
-libs.subdir = ./libs
-ofl_creator.subdir  = ./tools/ofl_creator
-mesh_avg.subdir  = ./tools/mesh_avg
+dev.subdir = ./dev
 mesh_converter.subdir  = ./tools/mesh_converter
 mesh_viewer.subdir  = ./tools/mesh_viewer
 stereo_mesh_viewer.subdir  = ./tools/stereo_mesh_viewer

@@ -1,5 +1,0 @@
-// Just get the base color from the vertex color 
-vec4 calcBaseColor()
-{
-	return clr;
-}

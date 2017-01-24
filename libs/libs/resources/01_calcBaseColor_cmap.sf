@@ -1,6 +1,0 @@
-// Get the base color from the colormap
-vec4 calcBaseColor()
-{
-	return  TEXTURE2D(cmap,tex);
-}
-
