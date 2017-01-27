@@ -161,7 +161,8 @@ for llist in lib_list:
 # Write the header part.
     guard = output_prefix.upper() + lib_name.upper();
     if implementation_in_header:
-        header_output_file.write('#ifdef ' + guard + '\n\n')
+        header_output_file.write('#ifndef ' + guard + '\n\n')
+        header_output_file.write('#define ' + guard + '\n\n')
     else:
         header_output_file.write('#pragma once \n\n')
     header_output_file.write(headers_header)
@@ -171,7 +172,7 @@ for llist in lib_list:
         process_header(lib, done_header, header_output_file)
 
     if implementation_in_header:
-        header_output_file.write('#endif ' + guard + '\n\n')
+        header_output_file.write('#endif //' + guard + '\n\n')
 
 # Write the implementation part
     if implementation_in_header:
