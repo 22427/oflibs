@@ -6,7 +6,8 @@ CONFIG   -= app_bundle
 
 
 INCLUDEPATH += dep/
-SOURCES += dep/glad/glad.c
+SOURCES += dep/glad/glad.c \
+    00_main.cpp
 
 DISTFILES += \
     doc/ogl_geo.md \
@@ -60,4 +61,6 @@ CONFIG += c++11
 
 DESTDIR = bin
 OBJECTS_DIR = obj
+
+LIBS += -ldl
 #DEFINES += "OFL_GL_HEADER=<glad/glad.h>"
