@@ -14,7 +14,7 @@ SOURCES += \
 
 CONFIG += c++11
 
-INCLUDEPATH += ../../oflibs
+INCLUDEPATH += ../../libs
 LIBS += -lGL -lglfw -ldl
 
 

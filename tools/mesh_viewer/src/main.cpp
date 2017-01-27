@@ -2,21 +2,13 @@
 #include <cstdio>
 #include <fstream>
 #include <set>
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
 
-#include <ofl_ogl_win.h>
-#include <ofl_vd.h>
-#include <ofl_vdman.h>
-#include <ofl_ogl_state.h>
-#include <ofl_ogl_geo.h>
+#include <ofl_all.h>
 
 
-using namespace ofl;
 using namespace ofl;
 
 class MeshViewer :
-		public ofl::VertexDataTools,
 		public ofl::Window_GLFW,
 		public ofl::StateSimulator
 {
@@ -62,7 +54,7 @@ public:
 		if(argv.size() < 2)
 			return 1;
 		VertexData* vd;
-		vd = readFromFile(argv[1]);
+		vd = VertexDataOperations::read_from_file(argv[1]);
 		if(!vd)
 			return 1;
 		glm::vec3 bb_min(std::numeric_limits<float>::max(),
@@ -73,7 +65,8 @@ public:
 					std::numeric_limits<float>::min());
 		for(const Vertex& v : *vd)
 		{
-			const vec3& p = v.pos();
+			vec3 p;
+			v.get_value(ATTRIB_POSITION,p);
 			for(int i = 0 ; i<3;i++)
 			{
 				bb_min[i] = std::min(p[i],bb_min[i]);
@@ -145,8 +138,8 @@ public:
 		matrixMode(MODELVIEW);
 		loadIdentity();
 
-		vec3 cam_dir = normalize(cam_pos);
-		float len = length(cam_pos);
+		vec3 cam_dir = glm::normalize(cam_pos);
+		float len = glm::length(cam_pos);
 		len *= 1.0-(y*0.05);
 		cam_pos = cam_dir*len;
 		lookAt(cam_pos.x,cam_pos.y,cam_pos.z,0,0.5,0,0,1,0);
@@ -177,12 +170,7 @@ int main(int argc, char** argv)
 }
 
 #define OFL_IMPLEMENTATION
-#include <ofl_ogl_win.h>
-#include <ofl_vd.h>
-#include <ofl_vdman.h>
-#include <ofl_ogl_state.h>
-#include <ofl_ogl_geo.h>
-
+#include <ofl_all.h>
 
 void MeshViewer::eventWindow(int event)
 {

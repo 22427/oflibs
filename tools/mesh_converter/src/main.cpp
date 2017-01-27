@@ -2,15 +2,16 @@
 #include <cstdio>
 #include <fstream>
 #include <set>
-#include <ofl_vd.h>
 
+#include <ofl_all.h>
 
+using namespace ofl;
 
-class Converter : public ofl::VertexDataTools
+class Converter
 {
 	bool calc_normals;
 	bool calc_tangents;
-	Format target_format;
+	VertexDataOperations::FileFormat target_format;
 	std::vector<std::string> input_files;
 	std::vector<std::string> output_files;
 
@@ -32,7 +33,7 @@ public:
 	Converter()
 	{
 		calc_normals = calc_tangents = false;
-		target_format = FROM_PATH;
+		target_format = VertexDataOperations::FROM_PATH;
 	}
 
 
@@ -68,13 +69,13 @@ public:
 			{
 				std::string of = argv[++i];
 				if(of == "obj" || of == "OBJ")
-					target_format = OBJ;
+					target_format = VertexDataOperations::OBJ;
 				else if(of == "PLY" || of =="ply")
-					target_format = PLY;
+					target_format = VertexDataOperations::PLY;
 				else if(of == "VD" || of == "vd")
-					target_format = VD;
+					target_format = VertexDataOperations::VD;
 				else if(of == "OFF" || of == "off")
-					target_format = OFF;
+					target_format = VertexDataOperations::OFF;
 				else
 				{
 					fprintf(stderr,"Unknown output format '%s' \n",of.c_str());
@@ -86,7 +87,7 @@ public:
 
 		}
 
-		if(target_format==FROM_PATH && output_files.empty())
+		if(target_format==VertexDataOperations::FROM_PATH && output_files.empty())
 		{
 			fprintf(stderr,"No output format choose one via -of or by setting an"
 						   "output file name.\n");
@@ -96,21 +97,21 @@ public:
 
 		for(uint i = 0 ; i< input_files.size();i++)
 		{
-			ofl::VertexData* vd =this->readFromFile(input_files[i]);
+			ofl::VertexData* vd =VertexDataOperations::read_from_file(input_files[i]);
 
 			if(calc_normals)
-				calculateNormals(vd);
+				VertexDataOperations::recalculate_normals(vd,ATTRIB_NORMAL);
 			if(calc_tangents)
-				calculateTangents(vd);
+				VertexDataOperations::recalculate_tangents(vd,ATTRIB_TANGENT);
 			std::string out_path;
-			if(target_format != FROM_PATH)
+			if(target_format != VertexDataOperations::FROM_PATH)
 			{
 				std::string ext = "obj";
-				if(target_format == PLY)
+				if(target_format == VertexDataOperations::PLY)
 					ext = "ply";
-				else if (target_format == VD)
+				else if (target_format == VertexDataOperations::VD)
 					ext = "vd";
-				else if (target_format == OFF)
+				else if (target_format == VertexDataOperations::OFF)
 					ext = "off";
 				out_path  = paths::without_extension(input_files[i])+"."+ext;
 
@@ -119,7 +120,7 @@ public:
 			{
 				out_path= output_files[i];
 			}
-			writeToFile(vd,out_path);
+			VertexDataOperations::write_to_file(vd,out_path);
 			delete vd;
 		}
 		return 0;
@@ -138,4 +139,4 @@ int main(int argc, char** argv)
 }
 
 #define OFL_IMPLEMENTATION
-#include <ofl_vd.h>
+#include <ofl_all.h>

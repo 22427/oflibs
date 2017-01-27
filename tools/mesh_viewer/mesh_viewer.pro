@@ -11,13 +11,16 @@ TEMPLATE = app
 
 SOURCES += \
     src/main.cpp \
-    deps/glad.cpp \
-
+  ../../dev/dep/glad/glad.c
 CONFIG += c++11
 
-INCLUDEPATH += ../../oflibs deps/glad/include
-LIBS += -lGL -lglfw -ldl
 
+CONFIG += link_pkgconfig
+PKGCONFIG += glfw3
+LIBS += -ldl -lGL -lm -lpthread
+
+INCLUDEPATH += ../../libs
+INCLUDEPATH += ../../dev/dep
 
 DESTDIR = ../../bin
 OBJECTS_DIR = obj

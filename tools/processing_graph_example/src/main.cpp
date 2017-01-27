@@ -1,15 +1,15 @@
-
+#if 0
 #include <cstdio>
 #include <fstream>
 #include <set>
 #include <cmath>
-#include <ofl_processing_graph.h>
+#include <ofl_all.h>
 
 using namespace ofl;
 
 
 
-class IntSource : public Node<int>
+class IntSource : public ofl::Node<int>
 {
 
 	int i;
@@ -29,7 +29,7 @@ public:
 		}
 		else
 		{
-			kill();
+			this->kill();
 		}
 	}
 };
@@ -121,3 +121,5 @@ FloatPlotter::~FloatPlotter(){}
 Sqrt::~Sqrt(){}
 
 IntPlotter::~IntPlotter(){}
+#endif
+int main(){return  0;}

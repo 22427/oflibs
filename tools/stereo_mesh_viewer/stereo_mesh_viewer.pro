@@ -15,7 +15,7 @@ SOURCES += \
 
 CONFIG += c++11
 
-INCLUDEPATH += ../../oflibs deps/glad/include
+INCLUDEPATH += ../../libs deps/glad/include
 LIBS += -lGL -lglfw -ldl
 
 

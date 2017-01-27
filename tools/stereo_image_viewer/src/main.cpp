@@ -1,4 +1,4 @@
-
+#if 0
 #include <cstdio>
 #include <fstream>
 #include <set>
@@ -197,3 +197,5 @@ void StereoImageViewer::eventCharacter(unsigned int c, int)
 		this->setFullscreen(false);
 
 }
+#endif
+int main(){return  0;}

@@ -1,4 +1,4 @@
-
+#if 0
 #include <cstdio>
 #include <fstream>
 #include <set>
@@ -223,3 +223,5 @@ int main(int argc, char** argv)
 #include <ofl_ogl_state.h>
 #include <ofl_ogl_geo.h>
 #include <ofl_ogl_stereo_compositor.h>
+#endif
+int main(){return  0;}
