@@ -1,5 +1,6 @@
 #include "vd.h"
 #include "stru.h"
+#include "vmath.h"
 #include <glm/gtx/norm.hpp>
 namespace ofl {
 
@@ -1758,11 +1759,11 @@ bool VertexDataOperations::write_obj(const VertexData *vd, FILE* f)
 	struct obj_vert{int p;int t;int n;};
 	typedef struct{obj_vert v[3];} obj_face;
 
-	std::map<vec3,uint32_t> pos2id;
+	std::map<vec3,uint32_t,Comperator<vec3>> pos2id;
 	int pid = 1;
-	std::map<vec3,uint32_t> nrm2id;
+	std::map<vec3,uint32_t,Comperator<vec3>> nrm2id;
 	int nid = 1;
-	std::map<vec2,uint32_t> tex2id;
+	std::map<vec2,uint32_t,Comperator<vec2>> tex2id;
 	int tid = 1;
 	const Primitive& prim = vd->primitive();
 	uint consumed = 0;
@@ -2001,7 +2002,7 @@ bool VertexDataOperations::recalculate_normals(VertexData *vd, AttributeID to_at
 	}
 
 	//std::vector<Vertex>& verts =  vd->data();
-	std::map<vec3, vec3, compare_vec_3> p2n;
+	std::map<vec3, vec3,Comperator<vec3>> p2n;
 
 	Primitive prim = vd->primitive();
 

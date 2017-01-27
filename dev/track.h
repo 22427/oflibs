@@ -81,11 +81,11 @@ class TrackingData
 {
 	std::vector<Target3DOF> m_t3d;
 	std::mutex m_t3d_mtx;
-	std::map<int,Target6DOF> m_t6d;
+	std::map<uint32_t,Target6DOF> m_t6d;
 	std::mutex m_t6d_mtx;
-	std::map<int,Target6DOF> m_t6di;
+	std::map<uint32_t,Target6DOF> m_t6di;
 	std::mutex m_t6di_mtx;
-	std::map<int,TargetFlystick> m_tfly;
+	std::map<uint32_t,TargetFlystick> m_tfly;
 	std::mutex m_tfly_mtx;
 
 	mat4 m_transformation;

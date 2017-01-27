@@ -46,7 +46,7 @@ class  OFL_DLL_PUBLIC Attribute
 {
 public:
 	AttributeID attribute_id;
-	uint32_t elements;
+	int32_t elements;
 	Type type;
 	uint32_t offset;
 	bool normalized;
@@ -121,11 +121,11 @@ class OFL_DLL_PUBLIC VertexConfiguration
 protected:
 	std::vector<Attribute> m_attributes;
 	std::map<AttributeID, uint32_t> m_attrib_from_id;
-	uint m_size;
+	uint32_t m_size;
 
-	uint OFL_DLL_LOCAL m_minimum_size()
+	uint32_t OFL_DLL_LOCAL m_minimum_size()
 	{
-		uint r_size = 0;
+		uint32_t r_size = 0;
 		for(auto& a : m_attributes)
 		{
 			if(!a.use_constant)
@@ -144,7 +144,7 @@ public:
 	{
 
 	}
-	uint vertex_size()const{return m_size;}
+	uint32_t vertex_size()const{return m_size;}
 
 	const Attribute& get_attribute_by_id(AttributeID id) const
 	{
@@ -202,7 +202,14 @@ public:
 		return  !(*this==o);
 	}
 
-
+	auto begin() ->decltype (m_attributes.begin())
+	{
+		return m_attributes.begin();
+	}
+	auto end() ->decltype (m_attributes.end())
+	{
+		return m_attributes.end();
+	}
 
 };
 
@@ -340,8 +347,6 @@ public:
 			free(m_index_data);
 	}
 
-	const Type& index_type() const {return m_index_type;}
-
 	/**
 	 * @brief vertex_configuration gives access to the vertex configuration
 	 * @return
@@ -472,6 +477,38 @@ public:
 		auto v = Vertex(m_cfg,nullptr);
 		v.load_data(dat);
 		return v;
+	}
+	/**
+	 * @brief get_all_attributes converts all vertices attributes of one given id
+	 * into vec4 and returns them as a std::vector. Note this is not fast!
+	 * @param attrib_id the attribute id to read
+	 * @return returns an array of this attributes values.
+	 */
+	std::vector<vec4> get_all_attributes(const AttributeID attrib_id) const
+	{
+		std::vector<vec4> res;
+		if(!m_cfg.has_attribute(attrib_id))
+			return res;
+		auto a = m_cfg.get_attribute_by_id(attrib_id);
+		vec4 r;
+		res.reserve(m_vertex_count);
+		for(uint32_t i = 0 ; i< m_vertex_count*m_cfg.vertex_size();i+=m_cfg.vertex_size())
+		{
+			a.read(static_cast<ubyte*>(m_vertex_data) + i,r);
+			res.push_back(r);
+		}
+		return res;
+	}
+
+	std::vector<uint32_t> get_all_indices() const
+	{
+		std::vector<uint32_t> res;
+		res.reserve(m_index_count);
+		for(uint32_t i = 0 ; i<m_index_count;i++)
+		{
+			res.push_back(get_index(i));
+		}
+		return res;
 	}
 
 };

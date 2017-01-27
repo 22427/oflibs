@@ -91,32 +91,22 @@ public:
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
 			glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-			const size_t vertex_size = sizeof(ofl::Vertex);
-			const ofl::Vertex v;
-
-
-
-#define addr_diff(a,b) (reinterpret_cast<void*>(reinterpret_cast<const char*>(a)-reinterpret_cast<const char*>(b)))
-		glVertexAttribPointer(ALOC_POSITION, 3, GL_FLOAT, GL_FALSE,
-							  vertex_size, addr_diff(&(v.pos()),&v));
-		glEnableVertexAttribArray(ALOC_POSITION);
-
-		glVertexAttribPointer(ALOC_NORMAL, 3, GL_FLOAT, GL_FALSE,
-							  vertex_size, addr_diff(&(v.nrm()),&v));
-		glEnableVertexAttribArray(ALOC_NORMAL);
-
-		glVertexAttribPointer(ALOC_COLOR, 4, GL_FLOAT, GL_FALSE,
-							  vertex_size, addr_diff(&(v.clr()),&v));
-		glEnableVertexAttribArray(ALOC_COLOR);
-
-		glVertexAttribPointer(ALOC_TEXCOORD, 2, GL_FLOAT, GL_FALSE,
-							  vertex_size, addr_diff(&(v.tex()),&v));
-		glEnableVertexAttribArray(ALOC_TEXCOORD);
-
-		glVertexAttribPointer(ALOC_TANGENT, 3, GL_FLOAT, GL_FALSE,
-							  vertex_size, addr_diff(&(v.tan()),&v));
-		glEnableVertexAttribArray(ALOC_TANGENT);
-#undef addr_diff
+			for ( const auto& a : m_vcfg)
+			{
+				if(!a.use_constant)
+				{
+				glVertexAttribPointer(a.attribute_id, a.elements, a.type,a.normalized,
+									  static_cast<int>(m_vcfg.vertex_size()),reinterpret_cast<const void*>(a.offset));
+				glEnableVertexAttribArray(a.attribute_id);
+				}
+				else
+				{
+					// TODO: Do this for all types and all number of attributes.
+					vec4 attrib;
+					a.read(nullptr,attrib);
+					glVertexAttrib4fv(a.attribute_id,&(attrib.x));
+				}
+			}
 			glDrawElements(
 						m_primitive,
 						m_vertice_count,

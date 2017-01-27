@@ -1,7 +1,8 @@
 #include "vrpv.h"
-
+#include "vmath.h"
+#include "stru.h"
 namespace ofl {
-
+using namespace glm;
 
 ////// Screen //////////////////////////////////////////////////////////////////
 
@@ -19,7 +20,7 @@ Screen::Screen(const vec4 blc, const vec4 brc, const vec4 &tlc)
 
 	vec4 x = normalize(m_corners[BR]-m_corners[BL]);
 	vec4 y = normalize(m_corners[TL]-m_corners[BL]);
-	vec4 z = vec4(cross(x,y),0.0f);
+	vec4 z = vec4(cross(vec3(x),vec3(y)),0.0f);
 
 
 	m_wall_space = mat4(x,y,z,vec4(0,0,0,1));
@@ -63,7 +64,7 @@ void Screen::calculate_projection_and_view(
 			corner[2][1], near, far);
 
 	// generate view matrix
-	view_matrix =   translate(m_wall_space,eye*-1.0f);
+	view_matrix = translate(m_wall_space,vec3(eye*-1.0f));
 }
 
 ////// ScreenArrangement ///////////////////////////////////////////////////////
@@ -107,10 +108,11 @@ bool ScreenArrangement::loadScreens(const std::string &path)
 		std::string name = line.substr(0,line.find(' '));
 		line = line.substr(line.find(' ')+1);
 
+/* TODO!!!
 		bl = read_from_string(line);
 		br = read_from_string(line);
 		tl = read_from_string(line);
-
+*/
 		this->addScreen(Screen(bl,br,tl),name);
 	}
 
@@ -128,9 +130,11 @@ bool ScreenArrangement::saveScreens(const std::string &path)
 	{
 		const Screen& s = *(sp.second);
 		file<<sp.first;
+		/* TODO:
 		for(int i =0  ; i< 3; i++)
 			file<<" "<<to_string(s.corner(i));
 		file<<"\n";
+		*/
 	}
 	file.close();
 	return true;

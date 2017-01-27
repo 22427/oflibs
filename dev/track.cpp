@@ -71,12 +71,12 @@ void TrackingData::unlock_all()
 std::vector<float> readARTBlob(ofl::Tokenizer& tkn)
 {
 	std::vector<float> res;
-	ofl::Tokenizer t(tkn.getToken(']'));
-	t.skipOverAll("["+t.whitespaces);
+	ofl::Tokenizer t(tkn.get_token(']'));
+	t.skip_over_all("["+t.whitespaces);
 
 	std::string seperators = ","+t.whitespaces;
 	float f;
-	while(t.getTokenAs(f,seperators))
+	while(t.get_token_as(f,seperators))
 	{
 		res.push_back(f);
 	}
@@ -86,7 +86,7 @@ std::vector<float> readARTBlob(ofl::Tokenizer& tkn)
 mat4 mat4_from_array(const std::vector<float> &vec)
 {
 	mat4 res(1);
-	int s = sqrt(vec.size());
+	int s = static_cast<int>(sqrtf(static_cast<float>(vec.size())));
 	s = std::min(s,4);
 	for(int i =0 ; i<s;i++)
 	{
@@ -106,7 +106,7 @@ Target6DOF read6d(ofl::Tokenizer &tkn, int frame_no)
 
 	return Target6DOF(head[0],
 			frame_no,
-			vec4(pos_eul[0],pos_eul[1],pos_eul[2]),
+			vec4(pos_eul[0],pos_eul[1],pos_eul[2],1.0f),
 			mat);
 
 }
@@ -118,7 +118,7 @@ Target3DOF  read3d(ofl::Tokenizer &tkn, int frame_no)
 
 	return Target3DOF(head[0],
 			frame_no,
-			vec4(pos[0],pos[1],pos[2]));
+			vec4(pos[0],pos[1],pos[2],1.0f));
 }
 
 TargetFlystick  read6df(ofl::Tokenizer &tkn, int frame_no)
@@ -134,7 +134,7 @@ TargetFlystick  read6df(ofl::Tokenizer &tkn, int frame_no)
 		buttons.push_back(b&(1<<i));
 	}
 	return TargetFlystick(head[0],frame_no,buttons,
-			vec4(pos_eul[0],pos_eul[1],pos_eul[2]),
+			vec4(pos_eul[0],pos_eul[1],pos_eul[2],1.0f),
 			mat);
 }
 
@@ -159,9 +159,9 @@ void TrackingData::loop()
 		while(std::getline(strm,l))
 		{
 			ofl::Tokenizer line(l);
-			std::string lt = line.getToken(' ');
+			std::string lt = line.get_token(' ');
 			int cnt = 0;
-			line.getTokenAs(cnt," ");
+			line.get_token_as(cnt," ");
 
 			if(lt == "fr")
 			{

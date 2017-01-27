@@ -4,8 +4,8 @@
 #include <algorithm>
 namespace ofl
 {
-
-int addPos(std::map<vec3,int,compare_vec_3>& map ,const vec3& pos, std::vector<vec3>& poss)
+using namespace glm;
+int addPos(std::map<vec3,int,Comperator<vec3>>& map ,const vec3& pos, std::vector<vec3>& poss)
 {
 	if(map.find(pos)== map.end())
 	{
@@ -21,14 +21,15 @@ Mesh::Mesh(const VertexData *vd)
 {
 	if(vd->primitive() != TRIANGLES)
 		fprintf(stderr,"Mesh can only be created from TRIANGLE based vertex data!\n");
-	std::map<vec3,int,compare_vec_3> pmap;
+	std::map<vec3,int,Comperator<vec3>> pmap;
 	Triangle tri(0,0,0);
-	const auto& pd = vd->data();
-	const auto& id = vd->indices();
-	for(uint i = 0 ; i < vd->indices().size();i+=3)
+	const auto& pd = vd->get_all_attributes(ATTRIB_POSITION);
+	const auto& id = vd->get_all_indices();
+
+	for(uint i = 0 ; i < vd->index_count();i+=3)
 	{
 		for(uint j =0 ; j<3;j++)
-			tri(j) = addPos(pmap,pd[id[i+j]].pos(),m_positions);
+			tri(j) = addPos(pmap,vec3(pd[id[i+j]]),m_positions);
 		m_triangles.push_back(tri);
 	}
 	buildDataStructure();
@@ -36,20 +37,21 @@ Mesh::Mesh(const VertexData *vd)
 
 VertexData* Mesh::toVertexData()
 {
-	VertexData* vd = new VertexData;
-	vd->data().reserve(m_positions.size());
-	Vertex v;
+	VertexConfiguration cfg;
+	cfg.add_attribute(Attribute(ATTRIB_POSITION,3,FLOAT,false));
+	VertexData* vd = new VertexData(TRIANGLES,cfg,UNSIGNED_INT);
+	vd->vertices_reserve(m_positions.size());
+	Vertex v(cfg,nullptr);
 	for(const vec3& p :m_positions)
 	{
-		v.setPosition(p);
-		vd->data().push_back(v);
+		v.set_value(ATTRIB_POSITION,p);
+		vd->push_back(v);
 	}
-
-	vd->indices().reserve(m_triangles.size()*3);
+	vd->indices_reserve(m_triangles.size()*3);
 	for(const Triangle& t : m_triangles)
 	{
 		for(int i  =0 ; i<3;i++)
-			vd->push_back(static_cast<uint>(t(i)));
+			vd->push_back(static_cast<uint32_t>(t(i)));
 	}
 	return vd;
 }
@@ -367,7 +369,7 @@ Mesh *MeshTools::averageSurfaces(const std::vector<Mesh *> ms)
 		}
 
 		VertexData* vd = rs[j]->toVertexData();
-		VertexDataTools::writeToFile(vd,std::to_string(j)+".obj");
+		VertexDataOperations::write_to_file(vd,std::to_string(j)+".obj");
 		delete vd;
 		delete rs[j];
 	}

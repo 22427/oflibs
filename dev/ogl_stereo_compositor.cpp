@@ -1,7 +1,7 @@
 #include "ogl_stereo_compositor.h"
 #include <glad/glad.h>
 namespace ofl {
-
+using namespace glm;
 
 void ofl::StereoCompositor::resize(const int width, const int height)
 {

@@ -28,13 +28,14 @@ inline bool operator<(const vec2& a , const vec2& b)
 	{
 		auto e = a[j]-b[j];
 
-		if(fabs(e) < eps)
+		if(fabsf(e) < eps)
 			continue;
 		if(e<0)
 			return true;
 		if(e>0)
 			return false;
 	}
+	return  false;
 }
 
 
@@ -46,11 +47,13 @@ inline bool operator==(const vec2& a , const vec2& b)
 	{
 		auto e = a[j]-b[j];
 
-		if(fabs(e) < eps)
+		if(fabsf(e) < eps)
 			continue;
 		return  false;
 	}
+	return true;
 }
+
 
 
 inline bool operator<(const vec3& a , const vec3& b)
@@ -61,13 +64,14 @@ inline bool operator<(const vec3& a , const vec3& b)
 	{
 		auto e = a[j]-b[j];
 
-		if(fabs(e) < eps)
+		if(fabsf(e) < eps)
 			continue;
 		if(e<0)
 			return true;
 		if(e>0)
 			return false;
 	}
+	return  false;
 }
 
 inline bool operator==(const vec3& a , const vec3& b)
@@ -78,10 +82,11 @@ inline bool operator==(const vec3& a , const vec3& b)
 	{
 		auto e = a[j]-b[j];
 
-		if(fabs(e) < eps)
+		if(fabsf(e) < eps)
 			continue;
 		return  false;
 	}
+	return  true;
 }
 
 
@@ -93,13 +98,14 @@ inline bool operator<(const vec4& a , const vec4& b)
 	{
 		auto e = a[j]-b[j];
 
-		if(fabs(e) < eps)
+		if(fabsf(e) < eps)
 			continue;
 		if(e<0)
 			return true;
 		if(e>0)
 			return false;
 	}
+	return false;
 }
 
 inline bool operator==(const vec4& a , const vec4& b)
@@ -110,12 +116,22 @@ inline bool operator==(const vec4& a , const vec4& b)
 	{
 		auto e = a[j]-b[j];
 
-		if(fabs(e) < eps)
+		if(fabsf(e) < eps)
 			continue;
 		return  false;
 	}
+	return false;
 }
 
+template<typename T>
+class Comperator
+{
+	public:
+	bool operator()(const T& a, const T&b)
+	{
+		return a <b;
+	}
+};
 
 
 }
