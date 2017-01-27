@@ -202,6 +202,8 @@ public:
 		return  !(*this==o);
 	}
 
+
+
 };
 
 
@@ -337,6 +339,8 @@ public:
 		if(m_index_data)
 			free(m_index_data);
 	}
+
+	const Type& index_type() const {return m_index_type;}
 
 	/**
 	 * @brief vertex_configuration gives access to the vertex configuration

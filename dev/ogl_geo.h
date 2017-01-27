@@ -35,17 +35,14 @@ protected:
 	GLuint m_primitive;
 	GLsizei m_vertice_count;
 	GLenum m_index_type;
+	VertexConfiguration m_vcfg;
 
 public:
 	/**
 	 * @brief Geometry creates a geometry from VertexData.
 	 * Will create a VBO and a VAO uploading the data from vp.
 	 * The attribute locations will be set to:
-	 * 	position              0  (= ALOC_POSITION )
-	 * 	normal                1  (= ALOC_NORMAL   )
-	 * 	color                 2	 (= ALOC_TEXCOORD )
-	 * 	texture coordinates   3  (= ALOC_COLOR    )
-	 * 	tangent               4  (= ALOC_TANGENT  )
+	 * TODO!!!
 	 * @param vd The vertex data.
 	 * @param destroy_vd If set true vd will be freed.
 	 */
@@ -96,6 +93,7 @@ public:
 
 			const size_t vertex_size = sizeof(ofl::Vertex);
 			const ofl::Vertex v;
+
 
 
 #define addr_diff(a,b) (reinterpret_cast<void*>(reinterpret_cast<const char*>(a)-reinterpret_cast<const char*>(b)))

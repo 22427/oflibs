@@ -7,6 +7,7 @@ Geometry::Geometry(VertexData* vd, bool destroy_vd)
 {
 
 	m_vbo = m_vao = m_ibo = 0;
+	m_vcfg = vd->vertex_configuration();
 	if (glGenVertexArrays)
 		glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &m_ibo);
@@ -38,44 +39,32 @@ void Geometry::uploadData(VertexData *vd)
 
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
-	if(vd->indices().size() < USHRT_MAX)
-	{
-		m_index_type = GL_UNSIGNED_SHORT;
 
-		std::vector<GLushort> sid;
-		sid.reserve(vd->indices().size());
-		for(const uint32_t& i: vd->indices())
-		{
-			sid.push_back(static_cast<GLushort>(i));
-		}
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-			static_cast<GLsizeiptr>(sizeof(GLushort)*sid.size()),
-			sid.data(), GL_STATIC_DRAW);
-	}
-	else
-	{
-		m_index_type = GL_UNSIGNED_INT;
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-			static_cast<GLsizeiptr>(sizeof(GLuint)*vd->indices().size()),
-			vd->indices().data(), GL_STATIC_DRAW);
-	}
+		m_index_type = vd->index_type();
 
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+			static_cast<GLsizeiptr>(vd->index_type().size()*vd->index_count()),
+			vd->indices(), GL_STATIC_DRAW);
 
 
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
 	glBufferData(GL_ARRAY_BUFFER,
-				 static_cast<GLsizeiptr>(vertex_size* vd->data().size()),
-				 vd->data().data(),
+				 static_cast<GLsizeiptr>(m_vcfg.vertex_size()*vd->vertex_count()),
+				 vd->vertex_data(),
 				 GL_STATIC_DRAW);
 
-	const Vertex v = vd->data()[0];
+
 
 
 
 	if (m_vao)
 	{
+		for ( const auto& a a m_vcfg)
+		{
+
+		}
 #define addr_diff(a,b) (reinterpret_cast<void*>(reinterpret_cast<const char*>(a)-reinterpret_cast<const char*>(b)))
 		glVertexAttribPointer(ALOC_POSITION, 3, GL_FLOAT, GL_FALSE,
 							  vertex_size, addr_diff(&(v.pos()),&v));
