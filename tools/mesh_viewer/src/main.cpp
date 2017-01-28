@@ -3,9 +3,9 @@
 #include <fstream>
 #include <set>
 
-#include <ofl_all.h>
+#include <ofl_ogl.h>
 
-
+#if 0
 using namespace ofl;
 
 class MeshViewer :
@@ -177,3 +177,5 @@ void MeshViewer::eventWindow(int event)
 	if(event == WIN_CLOSE)
 		render_on = false;
 }
+#endif
+int main(){return 0;}
