@@ -1,10 +1,28 @@
 #pragma once
-
+#include "vmath.h"
 #include <string>
+#include <vector>
+#include <cstring>
+
+#ifndef OFL_GL_HEADER
+#define OFL_GL_HEADER <glad/glad.h>
+#endif
+#include OFL_GL_HEADER
+
+#define GL_GLEXT_PROTOTYPES
+#define GLX_GLXEXT_PROTOTYPES
+#include <GL/glx.h>
+
+
+
+
+
+
+
 namespace ofl {
 
 
-enum WindowEvents
+enum WindowEvent
 {
 	WIN_CLOSE,
 	WIN_ICONIFY,
@@ -25,382 +43,308 @@ enum OpenGLProfile
 	COMPATIBILITY,
 	CORE
 };
-class WindowPreferences
-{
-public:
-	std::string title;
-	bool resizable;
-	bool visible;
-	bool decorated;
-	bool focused;
-	bool fullscreen;
-	int width;
-	int height;
-	bool use_monitor_properties; // will use the monitors settings..
-	int red_bits;
-	int green_bits;
-	int blue_bits;
-	int alpha_bits;
-	int depth_bits;
-	int stencil_bits;
-	int accum_red_bits;
-	int accum_green_bits;
-	int accum_blue_bits;
-	int accum_alpha_bits;
-	int aux_buffers;
-	int samples;
-	int refresh_rate;
-	// ... until here
-	bool stereo;
-	bool srgb;
-	bool double_buffer;
-	OpenGLAPI opengl_api;
-	int opengl_version_major;
-	int opengl_version_minor;
-	bool debug_context;
-	OpenGLProfile opengl_profile;
 
-	WindowPreferences()
-	{
-		title = "OpenGL-Window";
-		width = 640;
-		height = 480;
-		resizable = true;
-		visible = true;
-		decorated = true;
-		focused = true;
-		fullscreen = false;
-		use_monitor_properties = true;
-		red_bits = 8;
-		green_bits = 8;
-		blue_bits = 8;
-		alpha_bits = 8;
-		depth_bits = 24;
-		stencil_bits = 8;
-		accum_red_bits = 0;
-		accum_green_bits= 0;
-		accum_blue_bits= 0;
-		accum_alpha_bits= 0;
-		aux_buffers= 0;
-		samples = 0;
-		refresh_rate= 60;
-		stereo = false;
-		srgb = false ;
-		double_buffer = true;
-		opengl_api = OPEN_GL;
-		opengl_version_major=0;
-		opengl_version_minor=0;
-		debug_context=false;
-		opengl_profile=COMPATIBILITY;
-	}
+enum KeyActions
+{
+	OFL_RELEASED = -1,
+	OFL_REPEAT = 0,
+	OFL_PRESSED = 1,
 };
 
-class Window
+enum KeyModifiers
 {
+	OFL_SHIFT = 1,
+	OFL_CTRL = 2,
+	OFL_ALT = 4,
+	OFL_SUPER = 8
+};
+
+enum class Key
+{
+	UNKNOWN			=	-1,
+	SPACE			=	32,
+	APOSTROPHE		=	39,		// '
+	COMMA			=	44,		// ,
+	MINUS			=	45,		// -
+	PERIOD			=	46,		// .
+	SLASH			=	47,		// /
+	ZERO			=	48,
+	ONE				=	49,
+	TWO				=	50,
+	THREE			=	51,
+	FOUR			=	52,
+	FIVE			=	53,
+	SIX				=	54,
+	SEVEN			=	55,
+	EIGHT			=	56,
+	NINE			=	57,
+	SEMICOLON		=	59,		// ;
+	EQUAL			=	61,		// =
+	A				=	65,
+	B				=	66,
+	C				=	67,
+	D				=	68,
+	E				=	69,
+	F				=	70,
+	G				=	71,
+	H				=	72,
+	I				=	73,
+	J				=	74,
+	K				=	75,
+	L				=	76,
+	M				=	77,
+	N				=	78,
+	O				=	79,
+	P				=	80,
+	Q				=	81,
+	R				=	82,
+	S				=	83,
+	T				=	84,
+	U				=	85,
+	V				=	86,
+	W				=	87,
+	X				=	88,
+	Y				=	89,
+	Z				=	90,
+	LEFT_BRACKET	=	91,		// [
+	BACKSLASH		=	92,
+	RIGHT_BRACKET	=	93,		// ]
+	GRAVE_ACCENT	=	96,		// `
+	WORLD_1			=	161,	// #1
+	WORLD_2			=	162,	// #2
+	ESCAPE			=	256,
+	ENTER			=	257,
+	TAB				=	258,
+	BACKSPACE		=	259,
+	INSERT			=	260,
+	DELETE			=	261,
+	RIGHT			=	262,
+	LEFT			=	263,
+	DOWN			=	264,
+	UP				=	265,
+	PAGE_UP			=	266,
+	PAGE_DOWN		=	267,
+	HOME			=	268,
+	END				=	269,
+	CAPS_LOCK		=	280,
+	SCROLL_LOCK		=	281,
+	NUM_LOCK		=	282,
+	PRINT_SCREEN	=	283,
+	PAUSE			=	284,
+	F1				=	290,
+	F2				=	291,
+	F3				=	292,
+	F4				=	293,
+	F5				=	294,
+	F6				=	295,
+	F7				=	296,
+	F8				=	297,
+	F9				=	298,
+	F10				=	299,
+	F11				=	300,
+	F12				=	301,
+	F13				=	302,
+	F14				=	303,
+	F15				=	304,
+	F16				=	305,
+	F17				=	306,
+	F18				=	307,
+	F19				=	308,
+	F20				=	309,
+	F21				=	310,
+	F22				=	311,
+	F23				=	312,
+	F24				=	313,
+	F25				=	314,
+	NUM_ZERO		=	320,
+	NUM_ONE			=	321,
+	NUM_TWO			=	322,
+	NUM_THREE		=	323,
+	NUM_FOUR		=	324,
+	NUM_FIVE		=	325,
+	NUM_SIX			=	326,
+	NUM_SEVEN		=	327,
+	NUM_EIGHT		=	328,
+	NUM_NEINE		=	329,
+	NUM_DECIMAL		=	330,
+	NUM_DIVIDE		=	331,
+	NUM_MULTIPLY	=	332,
+	NUM_SUBTRACT	=	333,
+	NUM_ADD			=	334,
+	NUM_ENTER		=	335,
+	NUM_EQUAL		=	336,
+	LEFT_SHIFT		=	340,
+	LEFT_CONTROL	=	341,
+	LEFT_ALT		=	342,
+	LEFT_SUPER		=	343,
+	RIGHT_SHIFT		=	344,
+	RIGHT_CONTROL	=	345,
+	RIGHT_ALT		=	346,
+	RIGHT_SUPER		=	347,
+	MENU			=	348,
+	LAST			=	MENU
+};
+
+class WinListener
+{
+public:
+	virtual void event_window(WindowEvent /*event*/){}
+	virtual void event_moved(int /*x*/, int /*y*/){}
+	virtual void event_resized(int /*w*/, int /*h*/){}
+	virtual void event_key_change(int /*key*/, int /*action*/, int /*mods*/, int /*scancode*/){}
+	virtual void event_character_input(unsigned int /*c*/, int /*mods*/){}
+	virtual void event_mouse_button(int /*button*/, int /*action*/,int /*mods*/){}
+	virtual void event_mouse_scroll(double /*xScroll*/, double /*yScroll*/){}
+	virtual void event_mouse_move(double /*x*/, double /*y*/){}
+};
+
+class Win
+{
+	class WindowAttributes
+	{
+	public:
+		std::string title;
+		bool resizable;
+		bool visible;
+		bool decorated;
+		int border;
+		int width;
+		int height;
+		int pos_x;
+		int pos_y;
+		int red_bits;
+		int green_bits;
+		int blue_bits;
+		int alpha_bits;
+		int depth_bits;
+		int stencil_bits;
+		int accum_red_bits;
+		int accum_green_bits;
+		int accum_blue_bits;
+		int accum_alpha_bits;
+		int aux_buffers;
+		int samples;
+		bool stereo;
+		bool srgb;
+		bool double_buffer;
+		WindowAttributes();
+	} window_attributes;
+protected:
+	friend class GLContext;
+	std::vector<WinListener*> m_listeners;
+
+
+#ifdef linux
+	Display * m_display;
+	Window  m_win;
+	int m_screen;
+	GLXFBConfig m_fbcfg;
+	XVisualInfo* m_visinfo;
+#else
+#endif
+public:
+	Win();
+
+	~Win();
+
+
+	void init();
+	ivec2 getPosition();
+	ivec2 getWindowSize();
+
+	void process_events()
+	{
+		while ( XEventsQueued( m_display, QueuedAfterFlush ) )
+		{
+		  XEvent    event;
+		  XNextEvent( m_display, &event );
+		  if( event.xany.window != m_win )
+			continue;
+
+		  if (event.type==KeyPress)
+		  {
+				printf("%d\n",event.xkey.keycode);
+		  }
+
+		}
+	}
+
+	void inject_event_window(WindowEvent event)
+	{
+		for(auto l : m_listeners)
+			l->event_window(event);
+	}
+	void inject_event_moved(int x, int y)
+	{
+		for(auto l : m_listeners)
+			l->event_moved(x,y);
+	}
+	void inject_event_resized(int w, int h)
+	{
+		for(auto l : m_listeners)
+			l->event_resized(w,h);
+	}
+	void inject_event_key_change(int key, int action, int mods, int scancode)
+	{
+		for(auto l : m_listeners)
+			l->event_key_change(key,action,mods,scancode);
+	}
+	void inject_event_character_input(unsigned int /*c*/, int /*mods*/){}
+	void inject_event_mouse_button(int /*button*/, int /*action*/,int /*mods*/){}
+	void inject_event_mouse_scroll(double /*xScroll*/, double /*yScroll*/){}
+	void inject_event_mouse_move(double /*x*/, double /*y*/){}
+};
+
+
+class GLContext
+{
+public:
+
+	int opengl_version_major;
+	int opengl_version_minor;
+	OpenGLProfile opengl_profile;
+	bool opengl_debug_context;
+protected:
+	Win* m_window;
+
+#ifdef linux
+	GLXContext m_cntxt;
+#else
+#endif
 
 public:
-	Window(WindowPreferences* /*wp*/){}
-	virtual ~Window();
-	virtual void swapBuffers() = 0;
-	virtual void makeCurrent() = 0;
-	virtual void enterRenderLoop() = 0;
-	virtual void setTitle(const std::string& title) = 0;
-	virtual void setFullscreen(bool fs) = 0;
+	GLContext(Win* win)
+	{
+		m_window = win;
+		opengl_version_major = 1;
+		opengl_version_minor = 0;
+		opengl_debug_context = false;
+		opengl_profile = COMPATIBILITY;
+	}
+	~GLContext();
+	void init();
+	void swapBuffers();
+	void makeCurrent();
+};
 
+
+class WinIOListeners
+{
+public:
 	virtual void eventKey(int /*key*/, int /*action*/, int /*mods*/, int /*scancode*/){}
 	virtual void eventCharacter(unsigned int /*c*/, int /*mods*/){}
 	virtual void eventMouseButton(int /*button*/, int /*action*/,int /*mods*/){}
 	virtual void eventMouseScroll(double /*xScroll*/, double /*yScroll*/){}
 	virtual void eventMouseMove(double /*x*/, double /*y*/){}
-	virtual void eventWindow(int /*event*/){}
-	virtual void eventWindowPosition(int /*x*/, int /*y*/){}
-	virtual void eventWindowSize(int /*w*/, int /*h*/){}
-
-	virtual bool renderAFrame(double /*tslf_s*/)
-	{return true;}
-
-	virtual int getWidth() const = 0;
-	virtual int getHeight() const  = 0;
 };
-Window::~Window(){}
-
-
-#include <cstdio>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <string>
-
-class Window_GLFW : public Window
+class WinIO
 {
-protected:
-
-	GLFWwindow* m_window;
-	double m_tsLastFrame;
-	static void error_callback(int error, const char* description)
-	{
-		fprintf(stderr,"[ERR] %d: %s\n",error,description);
-	}
-
-	static void key_callback(
-			GLFWwindow* win,
-			int key,
-			int scancode,
-			int action,
-			int mods)
-	{
-		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
-		app->eventKey(key,action,mods,scancode);
-	}
-
-	static void charmods_callback(GLFWwindow* win, unsigned int c, int mods)
-	{
-		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
-		app->eventCharacter(c,mods);
-	}
-
-	static void cursor_position_callback(GLFWwindow* win, double xpos, double ypos)
-	{
-		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
-		app->eventMouseMove(xpos,ypos);
-	}
-	static void cursor_enter_callback(GLFWwindow* /*win*/, int /*entered*/)
-	{
-		//Window_GLFW* app= (Window_GLFW*)glfwGetWindowUserPointer(win);
-	}
-	static void mouse_button_callback(
-			GLFWwindow* win,
-			int button,
-			int action,
-			int mods)
-	{
-		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
-		app->eventMouseButton(button,action,mods);
-	}
-
-	static void scroll_callback(GLFWwindow* win, double xoff, double yoff)
-	{
-		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
-		app->eventMouseScroll(xoff,yoff);
-	}
-
-
-	static void win_resize_callback(GLFWwindow * win, int w , int h)
-	{
-		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
-		app->eventWindowSize(w,h);
-	}
-	static void win_position_callback(GLFWwindow * win, int x , int y)
-	{
-		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
-		app->eventWindowPosition(x,y);
-	}
-	static void win_iconify_callback(GLFWwindow * win, int iconified)
-	{
-		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
-		if(iconified)
-			app->eventWindow(WIN_ICONIFY);
-		else
-			app->eventWindow(WIN_RESTORE);
-	}
-	static void win_close_callback(GLFWwindow * win)
-	{
-		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
-		app->eventWindow(WIN_CLOSE);
-	}
-	static void win_focus_callback(GLFWwindow * win, int got_focus)
-	{
-		Window_GLFW* app=static_cast<Window_GLFW*>(glfwGetWindowUserPointer(win));
-		if(got_focus)
-			app->eventWindow(WIN_GOT_FOCUS);
-		else
-			app->eventWindow(WIN_LOST_FOCUS);
-	}
-
-	int m_win_res_w;
-	int m_win_res_h;
-	int m_win_pos_x;
-	int m_win_pos_y;
-
+	Win* m_window;
+	std::vector<WinListener*> m_listeners;
 public:
-
-	Window_GLFW(WindowPreferences* wp) : Window(wp)
+	WinIO(Win* win)
 	{
-		m_tsLastFrame = 0;
-		if (!glfwInit())
-			exit(EXIT_FAILURE);
-		glfwSetErrorCallback(error_callback);
-		WindowPreferences default_wp;
-		if(!wp)
-		{
-			wp= &default_wp;
-		}
-
-		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-		if(wp->use_monitor_properties)
-		{
-
-			wp->red_bits = mode->redBits;
-			wp->green_bits = mode->greenBits;
-			wp->blue_bits = mode->blueBits;
-			wp->refresh_rate = mode->refreshRate;
-		}
-
-		glfwWindowHint(GLFW_RESIZABLE,wp->resizable);
-		glfwWindowHint(GLFW_VISIBLE,wp->visible);
-		glfwWindowHint(GLFW_DECORATED,wp->decorated);
-		glfwWindowHint(GLFW_FOCUSED,wp->focused);
-		glfwWindowHint(GLFW_RED_BITS,wp->red_bits);
-		glfwWindowHint(GLFW_GREEN_BITS,wp->green_bits);
-		glfwWindowHint(GLFW_BLUE_BITS,wp->blue_bits);
-		glfwWindowHint(GLFW_ALPHA_BITS,wp->alpha_bits);
-		glfwWindowHint(GLFW_DEPTH_BITS,wp->depth_bits);
-		glfwWindowHint(GLFW_STENCIL_BITS,wp->stencil_bits);
-		glfwWindowHint(GLFW_ACCUM_RED_BITS,wp->accum_red_bits);
-		glfwWindowHint(GLFW_ACCUM_GREEN_BITS,wp->accum_green_bits);
-		glfwWindowHint(GLFW_ACCUM_BLUE_BITS,wp->accum_blue_bits);
-		glfwWindowHint(GLFW_ACCUM_ALPHA_BITS,wp->accum_alpha_bits);
-		glfwWindowHint(GLFW_AUX_BUFFERS,wp->aux_buffers);
-		glfwWindowHint(GLFW_SAMPLES,wp->samples);
-		glfwWindowHint(GLFW_REFRESH_RATE,wp->refresh_rate);
-		glfwWindowHint(GLFW_STEREO,wp->stereo);
-		glfwWindowHint(GLFW_SRGB_CAPABLE,wp->srgb);
-
-
-		glfwWindowHint(GLFW_DOUBLEBUFFER,wp->double_buffer);
-		if(wp->opengl_version_major)
-		{
-			printf("gl version major %d\n",wp->opengl_version_major);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,wp->opengl_version_major);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,wp->opengl_version_minor);
-		}
-		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT,wp->debug_context);
-		if(wp->opengl_version_major > 3 && wp->opengl_version_minor > 2)
-		{
-			if(wp->opengl_profile == ANY)
-				glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_ANY_PROFILE);
-			else if(wp->opengl_profile == COMPATIBILITY)
-				glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_COMPAT_PROFILE);
-			else
-				glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
-		}
-		if(wp->opengl_api == OPEN_GL)
-			glfwWindowHint(GLFW_CLIENT_API,GLFW_OPENGL_API);
-		else
-			glfwWindowHint(GLFW_CLIENT_API,GLFW_OPENGL_ES_API);
-
-		if(wp->fullscreen)
-		{
-			m_window = glfwCreateWindow(
-						mode->width,
-						mode->height,
-						wp->title.c_str(),
-						monitor,
-						nullptr);
-		}
-		else
-		{
-			m_window = glfwCreateWindow(
-						wp->width,
-						wp->height,
-						wp->title.c_str(),
-						nullptr,
-						nullptr);
-		}
-		if(m_window)
-		{
-			glfwMakeContextCurrent(m_window);
-			glfwSetWindowUserPointer(m_window, this);
-			glfwSetKeyCallback(m_window,key_callback);
-			glfwSetCharModsCallback(m_window,charmods_callback);
-			glfwSetCursorPosCallback(m_window,cursor_position_callback);
-			glfwSetMouseButtonCallback(m_window,mouse_button_callback);
-			glfwSetScrollCallback(m_window,scroll_callback);
-			glfwSetWindowCloseCallback(m_window,win_close_callback);
-			glfwSetWindowPosCallback(m_window,win_position_callback);
-			glfwSetWindowFocusCallback(m_window,win_focus_callback);
-			glfwSetWindowIconifyCallback(m_window,win_iconify_callback);
-			glfwSetWindowSizeCallback(m_window, win_resize_callback);
-
-			if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
-			{
-				printf("Failed to initialize OpenGL context\n");
-			}
-		}
-	}
-
-	virtual ~Window_GLFW();
-
-	virtual void swapBuffers()
-	{
-		glfwSwapBuffers(m_window);
-	}
-	virtual void makeCurrent()
-	{
-		glfwMakeContextCurrent(m_window);
-	}
-	virtual void enterRenderLoop()
-	{
-		bool contin = true;
-		glfwSetTime(0.0);
-		while(contin)
-		{
-			double time = glfwGetTime();
-			contin = this->renderAFrame(time-m_tsLastFrame);
-			m_tsLastFrame = time;
-			if(contin)
-			{
-				glfwPollEvents();
-			}
-		}
-	}
-
-	virtual void setTitle(const std::string& title)
-	{
-		glfwSetWindowTitle(m_window,title.c_str());
-	}
-
-	virtual void setFullscreen(bool fs)
-	{
-		if(fs)
-		{
-			glfwGetWindowSize(m_window,&m_win_res_w,&m_win_res_h);
-			glfwGetWindowPos(m_window,&m_win_pos_x,&m_win_pos_y);
-			GLFWmonitor* mon = glfwGetPrimaryMonitor();
-			const GLFWvidmode* mode = glfwGetVideoMode(mon);
-			glfwSetWindowMonitor(m_window,mon,0,0,mode->width,mode->height,mode->refreshRate);
-		}
-		else
-		{
-			GLFWmonitor* mon = glfwGetPrimaryMonitor();
-			const GLFWvidmode* mode = glfwGetVideoMode(mon);
-			glfwSetWindowMonitor(m_window,nullptr,m_win_pos_x,m_win_pos_y,m_win_res_w,m_win_res_h,mode->refreshRate);
-		}
-	}
-
-	virtual int getWidth() const
-	{
-		if(!m_window)
-			return 0;
-		int w;
-		glfwGetWindowSize(m_window,&w,nullptr);
-		return  w;
-	}
-	virtual int getHeight() const
-	{
-		if(!m_window)
-			return 0;
-		int h;
-		glfwGetWindowSize(m_window,nullptr,&h);
-		return  h;
+		m_window = win;
 	}
 };
-
-Window_GLFW::~Window_GLFW()
-{
-	glfwDestroyWindow(m_window);
-	glfwTerminate();
-}
-
-
 }

@@ -7,7 +7,7 @@ CONFIG   -= app_bundle
 
 INCLUDEPATH += dep/
 SOURCES += dep/glad/glad.c \
-    00_main.cpp
+
 
 DISTFILES += \
     doc/ogl_geo.md \
@@ -44,6 +44,7 @@ HEADERS += \
 SOURCES += \
 	ogl_geo.cpp \
 	ogl_state.cpp \
+	ogl_win.cpp\
 	stru.cpp \
 	track.cpp \
 	vd.cpp \
@@ -54,7 +55,9 @@ SOURCES += \
 	mesh.cpp \
 	kd_tree.cpp \
 	tnvb.cpp \
-	types.cpp
+	types.cpp \
+	00_main.cpp \
+
 
 CONFIG += c++11
 
@@ -62,5 +65,5 @@ CONFIG += c++11
 DESTDIR = bin
 OBJECTS_DIR = obj
 
-LIBS += -ldl
+LIBS += -ldl -lm -lpthread -lX11
 #DEFINES += "OFL_GL_HEADER=<glad/glad.h>"
