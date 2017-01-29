@@ -20,6 +20,8 @@ Win::~Win()
 	XFree(m_fbcfg);
 	XDestroyWindow(m_display,m_win);
 	XCloseDisplay(m_display);
+	memset(m_key_states,0,512);
+	m_key_modifiers = 0;
 };
 
 void Win::init()
@@ -81,7 +83,7 @@ void Win::init()
 	winAttr.border_pixel = window_attributes.border;
 	winAttr.background_pixel = 0;
 	winAttr.background_pixmap = 0;
-	winAttr.event_mask = StructureNotifyMask | KeyPressMask;
+	winAttr.event_mask = StructureNotifyMask | KeyPressMask | ButtonPressMask | ButtonMotionMask | PointerMotionMask | ResizeRedirectMask;
 	winAttr.colormap = XCreateColormap(m_display, root_win,m_visinfo->visual, AllocNone );
 
 
@@ -122,6 +124,103 @@ void Win::init()
 						PropModeReplace,
 						(unsigned char*) &hints,
 						sizeof(hints) / sizeof(long));
+	}
+}
+
+void Win::process_events()
+{
+	while ( XEventsQueued( m_display, QueuedAfterFlush ) )
+	{
+		XEvent    event;
+		XNextEvent( m_display, &event );
+		if( event.xany.window != m_win )
+			continue;
+
+		if (event.type==KeyPress)
+		{
+			XKeyEvent* kv = reinterpret_cast<XKeyEvent*>(&event);
+
+			KeySym sym;
+
+			char chars[4];
+			memset(chars,0,4);
+			auto r = XLookupString(kv,chars,4,&sym,nullptr);
+
+			if(sym==Key::LEFT_SHIFT || sym==Key::RIGHT_SHIFT)
+				m_key_modifiers=m_key_modifiers| OFL_SHIFT;
+			else if(sym==Key::LEFT_CONTROL || sym==Key::RIGHT_CONTROL)
+				m_key_modifiers=m_key_modifiers| OFL_CTRL;
+			else if(sym==Key::LEFT_ALT || sym==Key::RIGHT_ALT)
+				m_key_modifiers=m_key_modifiers| OFL_ALT;
+			else if(sym==Key::LEFT_SUPER || sym==Key::RIGHT_SUPER)
+				m_key_modifiers=m_key_modifiers| OFL_SUPER;
+
+			uint kc = sym&0x1ff;
+
+			if(m_key_states[kc])
+			{
+				inject_event_key_change(kc,OFL_REPEAT,m_key_modifiers,kv->keycode);
+				if(r)
+					inject_event_character_input(static_cast<uint32_t>(chars[0]),OFL_REPEAT,m_key_modifiers);
+			}
+			else
+			{
+				inject_event_key_change(kc,OFL_PRESSED,m_key_modifiers,kv->keycode);
+				if(r)
+					inject_event_character_input(static_cast<uint32_t>(chars[0]),OFL_PRESSED,m_key_modifiers);
+				m_key_states[kc] = true;
+			}
+
+
+		}
+		else if (event.type==KeyRelease)
+		{
+			XKeyEvent* kv = reinterpret_cast<XKeyEvent*>(&event);
+			KeySym sym;
+			char chars[4];
+			memset(chars,0,4);
+			XLookupString(kv,chars,4,&sym,nullptr);
+
+			if(sym==Key::LEFT_SHIFT || sym==Key::RIGHT_SHIFT)
+				m_key_modifiers=m_key_modifiers &~static_cast<uint>(OFL_SHIFT);
+			else if(sym==Key::LEFT_CONTROL || sym==Key::RIGHT_CONTROL)
+				m_key_modifiers=m_key_modifiers &~static_cast<uint>(OFL_CTRL);
+			else if(sym==Key::LEFT_ALT || sym==Key::RIGHT_ALT)
+				m_key_modifiers=m_key_modifiers & ~static_cast<uint>(OFL_ALT);
+			else if(sym==Key::LEFT_SUPER || sym==Key::RIGHT_SUPER)
+				m_key_modifiers=m_key_modifiers & ~static_cast<uint>(OFL_SUPER);
+
+			uint kc = sym&0x1ff;
+			inject_event_key_change(kc,OFL_RELEASED,m_key_modifiers,kv->keycode);
+			m_key_states[kc]=false;
+		}
+		else if (event.type == ResizeRequest)
+		{
+			inject_event_resized(event.xresizerequest.width,event.xresizerequest.height);
+		}
+		else if(event.type == ConfigureNotify)
+		{
+			inject_event_moved(event.xconfigure.x,event.xconfigure.y);
+		}
+		else if(event.type == MotionNotify)
+		{
+			inject_event_mouse_move(event.xmotion.x,event.xmotion.y);
+		}
+		else if(event.type == ButtonPress)
+		{
+			inject_event_mouse_button(event.xbutton.button,OFL_PRESSED,m_key_modifiers);
+		}
+		else if(event.type == ButtonRelease)
+		{
+			inject_event_mouse_button(event.xbutton.button,OFL_RELEASED,m_key_modifiers);
+		}
+		else
+		{
+			printf("unknown: %d\n",event.type);
+		}
+
+
+
 	}
 }
 

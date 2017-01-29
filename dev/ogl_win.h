@@ -59,141 +59,152 @@ enum KeyModifiers
 	OFL_SUPER = 8
 };
 
-enum class Key
+class Key
 {
-	UNKNOWN			=	-1,
-	SPACE			=	32,
-	APOSTROPHE		=	39,		// '
-	COMMA			=	44,		// ,
-	MINUS			=	45,		// -
-	PERIOD			=	46,		// .
-	SLASH			=	47,		// /
-	ZERO			=	48,
-	ONE				=	49,
-	TWO				=	50,
-	THREE			=	51,
-	FOUR			=	52,
-	FIVE			=	53,
-	SIX				=	54,
-	SEVEN			=	55,
-	EIGHT			=	56,
-	NINE			=	57,
-	SEMICOLON		=	59,		// ;
-	EQUAL			=	61,		// =
-	A				=	65,
-	B				=	66,
-	C				=	67,
-	D				=	68,
-	E				=	69,
-	F				=	70,
-	G				=	71,
-	H				=	72,
-	I				=	73,
-	J				=	74,
-	K				=	75,
-	L				=	76,
-	M				=	77,
-	N				=	78,
-	O				=	79,
-	P				=	80,
-	Q				=	81,
-	R				=	82,
-	S				=	83,
-	T				=	84,
-	U				=	85,
-	V				=	86,
-	W				=	87,
-	X				=	88,
-	Y				=	89,
-	Z				=	90,
-	LEFT_BRACKET	=	91,		// [
-	BACKSLASH		=	92,
-	RIGHT_BRACKET	=	93,		// ]
-	GRAVE_ACCENT	=	96,		// `
-	WORLD_1			=	161,	// #1
-	WORLD_2			=	162,	// #2
-	ESCAPE			=	256,
-	ENTER			=	257,
-	TAB				=	258,
-	BACKSPACE		=	259,
-	INSERT			=	260,
-	DELETE			=	261,
-	RIGHT			=	262,
-	LEFT			=	263,
-	DOWN			=	264,
-	UP				=	265,
-	PAGE_UP			=	266,
-	PAGE_DOWN		=	267,
-	HOME			=	268,
-	END				=	269,
-	CAPS_LOCK		=	280,
-	SCROLL_LOCK		=	281,
-	NUM_LOCK		=	282,
-	PRINT_SCREEN	=	283,
-	PAUSE			=	284,
-	F1				=	290,
-	F2				=	291,
-	F3				=	292,
-	F4				=	293,
-	F5				=	294,
-	F6				=	295,
-	F7				=	296,
-	F8				=	297,
-	F9				=	298,
-	F10				=	299,
-	F11				=	300,
-	F12				=	301,
-	F13				=	302,
-	F14				=	303,
-	F15				=	304,
-	F16				=	305,
-	F17				=	306,
-	F18				=	307,
-	F19				=	308,
-	F20				=	309,
-	F21				=	310,
-	F22				=	311,
-	F23				=	312,
-	F24				=	313,
-	F25				=	314,
-	NUM_ZERO		=	320,
-	NUM_ONE			=	321,
-	NUM_TWO			=	322,
-	NUM_THREE		=	323,
-	NUM_FOUR		=	324,
-	NUM_FIVE		=	325,
-	NUM_SIX			=	326,
-	NUM_SEVEN		=	327,
-	NUM_EIGHT		=	328,
-	NUM_NEINE		=	329,
-	NUM_DECIMAL		=	330,
-	NUM_DIVIDE		=	331,
-	NUM_MULTIPLY	=	332,
-	NUM_SUBTRACT	=	333,
-	NUM_ADD			=	334,
-	NUM_ENTER		=	335,
-	NUM_EQUAL		=	336,
-	LEFT_SHIFT		=	340,
-	LEFT_CONTROL	=	341,
-	LEFT_ALT		=	342,
-	LEFT_SUPER		=	343,
-	RIGHT_SHIFT		=	344,
-	RIGHT_CONTROL	=	345,
-	RIGHT_ALT		=	346,
-	RIGHT_SUPER		=	347,
-	MENU			=	348,
-	LAST			=	MENU
-};
+public:
+	enum KeyID
+	{
+		UNKNOWN			=	XK_VoidSymbol&0x01ff,
+		SPACE			=	XK_space&0x01ff,
+		APOSTROPHE		=	XK_apostrophe&0x01ff,		// '
+		COMMA			=	XK_comma&0x01ff,		// ,
+		MINUS			=	XK_minus&0x01ff,		// -
+		PERIOD			=	XK_period&0x01ff,		// .
+		SLASH			=	XK_slash&0x01ff,		// /
+		ZERO			=	XK_0&0x01ff,
+		ONE				=	XK_1&0x01ff,
+		TWO				=	XK_2&0x01ff,
+		THREE			=	XK_3&0x01ff,
+		FOUR			=	XK_4&0x01ff,
+		FIVE			=	XK_5&0x01ff,
+		SIX				=	XK_6&0x01ff,
+		SEVEN			=	XK_7&0x01ff,
+		EIGHT			=	XK_8&0x01ff,
+		NINE			=	XK_9&0x01ff,
+		SEMICOLON		=	XK_semicolon&0x01ff,		// ;
+		EQUAL			=	XK_equal&0x01ff,		// =
+		A				=	XK_A&0x01ff,
+		B				=	XK_B&0x01ff,
+		C				=	XK_C&0x01ff,
+		D				=	XK_D&0x01ff,
+		E				=	XK_E&0x01ff,
+		F				=	XK_F&0x01ff,
+		G				=	XK_G&0x01ff,
+		H				=	XK_H&0x01ff,
+		I				=	XK_I&0x01ff,
+		J				=	XK_J&0x01ff,
+		K				=	XK_K&0x01ff,
+		L				=	XK_L&0x01ff,
+		M				=	XK_M&0x01ff,
+		N				=	XK_N&0x01ff,
+		O				=	XK_O&0x01ff,
+		P				=	XK_P&0x01ff,
+		Q				=	XK_Q&0x01ff,
+		R				=	XK_R&0x01ff,
+		S				=	XK_S&0x01ff,
+		T				=	XK_T&0x01ff,
+		U				=	XK_U&0x01ff,
+		V				=	XK_V&0x01ff,
+		W				=	XK_W&0x01ff,
+		X				=	XK_X&0x01ff,
+		Y				=	XK_Y&0x01ff,
+		Z				=	XK_Z&0x01ff,
+		LEFT_BRACKET	=	XK_bracketleft&0x01ff,		// [
+		BACKSLASH		=	XK_backslash&0x01ff,
+		RIGHT_BRACKET	=	XK_bracketright&0x01ff,		// ]
+		GRAVE_ACCENT	=	XK_grave&0x01ff,		// `
+		ESCAPE			=	XK_Escape&0x01ff,
+		ENTER			=	XK_Return&0x01ff,
+		TAB				=	XK_Tab&0x01ff,
+		BACKSPACE		=	XK_BackSpace&0x01ff,
+		INSERT			=	XK_Insert&0x01ff,
+		DELETE			=	XK_Delete&0x01ff,
+		RIGHT			=	XK_Right&0x01ff,
+		LEFT			=	XK_Left&0x01ff,
+		DOWN			=	XK_Down&0x01ff,
+		UP				=	XK_Up&0x01ff,
+		PAGE_UP			=	XK_Page_Up&0x01ff,
+		PAGE_DOWN		=	XK_Page_Down&0x01ff,
+		HOME			=	XK_Home&0x01ff,
+		END				=	XK_End&0x01ff,
+		CAPS_LOCK		=	XK_Caps_Lock&0x01ff,
+		SCROLL_LOCK		=	XK_Scroll_Lock&0x01ff,
+		NUM_LOCK		=	XK_Num_Lock&0x01ff,
+		PRINT_SCREEN	=	XK_Print&0x01ff,
+		PAUSE			=	XK_Pause&0x01ff,
+		F1				=	XK_F1&0x01ff,
+		F2				=	XK_F2&0x01ff,
+		F3				=	XK_F3&0x01ff,
+		F4				=	XK_F4&0x01ff,
+		F5				=	XK_F5&0x01ff,
+		F6				=	XK_F6&0x01ff,
+		F7				=	XK_F7&0x01ff,
+		F8				=	XK_F8&0x01ff,
+		F9				=	XK_F9&0x01ff,
+		F10				=	XK_F10&0x01ff,
+		F11				=	XK_F11&0x01ff,
+		F12				=	XK_F12&0x01ff,
+		F13				=	XK_F13&0x01ff,
+		F14				=	XK_F14&0x01ff,
+		F15				=	XK_F15&0x01ff,
+		F16				=	XK_F16&0x01ff,
+		F17				=	XK_F17&0x01ff,
+		F18				=	XK_F18&0x01ff,
+		F19				=	XK_F19&0x01ff,
+		F20				=	XK_F20&0x01ff,
+		F21				=	XK_F21&0x01ff,
+		F22				=	XK_F22&0x01ff,
+		F23				=	XK_F23&0x01ff,
+		F24				=	XK_F24&0x01ff,
+		F25				=	XK_F25&0x01ff,
+		NUM_ZERO		=	XK_KP_0&0x01ff,
+		NUM_ONE			=	XK_KP_1&0x01ff,
+		NUM_TWO			=	XK_KP_2&0x01ff,
+		NUM_THREE		=	XK_KP_3&0x01ff,
+		NUM_FOUR		=	XK_KP_4&0x01ff,
+		NUM_FIVE		=	XK_KP_5&0x01ff,
+		NUM_SIX			=	XK_KP_6&0x01ff,
+		NUM_SEVEN		=	XK_KP_7&0x01ff,
+		NUM_EIGHT		=	XK_KP_8&0x01ff,
+		NUM_NEINE		=	XK_KP_9&0x01ff,
+		NUM_DECIMAL		=	XK_KP_Decimal&0x01ff,
+		NUM_DIVIDE		=	XK_KP_Divide&0x01ff,
+		NUM_MULTIPLY	=	XK_KP_Multiply&0x01ff,
+		NUM_SUBTRACT	=	XK_KP_Subtract&0x01ff,
+		NUM_ADD			=	XK_KP_Add&0x01ff,
+		NUM_ENTER		=	XK_KP_Enter&0x01ff,
+		NUM_EQUAL		=	XK_KP_Equal&0x01ff,
+		LEFT_SHIFT		=	XK_Shift_L&0x01ff,
+		LEFT_CONTROL	=	XK_Control_L&0x01ff,
+		LEFT_ALT		=	XK_Alt_L&0x01ff,
+		LEFT_SUPER		=	XK_Super_L&0x01ff,
+		RIGHT_SHIFT		=	XK_Shift_R&0x01ff,
+		RIGHT_CONTROL	=	XK_Control_R&0x01ff,
+		RIGHT_ALT		=	XK_Alt_R&0x01ff,
+		RIGHT_SUPER		=	XK_Super_R&0x01ff,
+		MENU			=	XK_Menu&0x01ff,
+		MAX_KEYS		=   0x0200
+	};
 
+	KeyID id;
+	Key(KeyID id){this->id = id;}
+	Key(uint32_t id){this->id = static_cast<KeyID>(id);}
+	Key(KeySym id){this->id = static_cast<KeyID>(id);}
+
+	operator KeyID(){return id;}
+	operator uint32_t(){return static_cast<uint32_t>(id);}
+	operator KeySym(){return static_cast<KeySym>(id);}
+};
 class WinListener
 {
 public:
+	virtual ~WinListener(){}
 	virtual void event_window(WindowEvent /*event*/){}
 	virtual void event_moved(int /*x*/, int /*y*/){}
 	virtual void event_resized(int /*w*/, int /*h*/){}
-	virtual void event_key_change(int /*key*/, int /*action*/, int /*mods*/, int /*scancode*/){}
-	virtual void event_character_input(unsigned int /*c*/, int /*mods*/){}
-	virtual void event_mouse_button(int /*button*/, int /*action*/,int /*mods*/){}
+	virtual void event_key_change(Key /*key*/, int /*action*/, uint /*mods*/, uint /*scancode*/){}
+	virtual void event_character_input(unsigned int /*c*/, uint /*mods*/){}
+	virtual void event_mouse_button(int /*button*/, int /*action*/,uint /*mods*/){}
 	virtual void event_mouse_scroll(double /*xScroll*/, double /*yScroll*/){}
 	virtual void event_mouse_move(double /*x*/, double /*y*/){}
 };
@@ -240,34 +251,20 @@ protected:
 	int m_screen;
 	GLXFBConfig m_fbcfg;
 	XVisualInfo* m_visinfo;
+	uint m_key_modifiers;
+	bool m_key_states[Key::MAX_KEYS];
 #else
 #endif
 public:
 	Win();
-
 	~Win();
-
 
 	void init();
 	ivec2 getPosition();
 	ivec2 getWindowSize();
 
-	void process_events()
-	{
-		while ( XEventsQueued( m_display, QueuedAfterFlush ) )
-		{
-		  XEvent    event;
-		  XNextEvent( m_display, &event );
-		  if( event.xany.window != m_win )
-			continue;
 
-		  if (event.type==KeyPress)
-		  {
-				printf("%d\n",event.xkey.keycode);
-		  }
-
-		}
-	}
+	void process_events();
 
 	void inject_event_window(WindowEvent event)
 	{
@@ -284,15 +281,15 @@ public:
 		for(auto l : m_listeners)
 			l->event_resized(w,h);
 	}
-	void inject_event_key_change(int key, int action, int mods, int scancode)
+	void inject_event_key_change(Key key, int action, uint mods, uint scancode)
 	{
 		for(auto l : m_listeners)
 			l->event_key_change(key,action,mods,scancode);
 	}
-	void inject_event_character_input(unsigned int /*c*/, int /*mods*/){}
-	void inject_event_mouse_button(int /*button*/, int /*action*/,int /*mods*/){}
+	void inject_event_character_input(unsigned int c, KeyActions action, uint mods){}
+	void inject_event_mouse_button(uint button, KeyActions action ,uint mods){}
 	void inject_event_mouse_scroll(double /*xScroll*/, double /*yScroll*/){}
-	void inject_event_mouse_move(double /*x*/, double /*y*/){}
+	void inject_event_mouse_move(double x, double y){}
 };
 
 
