@@ -128,6 +128,10 @@ public:
 	}
 
 	Mesh(const VertexData* vd);
+	Mesh()
+	{
+
+	}
 	VertexData* to_VertexData();
 	const std::vector<Triangle>& triangles()const{return  m_triangles;}
 	std::vector<Triangle>& triangles(){return  m_triangles;}
