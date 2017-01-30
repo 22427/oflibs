@@ -23,13 +23,20 @@ Mesh::Mesh(const VertexData *vd)
 		fprintf(stderr,"Mesh can only be created from TRIANGLE based vertex data!\n");
 	std::map<vec3,int,Comperator<vec3>> pmap;
 	Triangle tri(0,0,0);
-	const auto& pd = vd->get_all_attributes(ATTRIB_POSITION);
-	const auto& id = vd->get_all_indices();
 
+	std::vector<vec4> colors = vd->get_all_attributes(ATTRIB_COLOR);
+
+	const auto pd = vd->get_all_attributes(ATTRIB_POSITION);
+	const auto id = vd->get_all_indices();
+	m_colors.resize(vd->vertex_count(),vec4(1.0f));
 	for(uint i = 0 ; i < vd->index_count();i+=3)
 	{
 		for(uint j =0 ; j<3;j++)
+		{
 			tri(j) = addPos(pmap,vec3(pd[id[i+j]]),m_positions);
+			if(!m_colors.empty())
+				m_colors[tri(j)] = colors[id[i+j]];
+		}
 		m_triangles.push_back(tri);
 	}
 	build_data_structure();
@@ -144,7 +151,7 @@ void Mesh::build_data_structure()
 
 }
 
-void Mesh::insert_vertex(const vec3 &v, const int t)
+uint32_t Mesh::insert_vertex(const vec3 &v, const int t)
 {
 	Triangle tt = m_triangles[t];
 	m_positions.push_back(v);
@@ -170,6 +177,7 @@ void Mesh::insert_vertex(const vec3 &v, const int t)
 	m_pos2tris[tt(2)].insert(m_triangles.size()-2);
 	m_pos2tris[tt(2)].erase(m_pos2tris[tt(2)].find(t));
 
+	return newpos;
 
 }
 

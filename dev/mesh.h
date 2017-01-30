@@ -79,6 +79,8 @@ protected:
 	friend class MeshTools;
 	// per vertex attributes
 	std::vector<vec3> m_positions;
+	std::vector<vec4> m_colors;
+
 	std::vector<std::vector<vec4>> m_attributes;
 	std::vector<Triangle> m_triangles;
 
@@ -96,6 +98,9 @@ public:
 	vec3& vertex(const uint i){return m_positions[i];}
 	const vec3& vertex(const uint i)const{return m_positions[i];}
 
+	vec4& vertex_color(const uint i){return m_colors[i];}
+	const vec4& vertex_color(const uint i)const{return m_colors[i];}
+
 	Triangle& triangle(const uint i){return m_triangles[i];}
 	const Triangle& triangle(const uint i)const{return m_triangles[i];}
 
@@ -104,7 +109,8 @@ public:
 	const std::vector<vec3>& positions()const {return m_positions;}
 	std::vector<vec3>& positions(){return m_positions;}
 
-	void insert_vertex(const vec3& v, const int t);
+	uint32_t insert_vertex(const vec3& v, const int t);
+
 
 	int add_attribute(const vec4& def_val)
 	{
