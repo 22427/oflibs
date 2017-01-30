@@ -89,7 +89,7 @@ protected:
 	std::map<int, std::set<int>> m_pos2pos;
 
 	//std::vector<int> m_vertex2corner;
-//	std::vector<Corner> m_corners;
+	//	std::vector<Corner> m_corners;
 
 public:
 	std::vector<int> adjacent_triangles(int vertex);
@@ -135,12 +135,49 @@ public:
 	VertexData* to_VertexData();
 	const std::vector<Triangle>& triangles()const{return  m_triangles;}
 	std::vector<Triangle>& triangles(){return  m_triangles;}
+
+	void add_triangle(const vec3& a,const vec3& b,const vec3& c, float eps = std::numeric_limits<float>::epsilon())
+	{
+		Triangle new_tri;
+		const vec3* ps[3]={&a,&b,&c};
+
+		if(eps>=0)
+		{
+			int j = 0;
+			for(const auto v : m_positions)
+			{
+				for(int i = 0 ; i< 3;i++)
+				{
+					if(glm::distance2(*ps[i],v) < eps)
+						new_tri(i) = j;
+				}
+				j++;
+			}
+		}
+		for(int i = 0 ; i< 3;i++)
+		{
+			if(new_tri(i) <0 )
+			{
+				new_tri(i) = m_positions.size();
+				m_positions.push_back(*ps[i]);
+				m_colors.push_back(vec4(1.0));
+			}
+		}
+
+		m_triangles.push_back(new_tri);
+		for(int i = 0 ; i< 3;i++)
+		{
+			m_pos2pos[new_tri(i)].insert(new_tri((i+1)%3));
+			m_pos2pos[new_tri(i)].insert(new_tri((i+2)%3));
+			m_pos2tris[new_tri(i)].insert(m_triangles.size()-1);
+		}
+	}
 };
 
 
 class MeshTools
 {
-	public:
+public:
 
 	/**
 	 * @brief getClosestVertex searches for the closest vertex to a given
@@ -154,10 +191,12 @@ class MeshTools
 
 	static vec3 get_closest_point(Mesh* m, const vec3& p);
 	static vec3 get_closest_point(Mesh* m, const vec3& p,
-								const std::vector<mat4>& Ts,
-								const std::vector<mat4>& Tis);
+								  const std::vector<mat4>& Ts,
+								  const std::vector<mat4>& Tis);
 	static Mesh* merge(const Mesh* a, const Mesh*b);
 
 	static Mesh* average_surfaces(const std::vector<Mesh*> ms);
+
+
 };
 }
