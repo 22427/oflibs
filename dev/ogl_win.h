@@ -204,8 +204,8 @@ public:
 	virtual void event_resized(int /*w*/, int /*h*/){}
 	virtual void event_key_change(Key /*key*/, int /*action*/, uint /*mods*/, uint /*scancode*/){}
 	virtual void event_character_input(unsigned int /*c*/, uint /*mods*/){}
-	virtual void event_mouse_button(int /*button*/, int /*action*/,uint /*mods*/){}
-	virtual void event_mouse_scroll(double /*xScroll*/, double /*yScroll*/){}
+	virtual void event_mouse_button(uint /*button*/, int /*action*/,uint /*mods*/){}
+	virtual void event_mouse_scroll(double /*x_scroll*/, double /*y_scroll*/){}
 	virtual void event_mouse_move(double /*x*/, double /*y*/){}
 };
 
@@ -286,10 +286,26 @@ public:
 		for(auto l : m_listeners)
 			l->event_key_change(key,action,mods,scancode);
 	}
-	void inject_event_character_input(unsigned int c, KeyActions action, uint mods){}
-	void inject_event_mouse_button(uint button, KeyActions action ,uint mods){}
-	void inject_event_mouse_scroll(double /*xScroll*/, double /*yScroll*/){}
-	void inject_event_mouse_move(double x, double y){}
+	void inject_event_character_input(unsigned int c, uint mods)
+	{
+		for(auto l : m_listeners)
+			l->event_character_input(c,mods);
+	}
+	void inject_event_mouse_button(uint button, KeyActions action ,uint mods)
+	{
+		for(auto l : m_listeners)
+			l->event_mouse_button(button,action,mods);
+	}
+	void inject_event_mouse_scroll(double x_scroll, double y_scroll)
+	{
+		for(auto l : m_listeners)
+			l->event_mouse_scroll(x_scroll,y_scroll);
+	}
+	void inject_event_mouse_move(double x, double y)
+	{
+		for(auto l : m_listeners)
+			l->event_mouse_move(x,y);
+	}
 };
 
 
