@@ -9,7 +9,7 @@ inc_test = re.compile('#include\s*"([^.]*).([^"]*)"')
 
 lib_list = []
 collection = "collections"
-implementation_in_header = True
+split = False
 include_dir = "./dev/"
 source_dir = "./dev/"
 doc_dir = "./dev/doc/"
@@ -25,7 +25,7 @@ preambel = "// This is auto generated code. Do not edit it directly.\n\n"
 def print_help():
     print(
         "-split\n\tIf set the implementation will be stored in a seperat .cpp file.\n\tDefault: {0}".format(
-            implementation_in_header))
+            split))
     print(
         "-include_dir\n\tSet the source directory for the header files.\n\tDefault: {0}".format(
             include_dir))
@@ -150,7 +150,7 @@ for llist in lib_list:
     header_output_file.write(preambel)
     source_output_file = None
 
-    if not implementation_in_header:
+    if  split:
         source_output_file = open(output_dir + output_prefix + lib_name + '.cpp', 'w')
         source_output_file.write(preambel)
     else:
@@ -161,7 +161,7 @@ for llist in lib_list:
 
 # Write the header part.
     guard = output_prefix.upper() + lib_name.upper();
-    if implementation_in_header:
+    if not split:
         header_output_file.write('#ifndef ' + guard + '\n\n')
         header_output_file.write('#define ' + guard + '\n\n')
     else:
@@ -172,15 +172,15 @@ for llist in lib_list:
     for lib in libs:
         process_header(lib, done_header, header_output_file)
 
-    if implementation_in_header:
+    if not split:
         header_output_file.write('#endif //' + guard + '\n\n')
 
 # Write the implementation part
-    if implementation_in_header:
+    if not split:
         source_output_file.write('#ifdef ' + output_prefix.upper() + 'IMPLEMENTATION\n')
     for cpp in done_header:
         process_cpp(cpp, done_cpp, done_header, source_output_file)
-    if implementation_in_header:
+    if not split:
         source_output_file.write('#endif //' + output_prefix.upper() + 'IMPLEMENTATION\n')
 
     source_output_file.close()
