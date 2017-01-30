@@ -29,6 +29,7 @@ class BoundingBox3
 	vec3 m_min;
 	vec3 m_max;
 public:
+
 	BoundingBox3():m_min(NAN),m_max(NAN)
 	{
 	}
@@ -46,6 +47,11 @@ public:
 			}
 		}
 	}
+
+	vec3& min() {return m_min;}
+	const vec3& min() const {return m_min;}
+	vec3& max() {return m_max;}
+	const vec3& max() const {return m_max;}
 
 	void add_point(const vec4& p)
 	{
