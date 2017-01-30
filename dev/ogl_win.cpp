@@ -149,9 +149,9 @@ void Win::process_events()
 			if(sym==Key::LEFT_SHIFT || sym==Key::RIGHT_SHIFT)
 				m_key_modifiers=m_key_modifiers| Key::MOD_SHIFT;
 			else if(sym==Key::LEFT_CONTROL || sym==Key::RIGHT_CONTROL)
-				m_key_modifiers=m_key_modifiers| Key::MOD;
+				m_key_modifiers=m_key_modifiers| Key::MOD_CTRL;
 			else if(sym==Key::LEFT_ALT || sym==Key::RIGHT_ALT)
-				m_key_modifiers=m_key_modifiers| Key::MOD;
+				m_key_modifiers=m_key_modifiers| Key::MOD_ALT;
 			else if(sym==Key::LEFT_SUPER || sym==Key::RIGHT_SUPER)
 				m_key_modifiers=m_key_modifiers| Key::MOD_SUPER;
 
@@ -184,9 +184,9 @@ void Win::process_events()
 			if(sym==Key::LEFT_SHIFT || sym==Key::RIGHT_SHIFT)
 				m_key_modifiers=m_key_modifiers &~static_cast<uint>(Key::MOD_SHIFT);
 			else if(sym==Key::LEFT_CONTROL || sym==Key::RIGHT_CONTROL)
-				m_key_modifiers=m_key_modifiers &~static_cast<uint>(Key::MOD);
+				m_key_modifiers=m_key_modifiers &~static_cast<uint>(Key::MOD_CTRL);
 			else if(sym==Key::LEFT_ALT || sym==Key::RIGHT_ALT)
-				m_key_modifiers=m_key_modifiers & ~static_cast<uint>(Key::MOD);
+				m_key_modifiers=m_key_modifiers & ~static_cast<uint>(Key::MOD_ALT);
 			else if(sym==Key::LEFT_SUPER || sym==Key::RIGHT_SUPER)
 				m_key_modifiers=m_key_modifiers & ~static_cast<uint>(Key::MOD_SUPER);
 
