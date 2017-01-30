@@ -32,10 +32,10 @@ Mesh::Mesh(const VertexData *vd)
 			tri(j) = addPos(pmap,vec3(pd[id[i+j]]),m_positions);
 		m_triangles.push_back(tri);
 	}
-	buildDataStructure();
+	build_data_structure();
 }
 
-VertexData* Mesh::toVertexData()
+VertexData* Mesh::to_VertexData()
 {
 	VertexConfiguration cfg;
 	cfg.add_attribute(Attribute(ATTRIB_POSITION,3,FLOAT,false));
@@ -62,14 +62,14 @@ int corner_add(int c,int a)
 	return t*3 + ((c%3)+a)%3;
 };
 
-std::vector<int> Mesh::adjacentTriangles(int vertex)
+std::vector<int> Mesh::adjacent_triangles(int vertex)
 {
 	return std::vector<int>(m_pos2tris[vertex].begin(), m_pos2tris[vertex].end());
 }
 
 
 
-std::vector<int> Mesh::adjacentVertices(int vertex)
+std::vector<int> Mesh::adjacent_vertices(int vertex)
 {
 
 	return std::vector<int>(m_pos2pos[vertex].begin(), m_pos2pos[vertex].end());
@@ -89,7 +89,7 @@ std::set<T> intersect(const std::set<T>& a,const std::set<T>&b )
 }
 
 
-void Mesh::buildDataStructure()
+void Mesh::build_data_structure()
 {
 	int ct = 0;
 	for(auto& t : m_triangles)
@@ -144,7 +144,7 @@ void Mesh::buildDataStructure()
 
 }
 
-void Mesh::insertVertex(const vec3 &v, const int t)
+void Mesh::insert_vertex(const vec3 &v, const int t)
 {
 	Triangle tt = m_triangles[t];
 	m_positions.push_back(v);
@@ -173,7 +173,7 @@ void Mesh::insertVertex(const vec3 &v, const int t)
 
 }
 
-int MeshTools::getClosestVertex(Mesh *m, const vec3 &p)
+int MeshTools::get_closest_vertex(Mesh *m, const vec3 &p)
 {
 	if (m->positions().empty())
 		return -1;
@@ -245,9 +245,9 @@ vec3 triangle_cp(
 
 }
 
-int MeshTools::getClosestTriangle(Mesh *m, const vec3 &p)
+int MeshTools::get_closest_triangle(Mesh *m, const vec3 &p)
 {
-	const std::set<int> tris = m->m_pos2tris[getClosestVertex(m,p)];
+	const std::set<int> tris = m->m_pos2tris[get_closest_vertex(m,p)];
 
 	float min = std::numeric_limits<float>::max();
 	int res = *(tris.begin());
@@ -269,10 +269,10 @@ int MeshTools::getClosestTriangle(Mesh *m, const vec3 &p)
 }
 
 
-vec3 MeshTools::getClosestPoint(Mesh *m, const vec3 &p)
+vec3 MeshTools::get_closest_point(Mesh *m, const vec3 &p)
 {
-	int cv = getClosestVertex(m,p);
-	auto tris = m->adjacentTriangles(cv);
+	int cv = get_closest_vertex(m,p);
+	auto tris = m->adjacent_triangles(cv);
 	float min = distance2(m->vertex(cv),p);
 	vec3 res = m->vertex(cv);
 
@@ -294,10 +294,10 @@ vec3 MeshTools::getClosestPoint(Mesh *m, const vec3 &p)
 	return res;
 }
 
-vec3 MeshTools::getClosestPoint(Mesh *m, const vec3 &p, const std::vector<mat4> &Ts, const std::vector<mat4> &Tis)
+vec3 MeshTools::get_closest_point(Mesh *m, const vec3 &p, const std::vector<mat4> &Ts, const std::vector<mat4> &Tis)
 {
-	int cv = getClosestVertex(m,p);
-	auto tris = m->adjacentTriangles(static_cast<uint>(cv));
+	int cv = get_closest_vertex(m,p);
+	auto tris = m->adjacent_triangles(static_cast<uint>(cv));
 	float min = distance2(m->vertex(cv),p);
 	vec3 res = m->vertex(cv);
 
@@ -319,12 +319,12 @@ Mesh *MeshTools::merge(const Mesh *a, const Mesh *b)
 	Mesh* res = new Mesh(*a);
 	for(const glm::vec3 p : b->m_positions)
 	{
-		res->insertVertex(p,getClosestTriangle(res,p));
+		res->insert_vertex(p,get_closest_triangle(res,p));
 	}
 	return res;
 }
 
-Mesh *MeshTools::averageSurfaces(const std::vector<Mesh *> ms)
+Mesh *MeshTools::average_surfaces(const std::vector<Mesh *> ms)
 {
 	std::vector<Mesh *> rs;
 	std::vector<std::vector<mat4>> Ts(ms.size());
@@ -363,12 +363,12 @@ Mesh *MeshTools::averageSurfaces(const std::vector<Mesh *> ms)
 			for( uint k = 0 ; k<ms.size();k++)
 			{
 				if(k!= j)
-					cp+=MeshTools::getClosestPoint(ms[k],p);//,Ts[k],Tis[k]);
+					cp+=MeshTools::get_closest_point(ms[k],p);//,Ts[k],Tis[k]);
 			}
 			rs[j]->positions()[i] = cp/static_cast<float>(ms.size());
 		}
 
-		VertexData* vd = rs[j]->toVertexData();
+		VertexData* vd = rs[j]->to_VertexData();
 		VertexDataOperations::write_to_file(vd,std::to_string(j)+".obj");
 		delete vd;
 		delete rs[j];
