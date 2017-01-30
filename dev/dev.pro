@@ -39,7 +39,8 @@ HEADERS += \
 	protocol.h \
 	tnvb.h \
 	types.h \
-	dll.h
+	dll.h \
+    keys.h
 
 SOURCES += \
 	ogl_geo.cpp \

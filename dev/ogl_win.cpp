@@ -26,7 +26,7 @@ Win::~Win()
 
 void Win::init()
 {
-	m_display = XOpenDisplay( ":0.0");
+	m_display = XOpenDisplay(nullptr);
 	if ( !m_display )
 		printf( "Cannot open X display\n" );
 
@@ -147,27 +147,27 @@ void Win::process_events()
 			auto r = XLookupString(kv,chars,4,&sym,nullptr);
 
 			if(sym==Key::LEFT_SHIFT || sym==Key::RIGHT_SHIFT)
-				m_key_modifiers=m_key_modifiers| OFL_SHIFT;
+				m_key_modifiers=m_key_modifiers| Key::MOD_SHIFT;
 			else if(sym==Key::LEFT_CONTROL || sym==Key::RIGHT_CONTROL)
-				m_key_modifiers=m_key_modifiers| OFL_CTRL;
+				m_key_modifiers=m_key_modifiers| Key::MOD;
 			else if(sym==Key::LEFT_ALT || sym==Key::RIGHT_ALT)
-				m_key_modifiers=m_key_modifiers| OFL_ALT;
+				m_key_modifiers=m_key_modifiers| Key::MOD;
 			else if(sym==Key::LEFT_SUPER || sym==Key::RIGHT_SUPER)
-				m_key_modifiers=m_key_modifiers| OFL_SUPER;
+				m_key_modifiers=m_key_modifiers| Key::MOD_SUPER;
 
 			uint kc = sym&0x1ff;
 
 			if(m_key_states[kc])
 			{
-				inject_event_key_change(kc,OFL_REPEAT,m_key_modifiers,kv->keycode);
+				inject_event_key_change(kc,Key::REPEAT,m_key_modifiers,kv->keycode);
 				if(r)
-					inject_event_character_input(static_cast<uint32_t>(chars[0]),OFL_REPEAT,m_key_modifiers);
+					inject_event_character_input(static_cast<uint32_t>(chars[0]),Key::REPEAT,m_key_modifiers);
 			}
 			else
 			{
-				inject_event_key_change(kc,OFL_PRESSED,m_key_modifiers,kv->keycode);
+				inject_event_key_change(kc,Key::PRESSED,m_key_modifiers,kv->keycode);
 				if(r)
-					inject_event_character_input(static_cast<uint32_t>(chars[0]),OFL_PRESSED,m_key_modifiers);
+					inject_event_character_input(static_cast<uint32_t>(chars[0]),Key::PRESSED,m_key_modifiers);
 				m_key_states[kc] = true;
 			}
 
@@ -182,16 +182,16 @@ void Win::process_events()
 			XLookupString(kv,chars,4,&sym,nullptr);
 
 			if(sym==Key::LEFT_SHIFT || sym==Key::RIGHT_SHIFT)
-				m_key_modifiers=m_key_modifiers &~static_cast<uint>(OFL_SHIFT);
+				m_key_modifiers=m_key_modifiers &~static_cast<uint>(Key::MOD_SHIFT);
 			else if(sym==Key::LEFT_CONTROL || sym==Key::RIGHT_CONTROL)
-				m_key_modifiers=m_key_modifiers &~static_cast<uint>(OFL_CTRL);
+				m_key_modifiers=m_key_modifiers &~static_cast<uint>(Key::MOD);
 			else if(sym==Key::LEFT_ALT || sym==Key::RIGHT_ALT)
-				m_key_modifiers=m_key_modifiers & ~static_cast<uint>(OFL_ALT);
+				m_key_modifiers=m_key_modifiers & ~static_cast<uint>(Key::MOD);
 			else if(sym==Key::LEFT_SUPER || sym==Key::RIGHT_SUPER)
-				m_key_modifiers=m_key_modifiers & ~static_cast<uint>(OFL_SUPER);
+				m_key_modifiers=m_key_modifiers & ~static_cast<uint>(Key::MOD_SUPER);
 
 			uint kc = sym&0x1ff;
-			inject_event_key_change(kc,OFL_RELEASED,m_key_modifiers,kv->keycode);
+			inject_event_key_change(kc,Key::RELEASED,m_key_modifiers,kv->keycode);
 			m_key_states[kc]=false;
 		}
 		else if (event.type == ResizeRequest)
@@ -208,11 +208,13 @@ void Win::process_events()
 		}
 		else if(event.type == ButtonPress)
 		{
-			inject_event_mouse_button(event.xbutton.button,OFL_PRESSED,m_key_modifiers);
+			const auto& bev = event.xbutton;
+			inject_event_mouse_button(bev.button,Key::PRESSED,m_key_modifiers,bev.x,bev.y);
 		}
 		else if(event.type == ButtonRelease)
 		{
-			inject_event_mouse_button(event.xbutton.button,OFL_RELEASED,m_key_modifiers);
+			const auto& bev = event.xbutton;
+			inject_event_mouse_button(bev.button,Key::RELEASED,m_key_modifiers,bev.x,bev.y);
 		}
 		else
 		{
@@ -222,6 +224,54 @@ void Win::process_events()
 
 
 	}
+}
+
+void Win::inject_event_window(Win::WindowEvent event)
+{
+	for(auto l : m_listeners)
+		l->event_window(event);
+}
+
+void Win::inject_event_moved(const int x, const int y)
+{
+	for(auto l : m_listeners)
+		l->event_moved(x,y);
+}
+
+void Win::inject_event_resized(const int w, const int h)
+{
+	for(auto l : m_listeners)
+		l->event_resized(w,h);
+}
+
+void Win::inject_event_key_change(const Key key, const int action, const uint mods, const uint scancode)
+{
+	for(auto l : m_listeners)
+		l->event_key_change(key,action,mods,scancode);
+}
+
+void Win::inject_event_character_input(const unsigned int c, const Key::KeyActions action, const uint mods)
+{
+	for(auto l : m_listeners)
+		l->event_character_input(c,action,mods);
+}
+
+void Win::inject_event_mouse_button(const uint button, const Key::KeyActions action, const uint mods, const double x, const double y)
+{
+	for(auto l : m_listeners)
+		l->event_mouse_button(button,action,mods,x,y);
+}
+
+void Win::inject_event_mouse_scroll(const double x_scroll, const double y_scroll)
+{
+	for(auto l : m_listeners)
+		l->event_mouse_scroll(x_scroll,y_scroll);
+}
+
+void Win::inject_event_mouse_move(const double x, const double y)
+{
+	for(auto l : m_listeners)
+		l->event_mouse_move(x,y);
 }
 
 GLXContext createContext(Display *display, int screen, GLXFBConfig fbconfig, XVisualInfo *visinfo, ::Window window, int majorv, int minorv, bool core, bool debug)
