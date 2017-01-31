@@ -40,7 +40,8 @@ HEADERS += \
 	tnvb.h \
 	types.h \
 	dll.h \
-    keys.h
+    ogl_app.h \
+    user_io.h
 
 SOURCES += \
 	ogl_geo.cpp \

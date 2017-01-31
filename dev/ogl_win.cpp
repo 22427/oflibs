@@ -20,7 +20,8 @@ Win::~Win()
 	XFree(m_fbcfg);
 	XDestroyWindow(m_display,m_win);
 	XCloseDisplay(m_display);
-	memset(m_key_states,0,512);
+	memset(m_key_states,0,Key::MAX_KEYS);
+	memset(m_button_states,0,16);
 	m_key_modifiers = 0;
 };
 
@@ -31,7 +32,7 @@ void Win::init()
 		printf( "Cannot open X display\n" );
 
 	m_screen   = DefaultScreen( m_display );
-	::Window root_win = RootWindow( m_display, m_screen );
+	::Window m_root = RootWindow( m_display, m_screen );
 
 	if ( !glXQueryExtension( m_display, 0, 0 ) )
 		printf( "X Server doesn't support GLX extension\n" );
@@ -83,17 +84,46 @@ void Win::init()
 	winAttr.border_pixel = window_attributes.border;
 	winAttr.background_pixel = 0;
 	winAttr.background_pixmap = 0;
-	winAttr.event_mask = StructureNotifyMask | KeyPressMask | ButtonPressMask | ButtonMotionMask | PointerMotionMask | ResizeRedirectMask;
-	winAttr.colormap = XCreateColormap(m_display, root_win,m_visinfo->visual, AllocNone );
+	winAttr.event_mask  = StructureNotifyMask | ClientMessage;
+	winAttr.colormap = XCreateColormap(m_display, m_root,m_visinfo->visual, AllocNone );
+
+
+
+	if(window_attributes.event_mask & EM_MOUSE_IO)
+		winAttr.event_mask |= ButtonPressMask |ButtonReleaseMask| ButtonMotionMask | PointerMotionMask;
+	if(window_attributes.event_mask & EM_KEYBOARD_IO)
+		winAttr.event_mask |= KeyPressMask | KeyReleaseMask;
+	if(window_attributes.event_mask & EM_RESIZE)
+		winAttr.event_mask |= ResizeRedirectMask ;
+	if(window_attributes.event_mask & EM_REPOSITION)
+		winAttr.event_mask |= ConfigureNotify;
+
+
+	winAttr.event_mask = StructureNotifyMask | KeyPressMask | KeyReleaseMask |
+			PointerMotionMask | ButtonPressMask | ButtonReleaseMask |
+			ExposureMask | FocusChangeMask | VisibilityChangeMask |
+			EnterWindowMask | LeaveWindowMask | PropertyChangeMask;
+
 
 
 	unsigned int mask = CWBackPixmap | CWBorderPixel | CWColormap | CWEventMask;
 
-	m_win = XCreateWindow ( m_display, root_win,
+	m_win = XCreateWindow ( m_display, m_root,
 							window_attributes.pos_x, window_attributes.pos_y,
 							window_attributes.width, window_attributes.height, window_attributes.border,
 							m_visinfo->depth, InputOutput,
 							m_visinfo->visual, mask, &winAttr ) ;
+
+
+	wm_protocols     = XInternAtom( m_display, "WM_PROTOCOLS"    , False);
+	wm_delete_window = XInternAtom( m_display, "WM_DELETE_WINDOW", False);
+	net_wm_ping = XInternAtom(m_display, "_NET_WM_PING", False);
+
+	Atom ps[] = {wm_delete_window,net_wm_ping};
+	XSetWMProtocols( m_display,m_win, ps, 2);
+
+
+
 	// set the window title
 	XStoreName(m_display,m_win,window_attributes.title.c_str());
 	// set the decoration
@@ -129,7 +159,7 @@ void Win::init()
 
 void Win::process_events()
 {
-	while ( XEventsQueued( m_display, QueuedAfterFlush ) )
+	while (XPending(m_display))//XEventsQueued( m_display, QueuedAfterFlush ) )
 	{
 		XEvent    event;
 		XNextEvent( m_display, &event );
@@ -209,20 +239,58 @@ void Win::process_events()
 		else if(event.type == ButtonPress)
 		{
 			const auto& bev = event.xbutton;
-			inject_event_mouse_button(bev.button,Key::PRESSED,m_key_modifiers,bev.x,bev.y);
+			if(m_button_states[bev.button])
+				inject_event_mouse_button(bev.button,Key::REPEAT,m_key_modifiers,bev.x,bev.y);
+			else
+			{
+				inject_event_mouse_button(bev.button,Key::PRESSED,m_key_modifiers,bev.x,bev.y);
+				m_button_states[bev.button] = true;
+			}
 		}
 		else if(event.type == ButtonRelease)
 		{
 			const auto& bev = event.xbutton;
 			inject_event_mouse_button(bev.button,Key::RELEASED,m_key_modifiers,bev.x,bev.y);
+			m_button_states[bev.button] = false;
+		}
+		else if(event.type == ClientMessage)
+		{
+			const auto & c = event.xclient;
+			Atom protocol = None;
+			if(c.message_type == wm_protocols)
+			{
+				protocol = c.data.l[0];
+				if (protocol == None)
+					return;
+			}
+
+			if (protocol == wm_delete_window)
+			{
+				inject_event_window(WIN_CLOSE);
+			}
+			else if (protocol == net_wm_ping)
+			{
+				// The window manager is checking if we are still here ...
+				// lets say yes!
+				XEvent reply = event;
+				reply.xclient.window = m_root;
+
+				XSendEvent(m_display, m_root,
+						   False,
+						   SubstructureNotifyMask | SubstructureRedirectMask,
+						   &reply);
+			}
+
+
+		}
+		else if(event.type == PropertyNotify)
+		{
+			// todo handle this ....
 		}
 		else
 		{
-			printf("unknown: %d\n",event.type);
+			// handle other events
 		}
-
-
-
 	}
 }
 
@@ -235,46 +303,46 @@ void Win::inject_event_window(Win::WindowEvent event)
 void Win::inject_event_moved(const int x, const int y)
 {
 	for(auto l : m_listeners)
-		l->event_moved(x,y);
+		l->event_window_moved(x,y);
 }
 
 void Win::inject_event_resized(const int w, const int h)
 {
 	for(auto l : m_listeners)
-		l->event_resized(w,h);
+		l->event_window_resized(w,h);
 }
 
 void Win::inject_event_key_change(const Key key, const int action, const uint mods, const uint scancode)
 {
-	for(auto l : m_listeners)
-		l->event_key_change(key,action,mods,scancode);
+	if(on_key_change)
+		on_key_change(key,action,mods,scancode);
 }
 
 void Win::inject_event_character_input(const unsigned int c, const Key::KeyActions action, const uint mods)
 {
-	for(auto l : m_listeners)
-		l->event_character_input(c,action,mods);
+	if(on_char_input)
+		on_char_input(c,action,mods);
 }
 
 void Win::inject_event_mouse_button(const uint button, const Key::KeyActions action, const uint mods, const double x, const double y)
 {
-	for(auto l : m_listeners)
-		l->event_mouse_button(button,action,mods,x,y);
+	if(on_mouse_button)
+		on_mouse_button(button,action,mods,x,y);
 }
 
 void Win::inject_event_mouse_scroll(const double x_scroll, const double y_scroll)
 {
-	for(auto l : m_listeners)
-		l->event_mouse_scroll(x_scroll,y_scroll);
+	if(on_mouse_scroll)
+		on_mouse_scroll(x_scroll,y_scroll);
 }
 
 void Win::inject_event_mouse_move(const double x, const double y)
 {
-	for(auto l : m_listeners)
-		l->event_mouse_move(x,y);
+	if(on_mouse_move)
+		on_mouse_move(x,y);
 }
 
-GLXContext createContext(Display *display, int screen, GLXFBConfig fbconfig, XVisualInfo *visinfo, ::Window window, int majorv, int minorv, bool core, bool debug)
+GLXContext createContext(Display *display, int screen, GLXFBConfig fbconfig, int majorv, int minorv, bool core, bool debug)
 {
 #define GLX_CONTEXT_MAJOR_VERSION_ARB       0x2091
 #define GLX_CONTEXT_MINOR_VERSION_ARB       0x2092
@@ -284,34 +352,13 @@ GLXContext createContext(Display *display, int screen, GLXFBConfig fbconfig, XVi
 	//   Create an old-style GLX context first, to get the correct function ptr.
 	glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
 
-	GLXContext ctx_old = glXCreateContext( display, visinfo, 0, True );
-	if ( !ctx_old )
-	{
-		printf( "Could not even allocate an old-style GL context!\n" );
-		return nullptr;
-	}
-
-
-	glXMakeCurrent ( display, window, ctx_old ) ;
-
-	// Verify that GLX implementation supports the new context create call
 	if ( strstr( glXQueryExtensionsString( display, screen ),
 				 "GLX_ARB_create_context" ) != 0 )
 		glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)
 				glXGetProcAddress( (const GLubyte *) "glXCreateContextAttribsARB" );
 
-	if ( !glXCreateContextAttribsARB )
-	{
-		printf( "Can't create new-style GL context\n" );
-		exit(1);
-	}
-
-	// Got the pointer.  Nuke old context.
-	glXMakeCurrent( display, None, 0 );
-	glXDestroyContext( display, ctx_old );
 
 	static int context_attribs[12];
-
 
 	context_attribs[0] = GLX_CONTEXT_MAJOR_VERSION_ARB;  context_attribs[1] =majorv;
 	context_attribs[2] = GLX_CONTEXT_MINOR_VERSION_ARB;  context_attribs[3] =minorv;
@@ -355,8 +402,6 @@ void GLContext::init()
 				m_window->m_display,
 				m_window->m_screen,
 				m_window->m_fbcfg,
-				m_window->m_visinfo,
-				m_window->m_win,
 				opengl_version_major,
 				opengl_version_minor,
 				opengl_profile==CORE,
@@ -410,6 +455,7 @@ Win::WindowAttributes::WindowAttributes()
 	stereo = false;
 	srgb = false ;
 	double_buffer = true;
+	event_mask = 0;
 }
 
 #else

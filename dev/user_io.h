@@ -7,6 +7,8 @@
 
 namespace ofl
 {
+
+
 class Key
 {
 public:
@@ -160,4 +162,25 @@ public:
 #else
 TODO Windows
 #endif
+
+
+class UserIOListeners
+{
+public:
+	virtual void event_keyboard(const Key /*key*/,const int /*action*/,const  uint /*mods*/,const  uint /*scancode*/){}
+	virtual void event_character(const unsigned int /*c*/,const  Key::KeyActions /*action*/,const  uint /*mods*/){}
+	virtual void event_mouse_button(const uint /*button*/, const int /*action*/,const uint /*mods*/,const double /*x*/, const double /*y*/){}
+	virtual void event_mouse_scroll(double /*xScroll*/, double /*yScroll*/){}
+	virtual void event_mouse_move(double /*x*/, double /*y*/){}
+};
+
+class UserIODevice
+{
+public:
+	virtual void add_listener(UserIOListeners* l) = 0;
+	virtual bool is_key_down(Key k) = 0;
+	virtual uint modifyer_keys() = 0;
+	virtual bool is_button_down(uint button) = 0;
+};
+
 }
