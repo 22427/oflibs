@@ -5,12 +5,13 @@
 namespace ofl
 {
 using namespace glm;
-int addPos(std::map<vec3,int,Comperator<vec3>>& map ,const vec3& pos, std::vector<vec3>& poss)
+
+int addVtx(std::map<vec3,int,Comperator<vec3>>& map ,const vec3& pos, std::vector<MeshVertex>& vtxs)
 {
 	if(map.find(pos)== map.end())
 	{
-		map[pos] = static_cast<int>(poss.size());
-		poss.push_back(pos);
+		map[pos] = static_cast<int>(vtxs.size());
+		vtxs.push_back(MeshVertex(pos));
 	}
 	return  map[pos];
 }
@@ -22,65 +23,144 @@ Mesh::Mesh(const VertexData *vd)
 	if(vd->primitive() != TRIANGLES)
 		fprintf(stderr,"Mesh can only be created from TRIANGLE based vertex data!\n");
 	std::map<vec3,int,Comperator<vec3>> pmap;
-	Triangle tri(0,0,0);
+	MeshTriangle tri(0,0,0);
 
 	std::vector<vec4> colors = vd->get_all_attributes(ATTRIB_COLOR);
 
 	const auto pd = vd->get_all_attributes(ATTRIB_POSITION);
 	const auto id = vd->get_all_indices();
-	m_colors.resize(vd->vertex_count(),vec4(1.0f));
+
 	for(uint i = 0 ; i < vd->index_count();i+=3)
 	{
 		for(uint j =0 ; j<3;j++)
 		{
-			tri(j) = addPos(pmap,vec3(pd[id[i+j]]),m_positions);
-			if(!m_colors.empty())
-				m_colors[tri(j)] = colors[id[i+j]];
+			tri(j) = addVtx(pmap,vec3(pd[id[i+j]]),m_verts);
+
 		}
 		m_triangles.push_back(tri);
 	}
-	build_data_structure();
+	rebuild_data_structure();
 }
 
-VertexData* Mesh::to_VertexData()
+
+
+void Mesh::remove_rogue_elements()
 {
-	VertexConfiguration cfg;
-	cfg.add_attribute(Attribute(ATTRIB_POSITION,3,FLOAT,false));
-	VertexData* vd = new VertexData(TRIANGLES,cfg,UNSIGNED_INT);
-	vd->vertices_reserve(m_positions.size());
-	Vertex v(cfg,nullptr);
-	for(const vec3& p :m_positions)
+	std::vector<uint> missings;
+	uint i = 0;
+	for (const auto& ptt : m_vert2tris)
 	{
-		v.set_value(ATTRIB_POSITION,p);
-		vd->push_back(v);
+		if(ptt.empty())
+			missings.push_back(i);
+		i++;
 	}
-	vd->indices_reserve(m_triangles.size()*3);
-	for(const Triangle& t : m_triangles)
+
+	for(auto i : missings)
 	{
-		for(int i  =0 ; i<3;i++)
-			vd->push_back(static_cast<uint32_t>(t(i)));
+		m_verts.erase(m_verts.begin()+i);
 	}
-	return vd;
+
+	std::vector<uint> missing_tris;
+	i = 0;
+	for(auto& t:  m_triangles)
+	{
+		if(!t.valid())
+		{
+			missing_tris.push_back(i);
+			continue;
+		}
+		for(auto& v : t)
+		{
+			int to_rem = 0;
+			for(auto j : missings)
+			{
+				if(v> j)
+					to_rem--;
+			}
+			v+=to_rem;
+		}
+	}
+
+	for(auto i : missing_tris)
+	{
+		m_triangles.erase(m_triangles.begin()+i);
+	}
+
+	rebuild_data_structure();
 }
 
-int corner_add(int c,int a)
+void Mesh::delete_triangle(int triangle_id)
 {
-	int  t = c/3;
-	return t*3 + ((c%3)+a)%3;
-};
+	if(triangle_id <0 )
+		return;
 
-std::vector<int> Mesh::adjacent_triangles(int vertex)
+	auto& t = m_triangles[triangle_id];
+	for(const auto v : t)
+	{
+		m_vert2tris[v].erase(triangle_id);
+		recalc_v2v(v);
+	}
+	m_triangles[triangle_id] = MeshTriangle(); // make all vertices invalid
+}
+
+void Mesh::delete_vertex(int vertex_id)
 {
-	return std::vector<int>(m_pos2tris[vertex].begin(), m_pos2tris[vertex].end());
+	if(vertex_id<0)
+		return;
+	// delete every adjacent triangle
+	for(const auto ti : m_vert2tris[vertex_id])
+	{
+		delete_triangle(ti);
+	}
+}
+
+uint Mesh::add_triangle(const MeshVertex &a, const MeshVertex &b, const MeshVertex &c)
+{
+	MeshTriangle nt(add_vertex(a),add_vertex(b),add_vertex(c));
+	return add_triangle(nt);
+}
+
+uint Mesh::add_triangle(const MeshTriangle &nt)
+{
+	const uint r = m_triangles.size();
+	m_triangles.push_back(nt);
+
+	for(int i = 0 ; i< 3;i++)
+	{
+		m_vert2vert[nt(i)].insert(nt((i+1)%3));
+		m_vert2vert[nt(i)].insert(nt((i+2)%3));
+
+		m_vert2tris[nt(i)].insert(r);
+	}
+	return r;
+}
+
+uint Mesh::add_vertex(const MeshVertex &vtx)
+{
+	auto f = m_vertex_id_from_position.find(vtx.pos);
+	if(f != m_vertex_id_from_position.end())
+	{
+		m_verts[(*f).second] = vtx;
+		return (*f).second;
+	}
+	const uint r = m_verts.size();
+	m_verts.push_back(vtx);
+	m_vert2tris.push_back(std::set<uint>());
+	m_vert2vert.push_back(std::set<uint>());
+	m_vertex_id_from_position[vtx.pos] = r;
+
+	return  r;
 }
 
 
-
-std::vector<int> Mesh::adjacent_vertices(int vertex)
+std::set<uint> Mesh::adjacent_triangles(int vertex_id)
 {
+	return m_vert2tris[vertex_id];
+}
 
-	return std::vector<int>(m_pos2pos[vertex].begin(), m_pos2pos[vertex].end());
-
+std::set<uint> Mesh::adjacent_vertices(int vertex_id)
+{
+	return m_vert2vert[vertex_id];
 }
 
 template<typename T>
@@ -96,101 +176,72 @@ std::set<T> intersect(const std::set<T>& a,const std::set<T>&b )
 }
 
 
-void Mesh::build_data_structure()
+void Mesh::recalc_v2v(uint vertex_id)
+{
+	if(vertex_id==OFL_INVALID_VERTEX)
+		return;
+	auto& ptp = m_vert2vert[vertex_id];
+	ptp.clear();
+	for(const auto ti : m_vert2tris[vertex_id])
+	{
+		for(const auto v : m_triangles[ti])
+		{
+			if(v!=vertex_id)
+				ptp.insert(v);
+		}
+	}
+}
+
+void Mesh::rebuild_data_structure()
 {
 	int ct = 0;
+	m_vert2vert.resize(m_verts.size());
+	m_vert2tris.resize(m_verts.size());
+
+	m_vertex_id_from_position.clear();
+	for(uint i = 0 ; i< m_verts.size();i++)
+	{
+		m_vertex_id_from_position[m_verts[i].pos] = i;
+	}
+
 	for(auto& t : m_triangles)
 	{
 		for(uint i =0 ; i<3;i++)
 		{
-			m_pos2tris[t(i)].insert(ct);
-			m_pos2pos[t(i)].insert(t((i+1)%3));
-			m_pos2pos[t(i)].insert(t((i+2)%3));
+			m_vert2tris[t(i)].insert(ct);
+			m_vert2vert[t(i)].insert(t((i+1)%3));
+			m_vert2vert[t(i)].insert(t((i+2)%3));
 		}
 		ct++;
-
 	}
-
-	//	for(auto& t : m_triangles)
-	//	{
-	//		std::set<Triangle*> res = intersect(m_pos2tris[t(0)],m_pos2tris[t(1)]);
-
-	//	}
-
-
-	/*m_corners.resize(m_triangles.size()*3);
-	m_vertex2corner.resize(m_positions.size(),-1);
-
-	int corners = 0;
-	for(const Triangle& t : m_triangles)
-	{
-		for(int i = 0 ; i<3;i++)
-			if(m_vertex2corner[t(i)]<0) m_vertex2corner[t(i)] = corners+i;
-
-
-		int ot = 0;
-		for(const Triangle& tt : m_triangles)
-		{
-			if(tt==t)
-			{
-				ot+=3;
-				continue;
-			}
-			int ts=0, tts=0;
-			if(t.sharedEdgeWith(tt,tts,ts))
-			{
-				int	opp =  (ot)+(tts+3-1)%3;
-				m_corners[corners+(ts+3-1)%3].opp = opp;
-				m_corners[opp].opp = corners+(ts+3-1)%3;
-
-			}
-			ot+=3;
-		}
-		corners+=3;
-	}*/
-
 }
 
-uint32_t Mesh::insert_vertex(const vec3 &v, const int t)
+void Mesh::update_triangle(int triangle_id)
 {
-	Triangle tt = m_triangles[t];
-	m_positions.push_back(v);
-	int newpos = m_positions.size()-1;
-	Triangle newts[3];
+	const auto nt = m_triangles[triangle_id];
 
-	for(int i = 0 ; i<3;i++)
+
+	for(int i = 0 ; i< 3;i++)
 	{
-		newts[i](0) = tt(i);
-		newts[i](1) = tt((i+1)%3);
-		newts[i](2) = newpos;
-		m_pos2pos[i].insert(newpos);
+		m_vert2tris[nt(i)].erase(triangle_id);
+		recalc_v2v(nt(i));
+
+		m_vert2vert[nt(i)].insert(nt((i+1)%3));
+		m_vert2vert[nt(i)].insert(nt((i+2)%3));
+		m_vert2tris[nt(i)].insert(triangle_id);
 	}
-
-	m_triangles[t] = newts[0];
-	m_triangles.push_back(newts[1]);
-	m_triangles.push_back(newts[2]);
-
-	m_pos2tris[tt(0)].insert(m_triangles.size()-1);
-	m_pos2tris[tt(1)].insert(m_triangles.size()-2);
-
-	m_pos2tris[tt(2)].insert(m_triangles.size()-1);
-	m_pos2tris[tt(2)].insert(m_triangles.size()-2);
-	m_pos2tris[tt(2)].erase(m_pos2tris[tt(2)].find(t));
-
-	return newpos;
-
 }
 
-int MeshTools::get_closest_vertex(Mesh *m, const vec3 &p)
+
+
+int MeshOps::get_closest_vertex(Mesh *m, const vec3 &p)
 {
-	if (m->positions().empty())
-		return -1;
-	float min = distance2(p,m->positions()[0]);
+	float min = distance2(p,m->vertices()[0].pos);
 	int r = 0 ;
 	int i = 0;
-	for(const auto v : m->positions())
+	for(const auto v : m->vertices())
 	{
-		const float d = distance2(p,v) ;
+		const float d = distance2(p,v.pos) ;
 		if(d<min)
 		{
 			r = i ;
@@ -253,18 +304,18 @@ vec3 triangle_cp(
 
 }
 
-int MeshTools::get_closest_triangle(Mesh *m, const vec3 &p)
+int MeshOps::get_closest_triangle(Mesh *m, const vec3 &p)
 {
-	const std::set<int> tris = m->m_pos2tris[get_closest_vertex(m,p)];
+	const std::set<uint> tris = m->m_vert2tris[get_closest_vertex(m,p)];
 
 	float min = std::numeric_limits<float>::max();
 	int res = *(tris.begin());
 	for(const int tt : tris)
 	{
-		const Triangle& t = m->m_triangles[static_cast<uint>(tt)];
-		float d = distance2(triangle_cp(m->vertex(static_cast<uint>(t(0))),
-										m->vertex(static_cast<uint>(t(1))),
-										m->vertex(static_cast<uint>(t(2))),p),p);
+		const MeshTriangle& t = m->m_triangles[static_cast<uint>(tt)];
+		float d = distance2(triangle_cp(m->vertex_position(static_cast<uint>(t(0))),
+										m->vertex_position(static_cast<uint>(t(1))),
+										m->vertex_position(static_cast<uint>(t(2))),p),p);
 		if(d < min)
 		{
 			min = d;
@@ -277,20 +328,20 @@ int MeshTools::get_closest_triangle(Mesh *m, const vec3 &p)
 }
 
 
-vec3 MeshTools::get_closest_point(Mesh *m, const vec3 &p)
+vec3 MeshOps::get_closest_point(Mesh *m, const vec3 &p)
 {
 	int cv = get_closest_vertex(m,p);
 	auto tris = m->adjacent_triangles(cv);
-	float min = distance2(m->vertex(cv),p);
-	vec3 res = m->vertex(cv);
+	float min = distance2(m->vertex_position(cv),p);
+	vec3 res = m->vertex_position(cv);
 
 	for(const auto tt : tris)
 	{
-		const Triangle &t = m->triangle(static_cast<uint>(tt));
+		const MeshTriangle &t = m->triangle(static_cast<uint>(tt));
 		auto r = triangle_cp(
-					m->vertex(static_cast<uint>(t(0))),
-					m->vertex(static_cast<uint>(t(1))),
-					m->vertex(static_cast<uint>(t(2))),p);
+					m->vertex_position(static_cast<uint>(t(0))),
+					m->vertex_position(static_cast<uint>(t(1))),
+					m->vertex_position(static_cast<uint>(t(2))),p);
 
 		float d = distance2(p,r);
 		if(d < min)
@@ -302,12 +353,12 @@ vec3 MeshTools::get_closest_point(Mesh *m, const vec3 &p)
 	return res;
 }
 
-vec3 MeshTools::get_closest_point(Mesh *m, const vec3 &p, const std::vector<mat4> &Ts, const std::vector<mat4> &Tis)
+vec3 MeshOps::get_closest_point(Mesh *m, const vec3 &p, const std::vector<mat4> &Ts, const std::vector<mat4> &Tis)
 {
 	int cv = get_closest_vertex(m,p);
 	auto tris = m->adjacent_triangles(static_cast<uint>(cv));
-	float min = distance2(m->vertex(cv),p);
-	vec3 res = m->vertex(cv);
+	float min = distance2(m->vertex_position(cv),p);
+	vec3 res = m->vertex_position(cv);
 
 	for(const auto tt : tris)
 	{
@@ -322,17 +373,17 @@ vec3 MeshTools::get_closest_point(Mesh *m, const vec3 &p, const std::vector<mat4
 	return res;
 }
 
-Mesh *MeshTools::merge(const Mesh *a, const Mesh *b)
+Mesh *MeshOps::merge(const Mesh *a, const Mesh *b)
 {
 	Mesh* res = new Mesh(*a);
-	for(const glm::vec3 p : b->m_positions)
+	for(const auto& v : b->m_verts)
 	{
-		res->insert_vertex(p,get_closest_triangle(res,p));
+		MeshOps::insert_vertex(res,v,get_closest_triangle(res,v.pos));
 	}
 	return res;
 }
 
-Mesh *MeshTools::average_surfaces(const std::vector<Mesh *> ms)
+Mesh *MeshOps::average_surfaces(const std::vector<Mesh *> ms)
 {
 	std::vector<Mesh *> rs;
 	std::vector<std::vector<mat4>> Ts(ms.size());
@@ -352,8 +403,8 @@ Mesh *MeshTools::average_surfaces(const std::vector<Mesh *> ms)
 #pragma omp parallel for
 		for(uint it=0 ; it <m->m_triangles.size();it++)
 		{
-			const Triangle& t = m->m_triangles[it];
-			tTs[it] = (calcT(m->vertex(t(0)),m->vertex(t(1)),m->vertex(t(2))));
+			const MeshTriangle& t = m->m_triangles[it];
+			tTs[it] = (calcT(m->vertex_position(t(0)),m->vertex_position(t(1)),m->vertex_position(t(2))));
 			tTis[it] = (inverse(tTs.back()));
 		}
 
@@ -364,21 +415,21 @@ Mesh *MeshTools::average_surfaces(const std::vector<Mesh *> ms)
 	for(uint j = 0 ; j< ms.size();j++)
 	{
 #pragma omp parallel for
-		for(uint i = 0 ; i< ms[j]->positions().size(); i++)
+		for(uint i = 0 ; i< ms[j]->vertices().size(); i++)
 		{
-			const vec3& p  = ms[j]->positions()[i];
+			const vec3& p  = ms[j]->vertices()[i].pos;
 			vec3 cp = p;
 			for( uint k = 0 ; k<ms.size();k++)
 			{
 				if(k!= j)
-					cp+=MeshTools::get_closest_point(ms[k],p);//,Ts[k],Tis[k]);
+					cp+=MeshOps::get_closest_point(ms[k],p);//,Ts[k],Tis[k]);
 			}
-			rs[j]->positions()[i] = cp/static_cast<float>(ms.size());
+			rs[j]->vertices()[i].pos = cp/static_cast<float>(ms.size());
 		}
 
-		VertexData* vd = rs[j]->to_VertexData();
-		VertexDataOperations::write_to_file(vd,std::to_string(j)+".obj");
-		delete vd;
+//		VertexData* vd = rs[j]->to_VertexData();
+//		VertexDataOperations::write_to_file(vd,std::to_string(j)+".obj");
+//		delete vd;
 		delete rs[j];
 	}
 
@@ -388,7 +439,53 @@ Mesh *MeshTools::average_surfaces(const std::vector<Mesh *> ms)
 
 }
 
+VertexData *MeshOps::to_VertexData(const Mesh *m)
+{
+	VertexConfiguration cfg;
+	cfg.add_attribute(Attribute(ATTRIB_POSITION,3,FLOAT,false));
+	cfg.add_attribute(Attribute(ATTRIB_COLOR,4,FLOAT,false));
 
+	VertexData* vd = new VertexData(TRIANGLES,cfg,UNSIGNED_INT);
+	vd->vertices_reserve(m->m_verts.size());
+
+	Vertex v(cfg,nullptr);
+	for(const auto& mv :m->m_verts)
+	{
+		v.set_value(ATTRIB_POSITION,mv.pos);
+		v.set_value(ATTRIB_COLOR,mv.color);
+		vd->push_back(v);
+	}
+
+	vd->indices_reserve(m->m_triangles.size()*3);
+	for(const MeshTriangle& t : m->m_triangles)
+	{
+		for(int i  =0 ; i<3;i++)
+			vd->push_back(static_cast<uint32_t>(t(i)));
+	}
+	return vd;
+}
+
+uint32_t MeshOps::insert_vertex(Mesh *m, const MeshVertex &v, const int t)
+{
+	auto vid = m->add_vertex(v);
+	MeshTriangle tt = m->m_triangles[t];
+
+	MeshTriangle newts[3];
+
+	newts[0] = MeshTriangle(tt(0),tt(1),vid);
+	newts[1] = MeshTriangle(tt(1),tt(2),vid);
+	newts[2] = MeshTriangle(tt(2),tt(0),vid);
+
+	// instead of deleting to old triangle, reuse it as the first one!
+	m->m_triangles[t] = tt;
+	m->update_triangle(t);
+
+	// add the two new ones.
+	m->add_triangle(newts[1]);
+	m->add_triangle(newts[2]);
+	return vid;
+
+}
 
 
 

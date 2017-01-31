@@ -7,43 +7,48 @@
 #include <set>
 namespace ofl {
 
+#ifndef OFL_INVALID_VERTEX
+#define OFL_INVALID_VERTEX 0xFFFFFFFF
+#endif
 
-class Corner
+class MeshVertex
 {
 public:
-	int opp;
-
-	Corner(int o = -1) : opp(o){}
-	operator int()const {return opp;}
+	vec3 pos;
+	vec4 color;
+	MeshVertex(const float x, const float y, const float z): pos(x,y,z),color(1.0f)
+	{}
+	MeshVertex(const vec3& p,const vec4& c=vec4(1.0f)): pos(p),color(c)
+	{}
+	operator vec3() {return pos;}
+	operator const vec3() const {return pos;}
 };
 
-class Triangle
+class MeshTriangle
 {
-	friend class MeshTools;
-	int v[3];
+	friend class MeshOps;
+	uint v[3];
 public:
-	Triangle(const int a=-1, const int b=-1, const int c=-1)
+	MeshTriangle(const int a=OFL_INVALID_VERTEX,
+				 const int b=OFL_INVALID_VERTEX,
+				 const int c=OFL_INVALID_VERTEX)
 	{
 		v[0] = a;
 		v[1] = b;
 		v[2] = c;
 	}
-	int& operator()(const uint i){return v[i];}
-	const int& operator()(const uint i) const {return v[i];}
-
-	int& operator()(const int i){return v[i];}
-	const int& operator()(const int i) const {return v[i];}
-
-	int getEdgeStart(int a, int b) const
+	bool valid()
 	{
-		for(int i = 0 ; i< 3;i++)
-		{
-			if(v[i] == a && v[(i+1)%3] == b)
-				return i;
-		}
-		return -1;
+		return v[0]<OFL_INVALID_VERTEX&&v[1]<OFL_INVALID_VERTEX&&v[2]<OFL_INVALID_VERTEX;
 	}
-	bool operator ==(const Triangle& o) const
+
+	uint& operator()(const uint i){return v[i];}
+	const uint& operator()(const uint i) const {return v[i];}
+
+	uint& operator()(const int i){return v[i];}
+	const uint& operator()(const int i) const {return v[i];}
+
+	bool operator ==(const MeshTriangle& o) const
 	{
 		bool res = true;
 		for(int i = 0 ; i<3; i++)
@@ -51,131 +56,69 @@ public:
 		return res;
 	}
 
+	uint* begin(){return v;}
+	uint* end(){return v+3;}
 
-	/**
-	 * @brief sharedEdgeWith
-	 * @param o
-	 * @param so
-	 * @param st
-	 * @return
-	 */
-	bool sharedEdgeWith(const Triangle o, int& so, int& st) const
-	{
-		for(int i = 0 ; i< 3;i++)
-		{
-			so=o.getEdgeStart(v[(i+1)%3],v[i]);
-			if( so >= 0)
-			{
-				st = i;
-				return true;
-			}
-		}
-		return false;
-	}
+	const uint* begin()const {return v;}
+	const uint* end()const{return v+3;}
 };
+
+
 class Mesh
 {
 protected:
-	friend class MeshTools;
-	// per vertex attributes
-	std::vector<vec3> m_positions;
-	std::vector<vec4> m_colors;
+	friend class MeshOps;
 
-	std::vector<std::vector<vec4>> m_attributes;
-	std::vector<Triangle> m_triangles;
+	std::vector<MeshVertex> m_verts;
+	std::vector<MeshTriangle> m_triangles;
 
+	std::vector<std::set<uint>> m_vert2tris;
+	std::vector<std::set<uint>> m_vert2vert;
 
-	std::map<int, std::set<int>> m_pos2tris;
-	std::map<int, std::set<int>> m_pos2pos;
+	std::map<vec3,uint,Comperator<vec3>> m_vertex_id_from_position;
 
-	//std::vector<int> m_vertex2corner;
-	//	std::vector<Corner> m_corners;
+	void recalc_v2v(uint vertex_id);
+	void rebuild_data_structure();
+	void update_triangle(int triangle_id);
 
 public:
-	std::vector<int> adjacent_triangles(int vertex);
-	std::vector<int> adjacent_vertices(int vertex);
 
-	vec3& vertex(const uint i){return m_positions[i];}
-	const vec3& vertex(const uint i)const{return m_positions[i];}
-
-	vec4& vertex_color(const uint i){return m_colors[i];}
-	const vec4& vertex_color(const uint i)const{return m_colors[i];}
-
-	Triangle& triangle(const uint i){return m_triangles[i];}
-	const Triangle& triangle(const uint i)const{return m_triangles[i];}
-
-	void build_data_structure();
-
-	const std::vector<vec3>& positions()const {return m_positions;}
-	std::vector<vec3>& positions(){return m_positions;}
-
-	uint32_t insert_vertex(const vec3& v, const int t);
-
-
-	int add_attribute(const vec4& def_val)
-	{
-		m_attributes.push_back(std::vector<vec4>(m_positions.size(),def_val));
-	}
-
-	vec4& get_attribute(const uint32_t attrib, const uint32_t vtx)
-	{
-		return  m_attributes[attrib][vtx];
-	}
-
-	const vec4& get_attribute(const uint32_t attrib, const uint32_t vtx) const
-	{
-		return  m_attributes[attrib][vtx];
-	}
 
 	Mesh(const VertexData* vd);
-	Mesh()
-	{
+	Mesh(){}
 
-	}
-	VertexData* to_VertexData();
-	const std::vector<Triangle>& triangles()const{return  m_triangles;}
-	std::vector<Triangle>& triangles(){return  m_triangles;}
 
-	void add_triangle(const vec3& a,const vec3& b,const vec3& c, float eps = std::numeric_limits<float>::epsilon())
-	{
-		Triangle new_tri;
-		const vec3* ps[3]={&a,&b,&c};
+	std::set<glm::uint> adjacent_triangles(int vertex_id);
+	std::set<uint> adjacent_vertices(int vertex_id);
 
-		if(eps>=0)
-		{
-			int j = 0;
-			for(const auto v : m_positions)
-			{
-				for(int i = 0 ; i< 3;i++)
-				{
-					if(glm::distance2(*ps[i],v) < eps)
-						new_tri(i) = j;
-				}
-				j++;
-			}
-		}
-		for(int i = 0 ; i< 3;i++)
-		{
-			if(new_tri(i) <0 )
-			{
-				new_tri(i) = m_positions.size();
-				m_positions.push_back(*ps[i]);
-				m_colors.push_back(vec4(1.0));
-			}
-		}
+	vec3& vertex_position(const uint i){return m_verts[i].pos;}
+	const vec3& vertex_position(const uint i)const{return m_verts[i].pos;}
 
-		m_triangles.push_back(new_tri);
-		for(int i = 0 ; i< 3;i++)
-		{
-			m_pos2pos[new_tri(i)].insert(new_tri((i+1)%3));
-			m_pos2pos[new_tri(i)].insert(new_tri((i+2)%3));
-			m_pos2tris[new_tri(i)].insert(m_triangles.size()-1);
-		}
-	}
+	vec4& vertex_color(const uint i){return m_verts[i].color;}
+	const vec4& vertex_color(const uint i)const{return m_verts[i].color;}
+
+	MeshTriangle& triangle(const uint i){return m_triangles[i];}
+	const MeshTriangle& triangle(const uint i)const{return m_triangles[i];}
+
+	const std::vector<MeshVertex>& vertices()const {return m_verts;}
+	std::vector<MeshVertex>& vertices(){return m_verts;}
+
+
+	const std::vector<MeshTriangle>& triangles()const{return  m_triangles;}
+	std::vector<MeshTriangle>& triangles(){return  m_triangles;}
+
+	void remove_rogue_elements();
+
+	void delete_triangle(int triangle_id);
+	void delete_vertex(int vertex_id);
+
+	uint add_triangle(const MeshVertex& a,const MeshVertex& b,const MeshVertex& c);
+	uint add_triangle(const MeshTriangle& t);
+	uint add_vertex(const MeshVertex& vtx);
 };
 
 
-class MeshTools
+class MeshOps
 {
 public:
 
@@ -193,10 +136,13 @@ public:
 	static vec3 get_closest_point(Mesh* m, const vec3& p,
 								  const std::vector<mat4>& Ts,
 								  const std::vector<mat4>& Tis);
-	static Mesh* merge(const Mesh* a, const Mesh*b);
+
 
 	static Mesh* average_surfaces(const std::vector<Mesh*> ms);
 
+	static VertexData* to_VertexData(const Mesh* m);
 
+	static uint32_t insert_vertex(Mesh* m, const MeshVertex &v, const int t);
+	static Mesh* merge(const Mesh* a, const Mesh*b);
 };
 }
