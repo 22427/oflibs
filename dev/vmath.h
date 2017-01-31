@@ -11,6 +11,26 @@
 namespace ofl
 {
 
+
+template <typename T>
+inline bool eq(const T&a,const T&b)
+{
+	return a==b;
+}
+
+inline bool eq(const float& a,const float& b)
+{
+	return std::nextafter(a, std::numeric_limits<float>::lowest()) <= b
+		&& std::nextafter(a, std::numeric_limits<float>::max()) >= b;
+}
+
+inline bool eq(const double& a,const double& b)
+{
+	return std::nextafter(a, std::numeric_limits<double>::lowest()) <= b
+		&& std::nextafter(a, std::numeric_limits<double>::max()) >= b;
+}
+
+
 typedef glm::vec2 vec2;
 typedef glm::vec3 vec3;
 typedef glm::vec4 vec4;
@@ -121,17 +141,13 @@ public:
 
 inline bool operator<(const vec2& a , const vec2& b)
 {
-	const float eps = std::numeric_limits<float>::epsilon();
-
 	for(int j = 0 ; j< 2;j++)
 	{
-		auto e = a[j]-b[j];
-
-		if(fabsf(e) < eps)
+		if(eq(a[j],b[j]))
 			continue;
-		if(e<0)
+		if(a[j]<b[j])
 			return true;
-		if(e>0)
+		else
 			return false;
 	}
 	return  false;
@@ -140,15 +156,10 @@ inline bool operator<(const vec2& a , const vec2& b)
 
 inline bool operator==(const vec2& a , const vec2& b)
 {
-	const float eps = std::numeric_limits<float>::epsilon();
-
 	for(int j = 0 ; j< 2;j++)
 	{
-		auto e = a[j]-b[j];
-
-		if(fabsf(e) < eps)
-			continue;
-		return  false;
+		if(!eq(a[j],b[j]))
+			return  false;
 	}
 	return true;
 }
@@ -157,17 +168,14 @@ inline bool operator==(const vec2& a , const vec2& b)
 
 inline bool operator<(const vec3& a , const vec3& b)
 {
-	const float eps = std::numeric_limits<float>::epsilon();
 
 	for(int j = 0 ; j< 3;j++)
 	{
-		auto e = a[j]-b[j];
-
-		if(fabsf(e) < eps)
+		if(eq(a[j],b[j]))
 			continue;
-		if(e<0)
+		if(a[j]<b[j])
 			return true;
-		if(e>0)
+		else
 			return false;
 	}
 	return  false;
@@ -175,33 +183,24 @@ inline bool operator<(const vec3& a , const vec3& b)
 
 inline bool operator==(const vec3& a , const vec3& b)
 {
-	const float eps = std::numeric_limits<float>::epsilon();
-
 	for(int j = 0 ; j< 3;j++)
 	{
-		auto e = a[j]-b[j];
-
-		if(fabsf(e) < eps)
-			continue;
-		return  false;
+		if(!eq(a[j],b[j]))
+			return false;
 	}
-	return  true;
+	return true;
 }
 
 
 inline bool operator<(const vec4& a , const vec4& b)
 {
-	const float eps = std::numeric_limits<float>::epsilon();
-
 	for(int j = 0 ; j< 4;j++)
 	{
-		auto e = a[j]-b[j];
-
-		if(fabsf(e) < eps)
+		if(eq(a[j],b[j]))
 			continue;
-		if(e<0)
+		if(a[j]<b[j])
 			return true;
-		if(e>0)
+		else
 			return false;
 	}
 	return false;
@@ -209,17 +208,12 @@ inline bool operator<(const vec4& a , const vec4& b)
 
 inline bool operator==(const vec4& a , const vec4& b)
 {
-	const float eps = std::numeric_limits<float>::epsilon();
-
 	for(int j = 0 ; j< 4;j++)
 	{
-		auto e = a[j]-b[j];
-
-		if(fabsf(e) < eps)
-			continue;
-		return  false;
+		if(!eq(a[j],b[j]))
+			return false;
 	}
-	return false;
+	return true;
 }
 
 template<typename T>
@@ -228,7 +222,7 @@ class Comperator
 public:
 	bool operator()(const T& a, const T&b)
 	{
-		return a <b;
+		return a < b;
 	}
 };
 
