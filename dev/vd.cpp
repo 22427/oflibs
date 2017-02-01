@@ -1742,7 +1742,6 @@ VertexData *VertexDataOperations::read_off(FILE *f)
 
 	}
 	tkn.set_base(nullptr);
-	fclose(f);
 	if(line)
 		free(line);
 	return vd;
