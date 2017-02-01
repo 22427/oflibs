@@ -41,7 +41,8 @@ HEADERS += \
 	types.h \
 	dll.h \
     ogl_app.h \
-    user_io.h
+    user_io.h \
+    ogl_utils.h
 
 SOURCES += \
 	ogl_geo.cpp \

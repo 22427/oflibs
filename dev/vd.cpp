@@ -45,7 +45,7 @@ bool Attribute::read(const void *zero, vec4 &res) const
 	}
 	else if( type == UNSIGNED_BYTE )
 	{
-		const ubyte* v = reinterpret_cast<const ubyte*>(zero) + offset;
+		const ubyte* v = reinterpret_cast<const ubyte*>(zero);
 		for(int i = 0 ; i<elems;i++)
 			res[i] = normalized? nint_to_float(v[i]): v[i];
 	}

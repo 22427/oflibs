@@ -290,7 +290,7 @@ VertexData *VertexDataManufactory::createCoordinateSystem()
 	return this->finish();
 }
 
-vec2 colorTexCoordFramPosition(const vec3 &pos, const float &offset)
+vec2 colorTexCoordFromPosition(const vec3 &pos, const float &offset)
 {
 	const float pi = 3.14159265359f;
 	vec2 uv = vec2(pos.x, pos.y);
@@ -349,7 +349,7 @@ VertexData *VertexDataManufactory::create_uv_sphere(float radius, unsigned int s
 			for (int i = 0; i < 4;i++)
 			{
 				pos[i] = glm::normalize(pos[i]);
-				uv[i] = colorTexCoordFramPosition(pos[i], tex_offset);
+				uv[i] = colorTexCoordFromPosition(pos[i], tex_offset);
 			}
 
 			/* Draw a quad unless you are about do draw the last and the first

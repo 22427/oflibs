@@ -29,7 +29,7 @@ Geometry::Geometry()
 }
 
 void Geometry::uploadData(VertexData *vd)
-{
+{	
 	if (m_vao)
 		glBindVertexArray(m_vao);
 

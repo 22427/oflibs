@@ -17,9 +17,10 @@ Win::Win()
 Win::~Win()
 {
 	XFree(m_visinfo);
-	XFree(m_fbcfg);
+
 	XDestroyWindow(m_display,m_win);
 	XCloseDisplay(m_display);
+
 	memset(m_key_states,0,Key::MAX_KEYS);
 	memset(m_button_states,0,16);
 	m_key_modifiers = 0;
@@ -157,9 +158,15 @@ void Win::init()
 	}
 }
 
+void Win::add_listener(WinListener *l)
+{
+	m_listeners.push_back(l);
+}
+
 void Win::process_events()
 {
-	while (XPending(m_display))//XEventsQueued( m_display, QueuedAfterFlush ) )
+	int count = XPending(m_display);
+	while (count--)//XEventsQueued( m_display, QueuedAfterFlush ) )
 	{
 		XEvent    event;
 		XNextEvent( m_display, &event );
@@ -266,6 +273,7 @@ void Win::process_events()
 
 			if (protocol == wm_delete_window)
 			{
+				fflush(stdout);
 				inject_event_window(WIN_CLOSE);
 			}
 			else if (protocol == net_wm_ping)
@@ -418,7 +426,8 @@ void GLContext::init()
 
 	if ( ! glXMakeCurrent( m_window->m_display, m_window->m_win, m_cntxt) )
 		printf( "glXMakeCurrent failed.\n" );
-	gladLoadGL();
+	auto res = gladLoadGL();
+	printf("glad load GL: %d\n",res);
 }
 
 void GLContext::swapBuffers()

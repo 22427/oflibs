@@ -101,7 +101,7 @@ public:
 				}
 				else
 				{
-					// TODO: Do this for all types and all number of attributes.
+					// TODO: Do this for all types and element counts of attributes.
 					vec4 attrib;
 					a.read(nullptr,attrib);
 					glVertexAttrib4fv(a.attribute_id,&(attrib.x));

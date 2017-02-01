@@ -25,9 +25,19 @@ public:
 
 	virtual bool render_one_frame(double tslf_s) = 0;
 
+	void setUniform(const int location, const mat4& m)
+	{
+		glUniformMatrix4fv(location,1,GL_FALSE,glm::value_ptr(m));
+	}
+	void setUniform(const int location, const vec4& v)
+	{
+		glUniform4fv(location,1,glm::value_ptr(v));
+	}
+
 	OpenGLApplication() :m_context(&m_window),m_io(&m_window)
 	{
-
+		m_window.add_listener(this);
+		m_io.add_listener(this);
 	}
 
 	void init()
@@ -40,13 +50,20 @@ public:
 	{
 		auto start = std::chrono::high_resolution_clock::now();
 		auto finish = std::chrono::high_resolution_clock::now();
+		double time_passed = 0;
 		double tslf;
 		do
 		{
 			finish = std::chrono::high_resolution_clock::now();
 			tslf = std::chrono::duration_cast<std::chrono::duration<double>>(finish - start).count();
 			start = finish;
-			m_window.process_events();
+			time_passed+=tslf;
+
+			if(time_passed > 1.0/120.0) // limit event handling to 120 Hz.
+			{
+				time_passed -= 1.0/120.0;
+				m_window.process_events();
+			}
 		}while(render_one_frame(tslf));
 	}
 

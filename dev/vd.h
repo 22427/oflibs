@@ -1,4 +1,4 @@
-
+#pragma once
 #include <glm/glm.hpp>
 #include <cstring>
 
@@ -29,10 +29,10 @@ enum Primitive
 enum AttributeID
 {
 	ATTRIB_POSITION =0,
-	ATTRIB_NORMAL,
-	ATTRIB_TEXCOORD,
-	ATTRIB_TANGENT,
-	ATTRIB_COLOR,
+	ATTRIB_NORMAL=1,
+	ATTRIB_TEXCOORD=2,
+	ATTRIB_COLOR=3,
+	ATTRIB_TANGENT=4,
 	ATTRIB_COUNT
 };
 
@@ -275,6 +275,24 @@ public:
 	bool operator == (const Vertex& o)const;
 	bool operator != (const Vertex& o)const;
 	bool operator < (const Vertex& o)	const;
+
+	std::string to_string()
+	{
+		std::string res;
+		vec4 v;
+		for(const auto& a : cfg)
+		{
+			res += std::to_string(a.attribute_id)+" "+std::to_string(a.elements)+" x "+a.type.to_string()+" ";
+			a.read(m_data,v);
+			for(uint i = 0 ; i<a.elements;i++)
+			{
+				res+=std::to_string(v[i])+" ";
+			}
+			res+="\n";
+		}
+		return res;
+
+	}
 };
 
 

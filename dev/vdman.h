@@ -51,12 +51,21 @@ public:
 
 	VertexDataManufactory():m_v(m_cfg,nullptr)
 	{
+
+		m_attribute_state[ATTRIB_NORMAL] = vec4(0);
+		m_attribute_state[ATTRIB_TEXCOORD] = vec4(0);
+		m_attribute_state[ATTRIB_COLOR] = vec4(1.0f);
+		m_attribute_state[ATTRIB_TANGENT] = vec4(0);
+
+
 		m_cfg.add_attribute(Attribute(ATTRIB_POSITION,3,FLOAT,false,false));
 		m_cfg.add_attribute(Attribute(ATTRIB_NORMAL,3,FLOAT,false,false));
 		m_cfg.add_attribute(Attribute(ATTRIB_TEXCOORD,2,FLOAT,false,false));
-		m_cfg.add_attribute(Attribute(ATTRIB_TANGENT,3,FLOAT,false,false));
 		m_cfg.add_attribute(Attribute(ATTRIB_COLOR,4,UNSIGNED_BYTE,true,false));
-		m_v = Vertex(m_cfg,nullptr);
+		m_cfg.add_attribute(Attribute(ATTRIB_TANGENT,3,FLOAT,false,false));
+
+		set_vertex_configuration(m_cfg);
+
 		m_current_mesh = nullptr;
 		m_index_type = UNSIGNED_SHORT;
 	}
@@ -66,6 +75,7 @@ public:
 	{
 		m_cfg = cfg;
 		m_v = Vertex(m_cfg,nullptr);
+
 	}
 
 	const Type& index_type() const {return m_index_type;}

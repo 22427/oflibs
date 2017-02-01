@@ -121,6 +121,22 @@ public:
 	operator TypeID() const {return  id;}
 	operator unsigned int() const {	return  static_cast<unsigned int>(id);}
 	operator int() const {	return  static_cast<int>(id);}
+	std::string to_string() const
+	{
+		switch (id)
+		{
+		case BYTE: return "byte";
+		case UNSIGNED_BYTE: return "ubyte";
+		case SHORT: return "short";
+		case UNSIGNED_SHORT: return "ushort";
+		case INT: return "int";
+		case UNSIGNED_INT: return "uint";
+		case FLOAT: return "float";
+		case DOUBLE: return "double";
+		case INVALID: return "invalid";
+		}
+		return "invalid";
+	}
 
 	/**
 	 * @brief to_string converts this type to a string.
@@ -180,5 +196,7 @@ public:
 	 * @return the min value in double
 	 */
 	double min() const;
+
+
 };
 }

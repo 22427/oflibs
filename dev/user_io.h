@@ -158,6 +158,8 @@ public:
 	operator KeyID(){return id;}
 	operator uint32_t(){return static_cast<uint32_t>(id);}
 	operator KeySym(){return static_cast<KeySym>(id);}
+
+	bool operator ==(const Key o)const{return id == o.id;}
 };
 #else
 TODO Windows

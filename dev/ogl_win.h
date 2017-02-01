@@ -106,6 +106,7 @@ public:
 	ivec2 getPosition();
 	ivec2 getWindowSize();
 
+	void add_listener(WinListener* l);
 
 	void process_events();
 

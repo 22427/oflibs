@@ -7,6 +7,7 @@
 #include <iostream>
 #include <ostream>
 #include <istream>
+#include <fstream>
 #include <cstring>
 #include <cmath>
 
@@ -300,6 +301,19 @@ template<> inline bool Tokenizer::get_token_as<glm::mat4>(
 	return r;
 }
 
+inline std::string load_file(const std::string& path)
+{
+	std::ifstream t(path);
+	if(!t.is_open())
+	{
+		return "";
+	}
+	std::string str((std::istreambuf_iterator<char>(t)),
+					 std::istreambuf_iterator<char>());
+	t.close();
+	return str;
+
+}
 
 
 namespace paths
