@@ -19,7 +19,7 @@ namespace ofl
 #endif
 
 
-std::string get_gl_error_string(const GLenum err)
+inline std::string get_gl_error_string(const GLenum err)
 {
 	switch (err)
 	{

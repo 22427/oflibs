@@ -84,7 +84,7 @@ public:
 		if(ev ==Win::WIN_CLOSE )
 			m_goon = false;
 	}
-	bool render_one_frame(double tslf_s)
+	bool render_one_frame(double /*tslf_s*/)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -105,7 +105,5 @@ int main()
 {
 	Application app;
 	app.start_rendering();
-
-
 	return 0;
 }

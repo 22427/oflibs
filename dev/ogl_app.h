@@ -34,7 +34,7 @@ public:
 		glUniform4fv(location,1,glm::value_ptr(v));
 	}
 
-	OpenGLApplication() :m_context(&m_window),m_io(&m_window)
+	OpenGLApplication() :m_io(&m_window),m_context(&m_window)
 	{
 		m_window.add_listener(this);
 		m_io.add_listener(this);

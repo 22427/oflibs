@@ -46,7 +46,7 @@ class  OFL_DLL_PUBLIC Attribute
 {
 public:
 	AttributeID attribute_id;
-	int32_t elements;
+	uint32_t elements;
 	Type type;
 	uint32_t offset;
 	bool normalized;
