@@ -1329,7 +1329,6 @@ VertexData *VertexDataOperations::read_vd(FILE *f)
 	atr.n[2] = 'r';
 	atr.n[3] = ':';
 
-
 	bd vtx;
 	vtx.n[0] = 'v';
 	vtx.n[1] = 't';
@@ -1676,14 +1675,14 @@ VertexData *VertexDataOperations::read_ply(FILE* f)
 	return vd;
 }
 
-#if 0
-VertexData *VertexDataTools::readOFF(const std::string &path)
+VertexData *VertexDataOperations::read_off(FILE *f)
 {
-	FILE* f = fopen(path.c_str(),"r");
+
 	if(!f)
 		return nullptr;
-
-	VertexData* vd = new VertexData();
+	VertexConfiguration cfg;
+	cfg.add_attribute(Attribute(ATTRIB_POSITION,3,FLOAT,false));
+	VertexData* vd = new VertexData(TRIANGLES,cfg,UNSIGNED_INT);
 	char * line = NULL;
 	size_t len = 0;
 	ssize_t read = 0;
@@ -1692,64 +1691,62 @@ VertexData *VertexDataTools::readOFF(const std::string &path)
 	uint iv = 0;
 	uint face_cnt = 0;
 	uint it= 0;
-	Vertex v;
-	Tokenizer tkn("");
+	Vertex v(cfg,nullptr);
+	Tokenizer tkn(nullptr);
 	while ((read = getline(&line, &len, f)) != -1)
 	{
-		tkn.setBase(line);
-		tkn.skipWhiteSpaces();
-		tkn.skipOverAll("OFF");
-		tkn.skipWhiteSpaces();
-		if(!tkn.getRest() || tkn.getRest()[0] == '#' || tkn.getRest()[0] == 0)
+		tkn.set_base(line);
+		tkn.skip_white_spaces();
+		tkn.skip_over_all("OFF");
+		tkn.skip_white_spaces();
+		if(!tkn.get_rest() || tkn.get_rest()[0] == '#' || tkn.get_rest()[0] == 0)
 			continue;
 
 		if(vtx_cnt == 0 && face_cnt == 0)
 		{
-			tkn.getTokenAs(vtx_cnt);
-			tkn.getTokenAs(face_cnt);
-			vd->data().reserve(vtx_cnt);
+			tkn.get_token_as(vtx_cnt);
+			tkn.get_token_as(face_cnt);
+			vd->vertices_reserve(vtx_cnt);
 		}
 		else if(iv < vtx_cnt)
 		{
-			tkn.getTokenAs(v.pos().x);
-			tkn.getTokenAs(v.pos().y);
-			tkn.getTokenAs(v.pos().z);
+			vec3 p;
+			tkn.get_token_as(p.x);
+			tkn.get_token_as(p.y);
+			tkn.get_token_as(p.z);
+			v.set_value(ATTRIB_POSITION,p);
 			vd->push_back(v);
 			iv++;
 		}
 		else if (it < face_cnt)
 		{
 			uint i = 3;
-			tkn.getTokenAs(i);
+			tkn.get_token_as(i);
 			if(it == 0)
 			{
 				if(i == 3)
-					vd->setPrimitive(TRIANGLES);
+					vd->set_primitive(TRIANGLES);
 				else if(i == 4)
-					vd->setPrimitive(QUADS);
-				vd->indices().reserve(i*face_cnt);
+					vd->set_primitive(QUADS);
+				vd->indices_reserve(i*face_cnt);
 			}
 
 			for(uint j = 0; j<i;j++)
 			{
 				uint q = 0;
-				tkn.getTokenAs(q);
+				tkn.get_token_as(q);
 				vd->push_back(q);
 			}
 			it++;
 		}
 
 	}
-	tkn.setBase(nullptr);
+	tkn.set_base(nullptr);
 	fclose(f);
 	if(line)
 		free(line);
 	return vd;
 }
-
-#endif
-
-
 
 bool VertexDataOperations::write_obj(const VertexData *vd, FILE* f)
 {
@@ -1986,7 +1983,7 @@ VertexData* VertexDataOperations::read_from_file(
 	case PLY:
 		res= read_ply(file);break;
 	case OFF:
-		//		res= readOFF(file);break;
+		res= read_off(file);break;
 	case FROM_PATH:
 		res= nullptr; break;
 	}
