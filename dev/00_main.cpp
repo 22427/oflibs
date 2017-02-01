@@ -84,10 +84,11 @@ public:
 		if(ev ==Win::WIN_CLOSE )
 			m_goon = false;
 	}
-	bool render_one_frame(double /*tslf_s*/)
+	bool render_one_frame(double tslf_s)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+		printf("tslf : %f\n",tslf_s);
+		fflush(stdout);
 		geo->draw();
 
 		this->m_context.swapBuffers();
@@ -99,6 +100,13 @@ public:
 	{
 		if(k == Key::ESCAPE || k == Key::Q)
 			m_goon = false;
+	}
+
+	void event_window_resized(const int w, const int h)
+	{
+		glViewport(0,0,w,h);
+		pm  = glm::perspective(1.0f,static_cast<float>(w)/h,0.01f,100.0f);
+		setUniform(2,pm);
 	}
 };
 int main()

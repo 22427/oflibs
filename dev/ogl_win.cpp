@@ -103,7 +103,7 @@ void Win::init()
 	winAttr.event_mask = StructureNotifyMask | KeyPressMask | KeyReleaseMask |
 			PointerMotionMask | ButtonPressMask | ButtonReleaseMask |
 			ExposureMask | FocusChangeMask | VisibilityChangeMask |
-			EnterWindowMask | LeaveWindowMask | PropertyChangeMask;
+			EnterWindowMask | LeaveWindowMask | PropertyChangeMask ;
 
 
 
@@ -156,6 +156,7 @@ void Win::init()
 						(unsigned char*) &hints,
 						sizeof(hints) / sizeof(long));
 	}
+
 }
 
 void Win::add_listener(WinListener *l)
@@ -233,11 +234,24 @@ void Win::process_events()
 		}
 		else if (event.type == ResizeRequest)
 		{
-			inject_event_resized(event.xresizerequest.width,event.xresizerequest.height);
+
 		}
 		else if(event.type == ConfigureNotify)
 		{
-			inject_event_moved(event.xconfigure.x,event.xconfigure.y);
+			if(window_attributes.width != event.xconfigure.width ||
+				window_attributes.height	!= event.xconfigure.height)
+			{
+				window_attributes.height = event.xconfigure.height;
+				window_attributes.width = event.xconfigure.width;
+				inject_event_resized(event.xconfigure.width,event.xconfigure.height);
+			}
+			else if(window_attributes.pos_x != event.xconfigure.width ||
+				window_attributes.pos_y	!= event.xconfigure.height)
+			{
+				window_attributes.pos_x = event.xconfigure.x;
+				window_attributes.pos_y = event.xconfigure.y;
+				inject_event_moved(event.xconfigure.x,event.xconfigure.y);
+			}
 		}
 		else if(event.type == MotionNotify)
 		{

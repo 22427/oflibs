@@ -85,6 +85,7 @@ protected:
 	Display * m_display;
 	Window  m_win;
 	Window  m_root;
+
 	int m_screen;
 	GLXFBConfig m_fbcfg;
 	XVisualInfo* m_visinfo;
@@ -92,10 +93,10 @@ protected:
 	bool m_key_states[Key::MAX_KEYS];
 
 	bool m_button_states[16];
-
 	Atom wm_protocols;
 	Atom wm_delete_window ;
 	Atom net_wm_ping;
+
 #else
 #endif
 public:
