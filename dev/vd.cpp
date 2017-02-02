@@ -782,6 +782,73 @@ bool Attribute::write_constant(const float v)
 	return true;
 }
 
+std::string Attribute::value_to_string(const void* zero) const
+{
+	std::string res;
+	if(use_constant)
+		zero = reinterpret_cast<const void*>(constant);
+
+	zero = static_cast<const ubyte*>(zero)+ offset;
+	const int elems = static_cast<int>(elements);
+
+	if(type == BYTE)
+	{
+		const int8_t* z = static_cast<const int8_t*>(zero);
+		for(int i = 0 ; i<elems ;i++)
+			res+=(i?" ":"")+std::to_string(z[i]);
+	}
+	else if(type == UNSIGNED_BYTE )
+	{
+		const uint8_t* z = static_cast<const uint8_t*>(zero);
+		for(int i = 0 ; i<elems ;i++)
+			res+=(i?" ":"")+std::to_string(z[i]);
+	}
+
+	else if(type == SHORT)
+	{
+		const int16_t* z = static_cast<const int16_t*>(zero);
+		for(int i = 0 ; i<elems ;i++)
+			res+=(i?" ":"")+std::to_string(z[i]);
+	}
+	else if(type == UNSIGNED_SHORT )
+	{
+		const uint16_t* z = static_cast<const uint16_t*>(zero);
+		for(int i = 0 ; i<elems ;i++)
+			res+=(i?" ":"")+std::to_string(z[i]);
+	}
+
+	else if(type == INT)
+	{
+		const int32_t* z = static_cast<const int32_t*>(zero);
+		for(int i = 0 ; i<elems ;i++)
+			res+=(i?" ":"")+std::to_string(z[i]);
+	}
+	else if(type == UNSIGNED_INT )
+	{
+		const uint32_t* z = static_cast<const uint32_t*>(zero);
+		for(int i = 0 ; i<elems ;i++)
+			res+=(i?" ":"")+std::to_string(z[i]);
+	}
+
+	else if(type == FLOAT)
+	{
+		const float* z = static_cast<const float*>(zero);
+		for(int i = 0 ; i<elems ;i++)
+			res+=(i?" ":"")+std::to_string(z[i]);
+	}
+	else if(type == DOUBLE )
+	{
+		const double* z = static_cast<const double*>(zero);
+		for(int i = 0 ; i<elems ;i++)
+			res+=(i?" ":"")+std::to_string(z[i]);
+	}
+	else
+		return "";
+
+	return  res;
+}
+
+
 
 Vertex::Vertex(const VertexConfiguration &c, void *b)
 	:m_data(b), cfg(c)
@@ -1869,9 +1936,85 @@ bool VertexDataOperations::write_obj(const VertexData *vd, FILE* f)
 	return true;
 }
 
-bool VertexDataOperations::write_ply(const VertexData */*vd*/, FILE*/*f*/)
+bool VertexDataOperations::write_ply(const VertexData *vd, FILE*f)
 {
-	return false;
+	if(!f)
+		return false;
+	fprintf(f,"ply\nformat ascii 1.0\n");
+	fprintf(f,"element vertex %d\n",vd->vertex_count());
+
+	std::string names[4];
+	std::string type;
+	for(const auto& a : vd->vertex_configuration())
+	{
+		type = a.type.to_string();
+
+		if(a.attribute_id == ATTRIB_POSITION)
+		{
+			names[0] = "x";
+			names[1] = "y";
+			names[2] = "z";
+			names[3] = "w";
+		}
+		else if(a.attribute_id == ATTRIB_NORMAL)
+		{
+			names[0] = "nx";
+			names[1] = "ny";
+			names[2] = "nz";
+			names[3] = "nw";
+		}
+		else if(a.attribute_id == ATTRIB_TEXCOORD)
+		{
+			names[0] = "s";
+			names[1] = "t";
+			names[2] = "p";
+			names[3] = "q";
+		}
+		else if(a.attribute_id == ATTRIB_COLOR)
+		{
+			names[0] = "red";
+			names[1] = "green";
+			names[2] = "blue";
+			names[3] = "alpha";
+		}
+		for(uint i = 0; i<a.elements;i++)
+			fprintf(f,"property %s %s\n",type.c_str(),names[i].c_str());
+	}
+	uint face_count = vd->index_count();
+	uint prim_count = 0;
+	if(vd->primitive()==TRIANGLE_STRIP)
+		prim_count=1;
+	else if(vd->primitive()==QUAD_STRIP)
+		prim_count=2;
+	else if(vd->primitive()==TRIANGLES)
+		prim_count=3;
+	else if(vd->primitive()==QUADS)
+		prim_count=4;
+
+	face_count/=prim_count;
+
+
+
+	fprintf(f,"element face %d\n",face_count);
+	fprintf(f,"property list uchar %s vertex_indices\n",vd->index_type().to_string().c_str());
+	fprintf(f,"end_header\n");
+
+	for(const auto& v : (*vd))
+	{
+		fprintf(f,"%s\n",v.value_to_string().c_str());
+	}
+
+	for(uint i = 0 ; i<vd->index_count();i+=prim_count)
+	{
+		fprintf(f,"%d",prim_count);
+		for(int j  = 0; j< prim_count;j++)
+		{
+			fprintf(f," %d",vd->get_index(i+j));
+		}
+		fprintf(f,"\n");
+	}
+
+	return true;
 }
 
 bool VertexDataOperations::write_off(const VertexData *vd, FILE* f)
@@ -1895,7 +2038,6 @@ bool VertexDataOperations::write_off(const VertexData *vd, FILE* f)
 		fprintf(f,"%f %f %f\n",v.x,v.y,v.z);
 	}
 
-
 	for(uint i = 0 ; i<vd->index_count(); i+= vpf)
 	{
 
@@ -1906,7 +2048,6 @@ bool VertexDataOperations::write_off(const VertexData *vd, FILE* f)
 		}
 		fprintf(f,"\n");
 	}
-	fclose(f);
 	return true;
 }
 

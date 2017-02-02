@@ -110,6 +110,8 @@ public:
 		return  !(*this==o);
 	}
 
+	std::string value_to_string(const void *zero)const;
+
 };
 
 /**
@@ -211,6 +213,15 @@ public:
 		return m_attributes.end();
 	}
 
+	auto begin()const ->decltype (m_attributes.begin())
+	{
+		return m_attributes.begin();
+	}
+	auto end()const ->decltype (m_attributes.end())
+	{
+		return m_attributes.end();
+	}
+
 };
 
 
@@ -276,22 +287,17 @@ public:
 	bool operator != (const Vertex& o)const;
 	bool operator < (const Vertex& o)	const;
 
-	std::string to_string()
+	std::string value_to_string() const
 	{
 		std::string res;
-		vec4 v;
+
+		int i = 0 ;
 		for(const auto& a : cfg)
 		{
-			res += std::to_string(a.attribute_id)+" "+std::to_string(a.elements)+" x "+a.type.to_string()+" ";
-			a.read(m_data,v);
-			for(uint i = 0 ; i<a.elements;i++)
-			{
-				res+=std::to_string(v[i])+" ";
-			}
-			res+="\n";
+			res+=(i?" ":"")+a.value_to_string(m_data);
+			i++;
 		}
 		return res;
-
 	}
 };
 
