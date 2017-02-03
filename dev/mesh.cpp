@@ -393,7 +393,7 @@ Mesh *MeshOps::merge(Mesh *a, const Mesh *b)
 	return a;
 }
 
-void MeshOps::average_surfaces(const std::vector<Mesh *> ms)
+void MeshOps::average_surfaces(std::vector<Mesh *> ms)
 {
 	//std::vector<Mesh *> rs;
 
@@ -421,6 +421,12 @@ void MeshOps::average_surfaces(const std::vector<Mesh *> ms)
 //	}
 
 
+	std::vector<Mesh *> rs;
+
+	for(uint im = 0 ; im< ms.size();im++)
+	{
+		rs.push_back(new Mesh(*(ms[im])));
+	}
 
 	for(uint j = 0 ; j< ms.size();j++)
 	{
@@ -434,8 +440,14 @@ void MeshOps::average_surfaces(const std::vector<Mesh *> ms)
 				if(k!= j)
 					cp+=MeshOps::get_closest_point(ms[k],p);//,Ts[k],Tis[k]);
 			}
-			ms[j]->vertices()[i].pos = cp/static_cast<float>(ms.size());
+			rs[j]->vertices()[i].pos = cp/static_cast<float>(ms.size());
 		}
+	}
+
+	for(uint im = 0 ; im< ms.size();im++)
+	{
+		delete ms[im];
+		ms[im] =rs[im];
 	}
 }
 

@@ -138,7 +138,7 @@ public:
 								  const std::vector<mat4>& Tis);
 
 
-	static Mesh* average_surfaces(const std::vector<Mesh*> ms);
+	static void average_surfaces(std::vector<Mesh*> ms);
 
 	static VertexData* to_VertexData(const Mesh* m);
 
