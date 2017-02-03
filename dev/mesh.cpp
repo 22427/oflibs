@@ -393,15 +393,13 @@ Mesh *MeshOps::merge(Mesh *a, const Mesh *b)
 	return a;
 }
 
-Mesh *MeshOps::average_surfaces(const std::vector<Mesh *> ms)
+void MeshOps::average_surfaces(const std::vector<Mesh *> ms)
 {
 	//std::vector<Mesh *> rs;
 
 	// Precalculating the triangle matrices !?
 //	std::vector<std::vector<mat4>> Ts(ms.size());
 //	std::vector<std::vector<mat4>> Tis(ms.size());
-
-
 //	for(uint im = 0 ; im< ms.size();im++)
 //	{
 //		const Mesh* m = ms[im];
@@ -439,18 +437,6 @@ Mesh *MeshOps::average_surfaces(const std::vector<Mesh *> ms)
 			ms[j]->vertices()[i].pos = cp/static_cast<float>(ms.size());
 		}
 	}
-
-	Mesh* result = new Mesh(*ms[0]);
-
-	for(uint j = 1 ; j< ms.size();j++)
-	{
-		merge(result,ms[j]);
-	}
-
-
-	return nullptr;
-
-
 }
 
 VertexData *MeshOps::to_VertexData(const Mesh *m)
