@@ -143,6 +143,7 @@ public:
 	static VertexData* to_VertexData(const Mesh* m);
 
 	static uint32_t insert_vertex(Mesh* m, const MeshVertex &v, const int t);
-	static Mesh* merge(const Mesh* a, const Mesh*b);
+	static Mesh* combine(const Mesh* a, const Mesh*b);
+	static Mesh* merge(Mesh* a, const Mesh*b);
 };
 }

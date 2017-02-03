@@ -373,7 +373,7 @@ vec3 MeshOps::get_closest_point(Mesh *m, const vec3 &p, const std::vector<mat4> 
 	return res;
 }
 
-Mesh *MeshOps::merge(const Mesh *a, const Mesh *b)
+Mesh *MeshOps::combine(const Mesh *a, const Mesh *b)
 {
 	Mesh* res = new Mesh(*a);
 	for(const auto& v : b->m_verts)
@@ -383,32 +383,44 @@ Mesh *MeshOps::merge(const Mesh *a, const Mesh *b)
 	return res;
 }
 
+Mesh *MeshOps::merge(Mesh *a, const Mesh *b)
+{
+
+	for(const auto& v : b->m_verts)
+	{
+		MeshOps::insert_vertex(a,v,get_closest_triangle(a,v.pos));
+	}
+	return a;
+}
+
 Mesh *MeshOps::average_surfaces(const std::vector<Mesh *> ms)
 {
-	std::vector<Mesh *> rs;
-	std::vector<std::vector<mat4>> Ts(ms.size());
-	std::vector<std::vector<mat4>> Tis(ms.size());
+	//std::vector<Mesh *> rs;
+
+	// Precalculating the triangle matrices !?
+//	std::vector<std::vector<mat4>> Ts(ms.size());
+//	std::vector<std::vector<mat4>> Tis(ms.size());
 
 
-	for(uint im = 0 ; im< ms.size();im++)
-	{
-		const Mesh* m = ms[im];
-		rs.push_back(new Mesh(*(m)));
+//	for(uint im = 0 ; im< ms.size();im++)
+//	{
+//		const Mesh* m = ms[im];
+//		rs.push_back(new Mesh(*(m)));
 
-		std::vector<mat4>& tTs = Tis[im];
-		std::vector<mat4>& tTis = Tis[im];
-		tTs.resize(m->m_triangles.size());
-		tTis.resize(m->m_triangles.size());
+//		std::vector<mat4>& tTs = Tis[im];
+//		std::vector<mat4>& tTis = Tis[im];
+//		tTs.resize(m->m_triangles.size());
+//		tTis.resize(m->m_triangles.size());
 
-#pragma omp parallel for
-		for(uint it=0 ; it <m->m_triangles.size();it++)
-		{
-			const MeshTriangle& t = m->m_triangles[it];
-			tTs[it] = (calcT(m->vertex_position(t(0)),m->vertex_position(t(1)),m->vertex_position(t(2))));
-			tTis[it] = (inverse(tTs.back()));
-		}
+//#pragma omp parallel for
+//		for(uint it=0 ; it <m->m_triangles.size();it++)
+//		{
+//			const MeshTriangle& t = m->m_triangles[it];
+//			tTs[it] = (calcT(m->vertex_position(t(0)),m->vertex_position(t(1)),m->vertex_position(t(2))));
+//			tTis[it] = (inverse(tTs.back()));
+//		}
 
-	}
+//	}
 
 
 
@@ -424,13 +436,15 @@ Mesh *MeshOps::average_surfaces(const std::vector<Mesh *> ms)
 				if(k!= j)
 					cp+=MeshOps::get_closest_point(ms[k],p);//,Ts[k],Tis[k]);
 			}
-			rs[j]->vertices()[i].pos = cp/static_cast<float>(ms.size());
+			ms[j]->vertices()[i].pos = cp/static_cast<float>(ms.size());
 		}
+	}
 
-//		VertexData* vd = rs[j]->to_VertexData();
-//		VertexDataOperations::write_to_file(vd,std::to_string(j)+".obj");
-//		delete vd;
-		delete rs[j];
+	Mesh* result = new Mesh(*ms[0]);
+
+	for(uint j = 1 ; j< ms.size();j++)
+	{
+		merge(result,ms[j]);
 	}
 
 
