@@ -393,7 +393,7 @@ Mesh *MeshOps::merge(Mesh *a, const Mesh *b)
 	return a;
 }
 
-void MeshOps::average_surfaces(std::vector<Mesh *> ms)
+void MeshOps::average_surfaces(std::vector<Mesh *>& ms)
 {
 	//std::vector<Mesh *> rs;
 
