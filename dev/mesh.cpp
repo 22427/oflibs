@@ -254,55 +254,55 @@ int MeshOps::get_closest_vertex(Mesh *m, const vec3 &p)
 
 
 
-vec3 triangle_cp(
-		const vec3& p,
-		const mat4& T,
-		const mat4& Ti)
-{
-	vec3 pt = vec3(Ti * vec4(p,1));
+//vec3 triangle_cp(
+//		const vec3& p,
+//		const mat4& T,
+//		const mat4& Ti)
+//{
+//	vec3 pt = vec3(Ti * vec4(p,1));
 
 
-	pt.z = 1.0f-pt.x-pt.y;
+//	pt.z = 1.0f-pt.x-pt.y;
 
-	if(pt.z < 0)
-	{
-		pt.z = 0;
-		vec3 diag(0.5f*sqrt(2.0f),-0.5f*sqrt(2.0f),0);
-		pt = vec3(0,1,0) + diag* dot(diag,pt-vec3(0,1,0));
-	}
+//	if(pt.z < 0)
+//	{
+//		pt.z = 0;
+//		vec3 diag(0.5f*sqrt(2.0f),-0.5f*sqrt(2.0f),0);
+//		pt = vec3(0,1,0) + diag* dot(diag,pt-vec3(0,1,0));
+//	}
 
-	pt.x = pt.x<0.0f?0.0f : (pt.x > 1? 1.0f: pt.x);
-	pt.y = pt.y<0.0f?0.0f : (pt.y > 1? 1.0f: pt.y);
+//	pt.x = pt.x<0.0f?0.0f : (pt.x > 1? 1.0f: pt.x);
+//	pt.y = pt.y<0.0f?0.0f : (pt.y > 1? 1.0f: pt.y);
 
 
-	pt.z = 0;
-	return vec3(T * vec4(pt,1));
+//	pt.z = 0;
+//	return vec3(T * vec4(pt,1));
 
-}
+//}
 
-mat4 calcT(const vec3& t1,
-		   const vec3& t2,
-		   const vec3& t3)
-{
-	vec3 a = t2-t1;
-	vec3 b = t3-t1;
-	vec3 n = cross(a,b);
-	n = normalize(n);
+//mat4 calcT(const vec3& t1,
+//		   const vec3& t2,
+//		   const vec3& t3)
+//{
+//	vec3 a = t2-t1;
+//	vec3 b = t3-t1;
+//	vec3 n = cross(a,b);
+//	n = normalize(n);
 
-	return  mat4(vec4(a,0),vec4(b,0),vec4(n,0),vec4(t1,1));
-}
-vec3 triangle_cp(
-		const vec3& t1,
-		const vec3& t2,
-		const vec3& t3,
-		const vec3& p)
-{
-	mat4 T = calcT(t1,t2,t3);
-	mat4 Ti = glm::inverse(T);
+//	return  mat4(vec4(a,0),vec4(b,0),vec4(n,0),vec4(t1,1));
+//}
+//vec3 triangle_cp(
+//		const vec3& t1,
+//		const vec3& t2,
+//		const vec3& t3,
+//		const vec3& p)
+//{
+//	mat4 T = calcT(t1,t2,t3);
+//	mat4 Ti = glm::inverse(T);
 
-	return triangle_cp(p,T,Ti);
+//	return triangle_cp(p,T,Ti);
 
-}
+//}
 
 int MeshOps::get_closest_triangle(Mesh *m, const vec3 &p)
 {
@@ -313,9 +313,11 @@ int MeshOps::get_closest_triangle(Mesh *m, const vec3 &p)
 	for(const int tt : tris)
 	{
 		const MeshTriangle& t = m->m_triangles[static_cast<uint>(tt)];
-		float d = distance2(triangle_cp(m->vertex_position(static_cast<uint>(t(0))),
-										m->vertex_position(static_cast<uint>(t(1))),
-										m->vertex_position(static_cast<uint>(t(2))),p),p);
+		mat_tri T = calc_triangle_matrix(m->vertex_position(static_cast<uint>(t(0))),
+									   m->vertex_position(static_cast<uint>(t(1))),
+									   m->vertex_position(static_cast<uint>(t(2))));
+
+		float d = distance2(closest_point(p,T),p);
 		if(d < min)
 		{
 			min = d;
@@ -337,12 +339,12 @@ vec3 MeshOps::get_closest_point(Mesh *m, const vec3 &p)
 
 	for(const auto tt : tris)
 	{
-		const MeshTriangle &t = m->triangle(static_cast<uint>(tt));
-		auto r = triangle_cp(
-					m->vertex_position(static_cast<uint>(t(0))),
-					m->vertex_position(static_cast<uint>(t(1))),
-					m->vertex_position(static_cast<uint>(t(2))),p);
+		const MeshTriangle& t = m->triangle(static_cast<uint>(tt));
+		mat_tri T = calc_triangle_matrix(m->vertex_position(static_cast<uint>(t(0))),
+									   m->vertex_position(static_cast<uint>(t(1))),
+									   m->vertex_position(static_cast<uint>(t(2))));
 
+		auto r = closest_point(p,T);
 		float d = distance2(p,r);
 		if(d < min)
 		{
@@ -353,7 +355,7 @@ vec3 MeshOps::get_closest_point(Mesh *m, const vec3 &p)
 	return res;
 }
 
-vec3 MeshOps::get_closest_point(Mesh *m, const vec3 &p, const std::vector<mat4> &Ts, const std::vector<mat4> &Tis)
+vec3 MeshOps::get_closest_point(Mesh *m, const vec3 &p, const std::vector<mat_tri> &Ts, const std::vector<mat_tri> &Tis)
 {
 	int cv = get_closest_vertex(m,p);
 	auto tris = m->adjacent_triangles(static_cast<uint>(cv));
@@ -362,7 +364,7 @@ vec3 MeshOps::get_closest_point(Mesh *m, const vec3 &p, const std::vector<mat4> 
 
 	for(const auto tt : tris)
 	{
-		auto r = triangle_cp(p,Ts[tt],Tis[tt]);
+		auto r = closest_point(p,Ts[tt],Tis[tt]);
 		float d = distance2(p,r);
 		if(d < min)
 		{
@@ -395,30 +397,7 @@ Mesh *MeshOps::merge(Mesh *a, const Mesh *b)
 
 void MeshOps::average_surfaces(std::vector<Mesh *>& ms)
 {
-	//std::vector<Mesh *> rs;
 
-	// Precalculating the triangle matrices !?
-//	std::vector<std::vector<mat4>> Ts(ms.size());
-//	std::vector<std::vector<mat4>> Tis(ms.size());
-//	for(uint im = 0 ; im< ms.size();im++)
-//	{
-//		const Mesh* m = ms[im];
-//		rs.push_back(new Mesh(*(m)));
-
-//		std::vector<mat4>& tTs = Tis[im];
-//		std::vector<mat4>& tTis = Tis[im];
-//		tTs.resize(m->m_triangles.size());
-//		tTis.resize(m->m_triangles.size());
-
-//#pragma omp parallel for
-//		for(uint it=0 ; it <m->m_triangles.size();it++)
-//		{
-//			const MeshTriangle& t = m->m_triangles[it];
-//			tTs[it] = (calcT(m->vertex_position(t(0)),m->vertex_position(t(1)),m->vertex_position(t(2))));
-//			tTis[it] = (inverse(tTs.back()));
-//		}
-
-//	}
 
 
 	std::vector<Mesh *> rs;

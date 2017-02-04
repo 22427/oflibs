@@ -1,12 +1,14 @@
 
 
 #pragma once
-
+#include <vector>
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/norm.hpp>
+
 #include <glm/gtc/type_ptr.hpp>
 
 namespace ofl
@@ -51,9 +53,18 @@ class BoundingBox3
 	vec3 m_max;
 public:
 
-	BoundingBox3():m_min(NAN),m_max(NAN)
+	BoundingBox3(const vec3& min=vec3(NAN), const vec3& max=vec3(NAN))
+		:m_min(min),m_max(max)
 	{
 	}
+
+	BoundingBox3(const float minx,const float miny,const float minz,
+				 const float maxx,const float maxy,const float maxz)
+		:m_min(minx,miny,minz),m_max(maxx,maxy,maxz)
+	{
+	}
+
+
 
 	void add_point(const vec3& p)
 	{
@@ -226,6 +237,90 @@ public:
 		return a < b;
 	}
 };
+
+
+/**
+ * @brief get_transformation Gives a transformation matrix for T*fs[i] = ts[i]
+ * @param fs 4 points in one space
+ * @param ts the same 4 points in target space
+ * @return T
+ */
+inline mat4 get_transformation(const std::vector<vec3>& fs, const std::vector<vec3>& ts)
+{
+	const mat4 F(vec4(fs[1]-fs[0],0.0f),vec4(fs[2]-fs[0],0.0f),vec4(fs[3]-fs[0],0.0f),vec4(fs[0],1.0f));
+	const mat4 T(vec4(ts[1]-ts[0],0.0f),vec4(ts[2]-ts[0],0.0f),vec4(ts[3]-ts[0],0.0f),vec4(ts[0],1.0f));
+
+	return T*glm::inverse(F) ;
+}
+
+typedef  mat4 mat_tri;
+/**
+ * @brief calc_triangle_matrix calculates the "triangel matrix" for a given triangle.
+ * @param t1 first vertex of the triangle
+ * @param t2 second vertex of the triangle
+ * @param t3 third vertex of the triangle
+ * @return the triangle matrix
+ */
+inline mat_tri calc_triangle_matrix(
+		const vec3& t1,
+		const vec3& t2,
+		const vec3& t3)
+{
+	vec3 a = t2-t1;
+	vec3 b = t3-t1;
+	vec3 n = glm::cross(a,b);
+	n = glm::normalize(n);
+
+	return  mat4(vec4(a,0),vec4(b,0),vec4(n,0),vec4(t1,1));
+}
+
+/**
+ * @brief closest_point gives the closest point to p on the triangle T
+ * @param p The point you are interested in
+ * @param T The triangle matrix
+ * @param iT T^-1
+ * @return the closest point on the triangle T
+ */
+inline vec3 closest_point(
+		const vec3& p,
+		const mat_tri& T,
+		const mat_tri& iT)
+{
+	vec3 pt = vec3(iT * vec4(p,1.0f));
+
+	pt.z = 1.0f-pt.x-pt.y;
+
+	if(pt.z < 0)
+	{
+		pt.z = 0;
+		const float f = 0.5f*sqrt(2.0f);
+		const vec3 diag(f,-f,0);
+		pt = vec3(0,1,0) + diag* glm::dot(diag,pt-vec3(0,1,0));
+	}
+
+	pt.x = pt.x<0.0f?0.0f : (pt.x > 1? 1.0f: pt.x);
+	pt.y = pt.y<0.0f?0.0f : (pt.y > 1? 1.0f: pt.y);
+	pt.z = 0;
+
+	return vec3(T * vec4(pt,1));
+}
+
+/**
+ * @brief closest_point gives the closest point to p on the triangle T
+ * @param p The point you are interested in
+ * @param T The triangle matrix
+ * @return the closest point on the triangle T
+ */
+inline vec3 closest_point(
+		const vec3& p,
+		const mat_tri& T)
+{
+	const mat4 iT = glm::inverse(T);
+	return closest_point(p,T,iT);
+}
+
+
+
 
 
 }

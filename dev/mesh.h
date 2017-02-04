@@ -11,6 +11,10 @@ namespace ofl {
 #define OFL_INVALID_VERTEX 0xFFFFFFFF
 #endif
 
+/**
+ * @brief The MeshVertex class repesents a vertex in the mesh data structure.
+ * MeshVertices are fixed size.
+ */
 class MeshVertex
 {
 public:
@@ -24,6 +28,10 @@ public:
 	operator const vec3() const {return pos;}
 };
 
+/**
+ * @brief The MeshTriangle class represents a triangle inside the mesh, referencing
+ * the vertices by their id.
+ */
 class MeshTriangle
 {
 	friend class MeshOps;
@@ -64,6 +72,11 @@ public:
 };
 
 
+/**
+ * @brief The Mesh class represents a triangle mesh, containing vertices and triangles.
+ * The used structures aren't very memory efficient, but the access times should
+ * be well enough.
+ */
 class Mesh
 {
 protected:
@@ -88,30 +101,66 @@ public:
 	Mesh(const VertexData* vd);
 	Mesh(){}
 
-
-	std::set<glm::uint> adjacent_triangles(int vertex_id);
+	/**
+	 * @brief adjacent_triangles gives access to all adjacesnt triangles to a
+	 * given vertex id
+	 * @param vertex_id
+	 * @return std::set of triangle ids for the adjacent triangles.
+	 */
+	std::set<uint> adjacent_triangles(int vertex_id);
+	/**
+	 * @brief adjacent_vertices gives access to all adjacent vertices to a
+	 * given vertex id
+	 * @param vertex_id
+	 * @return std::set of all adjacent vertices.
+	 */
 	std::set<uint> adjacent_vertices(int vertex_id);
 
-	vec3& vertex_position(const uint i){return m_verts[i].pos;}
+	/*vec3& vertex_position(const uint i){return m_verts[i].pos;}
 	const vec3& vertex_position(const uint i)const{return m_verts[i].pos;}
 
 	vec4& vertex_color(const uint i){return m_verts[i].color;}
 	const vec4& vertex_color(const uint i)const{return m_verts[i].color;}
-
+*/
 	MeshTriangle& triangle(const uint i){return m_triangles[i];}
 	const MeshTriangle& triangle(const uint i)const{return m_triangles[i];}
+
+
+	const MeshVertex& vertex(const uint id)const {return m_verts[id];}
+	MeshVertex& vertex(const uint id){return m_verts[id];}
+
 
 	const std::vector<MeshVertex>& vertices()const {return m_verts;}
 	std::vector<MeshVertex>& vertices(){return m_verts;}
 
-
 	const std::vector<MeshTriangle>& triangles()const{return  m_triangles;}
 	std::vector<MeshTriangle>& triangles(){return  m_triangles;}
 
+	/**
+	 * @brief remove_rogue_elements removes unconnected vertices and invalid
+	 * triangles. They emerge by deleting triangles or vertices. This
+	 * contains a rebuild of the internal data structures and changes the indices!
+	 */
 	void remove_rogue_elements();
 
+	/**
+	 * @brief delete_triangle deletes a triangle by removing it from the
+	 * vertex adjacent lists and marking it invalid, but it stays in the
+	 * triangle array
+	 * @param triangle_id of the triangle you wish to delete.
+	 */
 	void delete_triangle(int triangle_id);
+
+	/**
+	 * @brief delete_vertex deletes a vertex by removing it from de adjacent
+	 * vertex lists of every adjacent vertex, and marking all adjacent triangles
+	 * invalid.The vertex however stays in the vertex array until
+	 * remove_rogue_elements() is called.
+	 * @param vertex_id
+	 */
 	void delete_vertex(int vertex_id);
+
+
 
 	uint add_triangle(const MeshVertex& a,const MeshVertex& b,const MeshVertex& c);
 	uint add_triangle(const MeshTriangle& t);
@@ -135,8 +184,8 @@ public:
 
 	static vec3 get_closest_point(Mesh* m, const vec3& p);
 	static vec3 get_closest_point(Mesh* m, const vec3& p,
-								  const std::vector<mat4>& Ts,
-								  const std::vector<mat4>& Tis);
+								  const std::vector<mat_tri> &Ts,
+								  const std::vector<mat_tri> &Tis);
 
 
 	static void average_surfaces(std::vector<Mesh *>& ms);
