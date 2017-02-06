@@ -2,15 +2,15 @@
 
 #pragma once
 #include <vector>
+// OFL_IB GLM
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/norm.hpp>
-
 #include <glm/gtc/type_ptr.hpp>
-
+// OFL_IB
 namespace ofl
 {
 

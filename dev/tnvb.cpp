@@ -2,141 +2,303 @@
 
 namespace ofl
 {
-std::string TypeNameValueBlock::get_type() const
+
+
+TNVB::TNVB(const std::string &type, const std::string &name)
+	:m_type(type), m_name(name)
+{
+}
+
+std::map<std::string, TNVB *> &TNVB::get_blocks(const std::string &type)
+{
+	return m_blocks[type];
+}
+
+TNVB *&TNVB::get_block(const std::string &type, const std::string &name)
+{
+	if(m_blocks[type].find(name) == m_blocks[type].end())
+		m_blocks[type][name] = new TNVB(type,name);
+	return m_blocks[type][name];
+}
+
+const std::map<std::string, std::vector<int32_t> > &TNVB::get_ints() const {return m_ints;}
+
+const std::map<std::string, std::vector<uint32_t> > &TNVB::get_uints() const {return m_uints;}
+
+const std::map<std::string, std::vector<float> > &TNVB::get_floats() const {return m_floats;}
+
+const std::map<std::string, std::vector<double> > &TNVB::get_doubles() const {return m_doubles;}
+
+const std::map<std::string, std::vector<vec2> > &TNVB::get_vec2s() const {return m_vec2s;}
+
+const std::map<std::string, std::vector<vec3> > &TNVB::get_vec3s() const {return m_vec3s;}
+
+const std::map<std::string, std::vector<vec4> > &TNVB::get_vec4s() const {return m_vec4s;}
+
+const std::map<std::string, std::vector<mat4> > &TNVB::get_mat4s() const {return m_mat4s;}
+
+const std::map<std::string, std::vector<mat3> > &TNVB::get_mat3s() const {return m_mat3s;}
+
+const std::map<std::string, std::vector<std::string> > &TNVB::get_strings() const {return m_strings;}
+
+const std::map<std::string, std::map<std::string, TNVB *> > &TNVB::get_blocks() const {return m_blocks;}
+
+
+const std::string& TNVB::type() const
 {
 	return m_type;
 }
 
-std::string TypeNameValueBlock::get_name() const
+const std::string& TNVB::name() const
 {
 	return m_name;
 }
 
-bool ofl::TypeNameValueBlock::has_block(const std::string &type, const std::string &name)
+
+std::string& TNVB::type()
+{
+	return m_type;
+}
+
+std::string& TNVB::name()
+{
+	return m_name;
+}
+
+bool TNVB::has_block(const std::string &type, const std::string &name)
 {
 	return (m_blocks.find(type) != m_blocks.end()) &&  (m_blocks[type].find(name) != m_blocks[type].end());
 }
 
-bool ofl::TypeNameValueBlock::has_blocks_of_type(const std::string &type)
+bool TNVB::has_blocks_of_type(const std::string &type)
 {
 	return (m_blocks.find(type) != m_blocks.end());
 }
 
-TypeNameValueBlock *load_TNVB_from_string(char *s, const std::string &btype, const std::string &bname)
+
+std::string read_type(const char** code)
 {
-	TypeNameValueBlock* res = nullptr;
-	int state = 0;
-	if(!btype.empty())
+	std::string type;
+	const char*r = skip_ws(*code);
+	while(*r && *r!='#' && !isspace(*r))
 	{
-		res = new TypeNameValueBlock(btype,bname);
-		state = 1;
+		type += *r;
+		r++;
 	}
+	*code = r;
+	return type;
+}
 
-	char* type;
-	char* name;
-	char* value;
-
-	Tokenizer tkn(s);
-	Tokenizer vtkn(nullptr);
-	if(state == 0)
+std::string read_name(const char** code)
+{
+	std::string name;
+	const char*r = skip_ws(*code);
+	while(*r && *r!='#' && !isspace(*r) && *r!='=')
 	{
-		type = tkn.get_token();
-		name = tkn.get_token();
-		if(name && type)
-		{
-			res = new TypeNameValueBlock(type,name);
-			// skip over till you find the first attribute/subblock
-			tkn.skip_over_all(Tokenizer::whitespaces+"{=");
-			state++;
-		}
-		else return  nullptr;
+		name += *r;
+		r++;
 	}
+	// skip over '=' or ' ='
+	r=skip_ws(r);
+	r++;
 
-	while((type = tkn.get_token()) != nullptr)
+	*code = r;
+	return name;
+}
+
+
+std::string read_values(const char** code)
+{
+	std::string value;
+	const char*r = skip_ws(*code);
+	while(*r)
 	{
-		name = tkn.get_token(Tokenizer::whitespaces+"=");
-		tkn.skip_white_spaces();
-		if(strcmp(type,"int") == 0)
+		if(*r==';')
 		{
+			r++;
+			break;
+		}
+		if(*r == '\\')
+			r++;
+		value += *r;
+		r++;
+	}
+	*code = r;
+	return value;
+}
+std::string read_block(const char** code)
+{
+	std::string block;
 
-			vtkn.set_base(tkn.get_token(';'));
-			auto& arr = res->getArray<int>(name);
-			int i;
-			while(vtkn.get_token_as(i,","))
-			{
-				arr.push_back(i);
-			}
-		}
-		else if(strcmp(type,"uint") == 0)
+	const char*r = skip_ws(*code);
+	if(*r!='{')
+		return "";
+	r++;
+	int count = 1;
+	bool in_string = false;
+	while(*r && count>0)
+	{
+		if(*r == '\\')
 		{
-			vtkn.set_base(tkn.get_token(';'));
-			auto& arr = res->getArray<uint>(name);
-			uint32_t i;
-			while(vtkn.get_token_as(i,","))
-			{
-				arr.push_back(i);
-			}
+			block += *r;
+			r++;
 		}
-		else if(strcmp(type,"float") == 0)
+		else if(*r == '\"')
+			in_string = !in_string;
+		else if(*r == '{' && !in_string)
+			count++;
+		else if(*r == '}' && !in_string)
+			count--;
+		if(count==0)
 		{
-			vtkn.set_base(tkn.get_token(';'));
-			auto& arr = res->getArray<float>(name);
-			float i;
-			while(vtkn.get_token_as(i,","))
-			{
-				arr.push_back(i);
-			}
-		}
-		else if(strcmp(type,"vec4") == 0)
-		{
-			vtkn.set_base(tkn.get_token(';'));
-			auto& arr = res->getArray<vec4>(name);
-			vec4 i;
-			while(vtkn.get_token_as(i,","))
-			{
-				arr.push_back(i);
-			}
-		}
-		else if(strcmp(type,"mat4") == 0)
-		{
-			vtkn.set_base(tkn.get_token(';'));
-			auto& arr = res->getArray<mat4>(name);
-			mat4 i;
-			while(vtkn.get_token_as(i,","))
-			{
-				arr.push_back(i);
-			}
+			r++; //skip the } that made the count go to zero
+			r=skip_ws(r); // skip anything between } and ;
+			r++; // skip ;
+			break;
 		}
 
-		else if(strcmp(type,"string") == 0)
+		block+=*r;
+		r++;
+
+
+	}
+	*code = r;
+	return block;
+}
+
+std::string read_value(const char** code)
+{
+	const char*r = skip_ws(*code);
+	if(*r=='{')
+		return read_block(code);
+	else
+		return read_values(code);
+}
+
+
+TNVB *read_from_string(const char *code, const char **end, const std::string &type, const std::string &name)
+{
+	TNVB* res;
+
+	if(type.empty() || name.empty())
+	{
+		res = new TNVB(read_type(&code),read_name(&code));
+		code = skip_ws(code);
+		if(*code !='{')
+			return nullptr;
+		code++;
+	}
+	else
+		res = new TNVB(type,name);
+
+	std::string t;
+	std::string n;
+	std::string v;
+
+	while(*code != '}')
+	{
+		t = read_type(&code);
+		n = read_name(&code);
+		v = read_value(&code);
+
+		if(t == "int")
 		{
-			vtkn.set_base(tkn.get_token(';'));
-			auto& arr = res->getArray<std::string>(name);
-			vtkn.skip_over_all(Tokenizer::whitespaces+",");
-			std::string i;
-			while(vtkn.get_rest())
-			{
-				if(vtkn.read_esc_string(i))
-					arr.push_back(i);
-				else
-					break;
-				vtkn.skip_over_all(Tokenizer::whitespaces+",;");
-			}
+			res->get_array<int>(n) = read_vector_from_string<int>(v.c_str());
+		}
+		else if(t == "uint")
+		{
+			res->get_array<uint>(n) = read_vector_from_string<uint>(v.c_str());
+		}
+		else if(t == "float")
+		{
+			res->get_array<float>(n) = read_vector_from_string<float>(v.c_str());
+		}
+		else if(t == "double")
+		{
+			res->get_array<double>(n) = read_vector_from_string<double>(v.c_str());
+		}
+		else if(t == "vec2")
+		{
+			res->get_array<vec2>(n) = read_vector_from_string<vec2>(v.c_str());
+		}
+		else if(t == "vec3")
+		{
+			res->get_array<vec3>(n) = read_vector_from_string<vec3>(v.c_str());
+		}
+		else if(t == "vec4")
+		{
+			res->get_array<vec4>(n) = read_vector_from_string<vec4>(v.c_str());
+		}
+		else if(t == "mat3")
+		{
+			res->get_array<mat3>(n) = read_vector_from_string<mat3>(v.c_str());
+		}
+		else if(t == "mat4")
+		{
+			res->get_array<mat4>(n) = read_vector_from_string<mat4>(v.c_str());
+		}
+		else if(t == "string")
+		{
+			res->get_array<std::string>(n) = read_vector_from_string<std::string>(v.c_str());
 		}
 		else
 		{
-			value = tkn.get_token_till_closing('{','}');
-			tkn.skip_over_all(Tokenizer::whitespaces+"};");
-			auto& arr = res->getBlocks(type);
-			arr[name] = load_TNVB_from_string(value,type,name);
+			res->get_block(t,n) = read_from_string(v.c_str(),nullptr,t,n);
 		}
-		vtkn.set_base(nullptr);
-
-
-
+		code = skip_ws(code);
 	}
-	tkn.set_base(nullptr);
+	code++; // skip }
+	code = skip_ws(code); // skip anything between } and ;
+	code++; // skip ;
+	if(end)
+		*end =  code;
 	return res;
 }
+
+std::string write_to_string(const TNVB &v)
+{
+	std::string res = v.type()+" "+v.name()+" =\n{\n";
+	for(const auto& i : v.get_ints())
+		res+="int "+i.first+" = "+write_to_string(i.second)+";\n";
+
+	for(const auto& i : v.get_uints())
+		res+="uint "+i.first+" = "+write_to_string(i.second)+";\n";
+
+	for(const auto& i : v.get_floats())
+		res+="float "+i.first+" = "+write_to_string(i.second)+";\n";
+
+	for(const auto& i : v.get_doubles())
+		res+="double "+i.first+" = "+write_to_string(i.second)+";\n";
+
+	for(const auto& i : v.get_vec2s())
+		res+="vec2 "+i.first+" = "+write_to_string(i.second)+";\n";
+
+	for(const auto& i : v.get_vec3s())
+		res+="vec3 "+i.first+" = "+write_to_string(i.second)+";\n";
+
+	for(const auto& i : v.get_vec4s())
+		res+="vec4 "+i.first+" = "+write_to_string(i.second)+";\n";
+
+	for(const auto& i : v.get_mat3s())
+		res+="mat3 "+i.first+" = "+write_to_string(i.second)+";\n";
+
+
+	for(const auto& i : v.get_mat4s())
+		res+="mat4 "+i.first+" = "+write_to_string(i.second)+";\n";
+
+	for(const auto& i : v.get_strings())
+		res+="string "+i.first+" = "+write_to_string(i.second)+";\n";
+
+	for(const auto& i : v.get_blocks())
+		for(const auto& b : i.second)
+		{
+			res+= write_to_string(*(b.second))+"\n";
+		}
+
+	res+="};";
+	return res;
+}
+
+
 
 }

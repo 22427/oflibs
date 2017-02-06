@@ -313,9 +313,9 @@ int MeshOps::get_closest_triangle(Mesh *m, const vec3 &p)
 	for(const int tt : tris)
 	{
 		const MeshTriangle& t = m->m_triangles[static_cast<uint>(tt)];
-		mat_tri T = calc_triangle_matrix(m->vertex_position(static_cast<uint>(t(0))),
-									   m->vertex_position(static_cast<uint>(t(1))),
-									   m->vertex_position(static_cast<uint>(t(2))));
+		mat_tri T = calc_triangle_matrix(m->vertex(static_cast<uint>(t(0))),
+									   m->vertex(static_cast<uint>(t(1))),
+									   m->vertex(static_cast<uint>(t(2))));
 
 		float d = distance2(closest_point(p,T),p);
 		if(d < min)
@@ -334,15 +334,15 @@ vec3 MeshOps::get_closest_point(Mesh *m, const vec3 &p)
 {
 	int cv = get_closest_vertex(m,p);
 	auto tris = m->adjacent_triangles(cv);
-	float min = distance2(m->vertex_position(cv),p);
-	vec3 res = m->vertex_position(cv);
+	float min = distance2(m->vertex(cv).pos,p);
+	vec3 res = m->vertex(cv);
 
 	for(const auto tt : tris)
 	{
 		const MeshTriangle& t = m->triangle(static_cast<uint>(tt));
-		mat_tri T = calc_triangle_matrix(m->vertex_position(static_cast<uint>(t(0))),
-									   m->vertex_position(static_cast<uint>(t(1))),
-									   m->vertex_position(static_cast<uint>(t(2))));
+		mat_tri T = calc_triangle_matrix(m->vertex(static_cast<uint>(t(0))),
+									   m->vertex(static_cast<uint>(t(1))),
+									   m->vertex(static_cast<uint>(t(2))));
 
 		auto r = closest_point(p,T);
 		float d = distance2(p,r);
@@ -359,8 +359,8 @@ vec3 MeshOps::get_closest_point(Mesh *m, const vec3 &p, const std::vector<mat_tr
 {
 	int cv = get_closest_vertex(m,p);
 	auto tris = m->adjacent_triangles(static_cast<uint>(cv));
-	float min = distance2(m->vertex_position(cv),p);
-	vec3 res = m->vertex_position(cv);
+	float min = distance2(m->vertex(cv).pos,p);
+	vec3 res = m->vertex(cv);
 
 	for(const auto tt : tris)
 	{

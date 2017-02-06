@@ -1,7 +1,8 @@
 #pragma once
+#include <cstring>
+// OFL_IB SOCKET
 #ifndef _WIN32
 #include <sys/types.h>
-#include <cstring>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -11,6 +12,7 @@
 #include <Ws2tcpip.h>
 #pragma comment(lib, "Ws2_32.lib")
 #endif
+//OFL_IB
 
 #include <iostream>
 

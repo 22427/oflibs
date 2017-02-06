@@ -1,15 +1,11 @@
 #pragma once
+// OFL_IB GL
 #ifndef OFL_GL_HEADER
 #define OFL_GL_HEADER <glad/glad.h>
 #endif
-
 #include OFL_GL_HEADER
+// OFL_IB
 
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "vmath.h"
 

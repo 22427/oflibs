@@ -1,9 +1,16 @@
 #pragma once
 
 #include <cstdint>
+// OFL_IB WINSYS
+#ifdef linux
+#include <X11/Xutil.h>
+#else
+// TODO WINDOWS stuff
+#endif
+// OFL_IB
+
 #ifdef linux
 
-#include <X11/Xutil.h>
 
 namespace ofl
 {

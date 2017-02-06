@@ -1,10 +1,12 @@
 #pragma once
 #include <glm/glm.hpp>
-#include "vd.h"
-#include "vmath.h"
 #include <vector>
 #include <map>
 #include <set>
+
+#include "vd.h"
+#include "vmath.h"
+
 namespace ofl {
 
 #ifndef OFL_INVALID_VERTEX

@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <algorithm>
 #include "dll.h"
+#include "vmath.h"
 
 typedef  uint32_t uint;
 typedef  uint8_t ubyte;
@@ -14,6 +15,10 @@ typedef  int8_t byte;
  */
 namespace ofl
 {
+
+inline OFL_DLL_LOCAL const char* skip_comment(const char* code);
+inline OFL_DLL_PUBLIC const char* skip_ws(const char* code);
+
 template<typename T>
 inline typename std::enable_if<std::is_floating_point<T>::value || std::is_class<T>::value, T>::type
 float_to_nint(float /*f*/)
@@ -199,4 +204,492 @@ public:
 
 
 };
+
+/**
+ * @brief to_string converts v to a human readable string.
+ * @param v
+ * @return
+ */template <typename T>
+OFL_DLL_PUBLIC inline std::string to_string(const T& v)
+{
+	return std::to_string(v);
+}
+
+
+/** READABLE STRING************************************************************/
+/**
+ * @brief readFromString reads from readable string.
+ * @param str String to read from
+ * @param end Pointer to the first not read character.
+ * @return The read value
+ */
+template<typename T>
+OFL_DLL_PUBLIC inline T read_from_string (const char* str, const char** end = nullptr);
+
+
+/**
+ * @brief writeToString transforms a given value into a readaable string
+ * @param v
+ * @return
+ */template <typename T>
+OFL_DLL_PUBLIC inline std::string write_to_string(const T& v)
+{
+	return std::to_string(v);
+}
+
+
+
+/** write_to_string ***********************************************************/
+
+template <>
+OFL_DLL_PUBLIC inline std::string to_string(const bool& v)
+{
+	if(v)
+		return "true";
+	else
+		return "false";
+}
+
+template <>
+OFL_DLL_PUBLIC inline  std::string to_string(const vec2& v)
+{
+	return "("+std::to_string(v.x)+","+std::to_string(v.y)+")";
+}
+
+template <>
+OFL_DLL_PUBLIC inline std::string to_string(const vec3& v)
+{
+	return "("+to_string(v.x)+","+to_string(v.y)+","+to_string(v.z)+")";
+}
+
+template <>
+OFL_DLL_PUBLIC inline std::string to_string(const vec4& v)
+{
+	return "("+to_string(v.x)+","+to_string(v.y)+","+to_string(v.z)+","+to_string(v.w)+")";
+}
+
+template <>
+OFL_DLL_PUBLIC inline std::string to_string(const mat4& v)
+{
+	return "("+to_string(v[0])+","+to_string(v[1])+","+to_string(v[2])+","+to_string(v[3])+")";
+}
+
+template <>
+OFL_DLL_PUBLIC inline std::string to_string(const std::string& v)
+{
+	return v;
+}
+
+template <typename T>
+OFL_DLL_PUBLIC inline std::string to_string(const std::vector<T>& v)
+{
+	std::string res;
+	bool first = true;
+	for(const auto& i:v)
+	{
+		if(first)
+		{
+			res+=write_to_string(i);
+			first = false;
+		}
+		else
+			res+=","+write_to_string(i);
+	}
+	return res;
+}
+
+
+
+/** read_from_string **********************************************************/
+template<>
+OFL_DLL_PUBLIC inline int read_from_string (const char* str, const char** end)
+{
+	return  strtol(str,const_cast<char**>(end),10);
+}
+
+template<>
+OFL_DLL_PUBLIC inline uint read_from_string (const char* str, const char** end)
+{
+	return strtol(str,const_cast<char**>(end),10);
+}
+
+template<>
+OFL_DLL_PUBLIC inline float read_from_string (const char* str, const char** end)
+{
+	return strtof(str,const_cast<char**>(end));
+}
+
+template<>
+OFL_DLL_PUBLIC inline double read_from_string (const char* str, const char** end)
+{
+	return strtod(str,const_cast<char**>(end));
+}
+
+template<>
+OFL_DLL_PUBLIC inline bool read_from_string (const char* str, const char** end)
+{
+	str = skip_ws(str);
+	int i=0;
+	const char* t = "true";
+	const char* f = "false";
+	bool guess = true;
+	for(i = 0 ; i< 5;i++)
+	{
+		if(guess && str[i] == t[i])
+		{
+			guess = true;
+			if(i == 3)
+				break;
+		}
+		else if(str[i] != t[i] && str[i] == f[i])
+		{
+			guess = false;
+		}
+		else
+		{
+			i = 0;
+			guess = false;
+			break;
+		}
+	}
+
+	if(end)
+		*end = str+i;
+	return guess;
+}
+
+/**
+ * Reads from an escaped string of the form:
+ * const char* c = "\"text some \"special\" text with a backslash \\\"";
+ */
+template<>
+OFL_DLL_PUBLIC inline std::string read_from_string (const char* str, const char** end)
+{
+	std::string res;
+	const char* s = skip_ws(str);
+	s++;
+	while(*s && *s != '"')
+	{
+		if(*s == '\\')
+			s++;
+		res+=*s;
+		s++;
+	}
+	if(*s=='"')
+		s++;
+	if(end)
+		*end = s;
+	return res;
+}
+
+/**
+ * Reads a vec2 :
+ * const char* c = "(x,y)";
+ */
+template<>
+OFL_DLL_PUBLIC inline vec2 read_from_string (const char* str, const char** end)
+{
+	vec2 res;
+	const char* s = skip_ws(str);
+	s++;
+	if(*s)
+	{
+		res.x = read_from_string<float>(s,&s);
+		s = skip_ws(s);
+		s++;
+	}
+	if(*s)
+	{
+		res.y = read_from_string<float>(s,&s);
+		s = skip_ws(s);
+		s++;
+	}
+	if(end)
+		*end = s;
+	return res;
+}
+
+/**
+ * Reads a vec3 :
+ * const char* c = "(x,y,z)";
+ */
+template<>
+OFL_DLL_PUBLIC inline vec3 read_from_string (const char* str, const char** end)
+{
+	vec3 res;
+	const char* s = skip_ws(str);
+	s++;
+
+	if(*s)
+	{
+		res.x = read_from_string<float>(s,&s);
+		s = skip_ws(s);
+		s++;
+	}
+	if(*s)
+	{
+		res.y = read_from_string<float>(s,&s);
+		s = skip_ws(s);
+		s++;
+	}
+	if(*s)
+	{
+		res.z = read_from_string<float>(s,&s);
+		s = skip_ws(s);
+		s++;
+	}
+
+	if(end)
+		*end = s;
+	return res;
+}
+
+/**
+ * Reads a vec4 :
+ * const char* c = "(x,y,z,w)";
+ */
+template<>
+OFL_DLL_PUBLIC inline vec4 read_from_string (const char* str, const char** end)
+{
+	vec4 res;
+	const char* s = skip_ws(str);
+	s++;
+
+	if(*s)
+	{
+		res.x = read_from_string<float>(s,&s);
+		s = skip_ws(s);if(end)
+			*end = s;
+		s++;
+		s = skip_ws(s);
+	}
+	if(*s)
+	{
+		res.y = read_from_string<float>(s,&s);
+		s = skip_ws(s);
+		s++;
+		s = skip_ws(s);
+	}
+	if(*s)
+	{
+		res.z = read_from_string<float>(s,&s);
+		s = skip_ws(s);
+		s++;
+		s = skip_ws(s);
+	}
+	if(*s)
+	{
+		res.w = read_from_string<float>(s,&s);
+		s = skip_ws(s);
+		s++;
+		s = skip_ws(s);
+	}
+
+	if(end)
+		*end = s;
+	return res;
+}
+
+
+/**
+ * Reads a mat3 :
+ * const char* c = "(( x , y ,z ),( x , y ,z),( x , y ,z ),( x , y ,z ))";
+ */
+template<> //
+OFL_DLL_PUBLIC inline mat3 read_from_string (const char* str, const char** end)
+{
+	mat3 res;
+	str = skip_ws(str);
+	str++;
+
+	if(*str)
+	{
+		res[0] = read_from_string<vec3>(str,&str);
+		str = skip_ws(str);
+		str++;
+		str = skip_ws(str);
+	}
+	if(*str)
+	{
+		res[1] = read_from_string<vec3>(str,&str);
+		str = skip_ws(str);
+		str++;
+		str = skip_ws(str);
+	}
+	if(*str)
+	{
+		res[2] = read_from_string<vec3>(str,&str);
+		str = skip_ws(str);
+		str++;
+		str = skip_ws(str);
+	}
+
+
+	if(end)
+		*end = str;
+	return res;
+}
+
+/**
+ * Reads a mat4 :
+ * const char* c = "(( x , y ,z, w ),( x , y ,z, w ),( x , y ,z, w ),( x , y ,z, w ))";
+ */
+template<> //
+OFL_DLL_PUBLIC inline mat4 read_from_string (const char* str, const char** end)
+{
+	mat4 res;
+	str = skip_ws(str);
+	str++;
+
+	if(*str)
+	{
+		res[0] = read_from_string<vec4>(str,&str);
+		str = skip_ws(str);
+		str++;
+		str = skip_ws(str);
+	}
+	if(*str)
+	{
+		res[1] = read_from_string<vec4>(str,&str);
+		str = skip_ws(str);
+		str++;
+		str = skip_ws(str);
+	}
+	if(*str)
+	{
+		res[2] = read_from_string<vec4>(str,&str);
+		str = skip_ws(str);
+		str++;
+		str = skip_ws(str);
+	}
+	if(*str)
+	{
+		res[3] = read_from_string<vec4>(str,&str);
+		str = skip_ws(str);
+		str++;
+		str = skip_ws(str);
+	}
+
+	if(end)
+		*end = str;
+	return res;
+}
+
+/**
+ *	Reads a vector of one of the above. elements are seperated with ','.
+ *  const char* c = "1,2,3,4";
+ */
+template<typename T>
+inline std::vector<T> read_vector_from_string(const char* str, const char** end = nullptr)
+{
+	std::vector<T> res;
+	while(*str)
+	{
+		res.push_back(read_from_string<T>(str,&str));
+		str = skip_ws(str);
+		if(*str != ',')
+			break;
+		str++;
+		str = skip_ws(str);
+	}
+	if(end)
+		*end = str;
+	return res;
+}
+
+
+
+/** write_to_string ***********************************************************/
+
+template <>
+OFL_DLL_PUBLIC inline std::string write_to_string(const vec2& v)
+{
+	return "("+std::to_string(v.x)+","+std::to_string(v.y)+")";
+}
+
+template <>
+OFL_DLL_PUBLIC inline std::string write_to_string(const vec3& v)
+{
+	return "("+write_to_string(v.x)+","+write_to_string(v.y)+","+write_to_string(v.z)+")";
+}
+
+template <>
+OFL_DLL_PUBLIC inline std::string write_to_string(const vec4& v)
+{
+	return "("+write_to_string(v.x)+","+write_to_string(v.y)+","+write_to_string(v.z)+","+write_to_string(v.w)+")";
+}
+
+
+template <>
+OFL_DLL_PUBLIC inline std::string write_to_string(const mat3& v)
+{
+	return "("+write_to_string(v[0])+","+write_to_string(v[1])+","+write_to_string(v[2])+")";
+}
+
+template <>
+OFL_DLL_PUBLIC inline std::string write_to_string(const mat4& v)
+{
+	return "("+write_to_string(v[0])+","+write_to_string(v[1])+","+write_to_string(v[2])+","+write_to_string(v[3])+")";
+}
+
+template <>
+OFL_DLL_PUBLIC inline std::string write_to_string(const std::string& v)
+{
+	std::string res = "\"";
+	for(const char c :v)
+	{
+		if(c == '\\' || c== '\"')
+			res+="\\";
+		res+=c;
+	}
+	return res+"\"";
+}
+
+template <typename T>
+OFL_DLL_PUBLIC inline std::string write_to_string(const std::vector<T>& v)
+{
+	std::string res;
+	bool first = true;
+	for(const auto& i:v)
+	{
+		if(first)
+		{
+			res+=write_to_string(i);
+			first = false;
+		}
+		else
+			res+=","+write_to_string(i);
+	}
+	return res;
+}
+
+inline OFL_DLL_LOCAL const char* skip_comment(const char* code)
+{
+	const char* res = code;
+	while(*res && *res != '\n')
+	{
+		res++;
+	}
+	return res;
+}
+
+
+inline OFL_DLL_PUBLIC   const char* skip_ws(const char* code)
+{
+	const char* res = code;
+	while(*res)
+	{
+		if(!isspace(*res))
+		{
+			if(*res == '#')
+				res = skip_comment(res);
+			else
+				break;
+		}
+		res++;
+	}
+	return res;
+}
+
+
 }

@@ -3,15 +3,19 @@
 #include <vector>
 #include <cstring>
 #include <functional>
-
+#include <cstdint>
+// OFL_IB GL
 #ifndef OFL_GL_HEADER
 #define OFL_GL_HEADER <glad/glad.h>
 #endif
 #include OFL_GL_HEADER
+// OFL_IB
 
+// OFL_IB GLX
 #define GL_GLEXT_PROTOTYPES
 #define GLX_GLXEXT_PROTOTYPES
 #include <GL/glx.h>
+// OFL_IB
 
 #include "vmath.h"
 #include "user_io.h"
