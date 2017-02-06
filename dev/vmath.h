@@ -253,6 +253,8 @@ inline mat4 get_transformation(const std::vector<vec3>& fs, const std::vector<ve
 	return T*glm::inverse(F) ;
 }
 
+
+
 typedef  mat4 mat_tri;
 /**
  * @brief calc_triangle_matrix calculates the "triangel matrix" for a given triangle.
