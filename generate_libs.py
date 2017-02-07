@@ -59,7 +59,7 @@ def print_help():
 
 for i in range(1,len(sys.argv)):
     if '-split' in sys.argv[i]:
-        implementation_in_header = False
+        split = True
     elif '-h' in sys.argv[i]:
         print_help()
         exit(0)
@@ -241,7 +241,7 @@ def process_module_set(mod_set,lib_name):
     header_output_file.write(preambel)
     source_output_file = None
 
-    if  split:
+    if split:
         source_output_file = open(output_dir + output_prefix + lib_name + '.cpp', 'w')
         source_output_file.write(preambel)
     else:
