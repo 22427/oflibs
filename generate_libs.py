@@ -102,8 +102,8 @@ def process_file(name,ending, dic,dep,sysheaders):
         if name not in dic:
             dep[name]= []
             dic[name] = File(name,ending,parse_code(name,ending,open(file).read(), dic,dep,sysheaders))
-    else:
-        print('Ignoring file {}'.format(file))
+    #else:
+        #print('Ignoring file {}'.format(file))
 
 def parse_code(name,ending,code,dic,dep,sysheaders):
     guard = 'OFL_'+name.upper()+'_'+ending.upper()
@@ -182,17 +182,12 @@ def write_sysheaders(sysheaders, file):
         file.write(sh+'\n')
 
 
-
-
-
-
 def read_module_set(mod_set):
     modules = mod_set
     new_modules = mod_set
     sysheaders = []
     while True:
-        modules = new_modules
-        new_modules = set()
+        modules = new_modules.copy()
         deps_cpp = {}
         files_cpp = {}
         files_h = {}
@@ -204,15 +199,21 @@ def read_module_set(mod_set):
             new_modules |= set(v)
         for k, v in deps_cpp.items():
             new_modules |= set(v)
-
         if len(new_modules) == len(modules):
             break
+
     return  modules
 
 
 def process_module_set(mod_set,lib_name):
     print('Generating library {} ...'.format(lib_name))
+    for m in mod_set:
+        print(m,end=', ')
+    print('Extended module list:')
     modules = read_module_set(mod_set)
+    for m in modules:
+        print(m,end=', ')
+    print('')
     sysheaders = []
 
     headers = {}.copy()
