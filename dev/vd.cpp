@@ -2007,7 +2007,7 @@ bool VertexDataOperations::write_ply(const VertexData *vd, FILE*f)
 	for(uint i = 0 ; i<vd->index_count();i+=prim_count)
 	{
 		fprintf(f,"%d",prim_count);
-		for(int j  = 0; j< prim_count;j++)
+		for(uint j  = 0; j< prim_count;j++)
 		{
 			fprintf(f," %d",vd->get_index(i+j));
 		}
