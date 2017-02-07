@@ -206,13 +206,15 @@ def read_module_set(mod_set):
 
 
 def process_module_set(mod_set,lib_name):
-    print('Generating library {} ...'.format(lib_name))
+    print('=========================== {} ==========================='.format(lib_name))
+    print('Module list:')
     for m in mod_set:
-        print(m,end=', ')
-    print('Extended module list:')
+        print('\t'+m)
+
+    print('\nExtended module list:')
     modules = read_module_set(mod_set)
     for m in modules:
-        print(m,end=', ')
+        print('\t'+m)
     print('')
     sysheaders = []
 
