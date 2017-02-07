@@ -6,7 +6,7 @@
 
 #include "vd.h"
 #include "vmath.h"
-
+#include "dll.h"
 namespace ofl {
 
 #ifndef OFL_INVALID_VERTEX
@@ -17,7 +17,7 @@ namespace ofl {
  * @brief The MeshVertex class repesents a vertex in the mesh data structure.
  * MeshVertices are fixed size.
  */
-class MeshVertex
+class OFL_DLL_PUBLIC MeshVertex
 {
 public:
 	vec3 pos;
@@ -34,7 +34,7 @@ public:
  * @brief The MeshTriangle class represents a triangle inside the mesh, referencing
  * the vertices by their id.
  */
-class MeshTriangle
+class OFL_DLL_PUBLIC MeshTriangle
 {
 	friend class MeshOps;
 	uint v[3];
@@ -79,7 +79,7 @@ public:
  * The used structures aren't very memory efficient, but the access times should
  * be well enough.
  */
-class Mesh
+class OFL_DLL_PUBLIC Mesh
 {
 protected:
 	friend class MeshOps;
@@ -170,7 +170,7 @@ public:
 };
 
 
-class MeshOps
+class OFL_DLL_PUBLIC MeshOps
 {
 public:
 

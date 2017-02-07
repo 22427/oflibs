@@ -3,7 +3,7 @@
 #include <thread>
 #include <queue>
 #include <condition_variable>
-
+#include "dll.h"
 namespace ofl{
 /**
  * @class SemQueue
@@ -23,7 +23,8 @@ enum SemQueueErrorCode {
 
 };
 
-template <typename T> class SemQueue
+template <typename T>
+class OFL_DLL_PUBLIC SemQueue
 {
 	std::queue<T> q;
 	std::condition_variable cv;

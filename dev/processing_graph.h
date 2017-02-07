@@ -3,6 +3,7 @@
 #include <atomic>
 #include <thread>
 #include "sem_queue.h"
+#include "dll.h"
 /**
  * @brief The Joint class The general connection interface.
  * A Joint kann receive Items of a given type T, and might
@@ -14,7 +15,7 @@ namespace ofl
 {
 
 template<typename T>
-class Item
+class OFL_DLL_PUBLIC Item
 {
 public:
 	Item()
@@ -43,7 +44,7 @@ protected:
 
 
 template<typename T>
-class Joint
+class OFL_DLL_PUBLIC Joint
 {
 protected:
 	Joint<T>* m_out;
@@ -107,7 +108,7 @@ public:
  * @brief The QueuedJoint class
  */
 template <typename T>
-class QueuedJoint : public Joint<T>
+class OFL_DLL_PUBLIC QueuedJoint : public Joint<T>
 {
 protected:
 	SemQueue<Item<T>> m_queue;
@@ -149,7 +150,7 @@ public:
  * the data, then give it to the Joints output.
  */
 template <typename T,class J = QueuedJoint<T>>
-class Node
+class OFL_DLL_PUBLIC Node
 {
 
 protected:
@@ -237,7 +238,7 @@ public:
  * Type, which is then given to the right joint.
  */
 template <typename T, typename Q>
-class TransformNode
+class OFL_DLL_PUBLIC TransformNode
 {
 protected:
 	QueuedJoint<T> m_left;
@@ -343,7 +344,7 @@ public:
  */
 
 template <typename T, typename Q>
-class ProcessingGraph
+class OFL_DLL_PUBLIC ProcessingGraph
 {
 
 public:

@@ -1,32 +1,23 @@
 #pragma once
-
+// OFL_IB GL
 #ifndef OFL_GL_HEADER
 #define OFL_GL_HEADER <glad/glad.h>
 #endif
-
 #include OFL_GL_HEADER
+// OFL_IB
 
 
-
+#include "dll.h"
 #include "vd.h"
 namespace ofl
 {
-
-#ifndef ALOC_POSITION
-#define ALOC_POSITION 0
-#define ALOC_NORMAL 1
-#define ALOC_COLOR 2
-#define ALOC_TEXCOORD 3
-#define ALOC_TANGENT 4
-#endif
-
 /**
  * @brief The Geometry class represents a VAO, with an associated IBO and VBO.
  * It is due to ATIs special interpretation to the reference counting on buffer
  * objects in the case of an IBO, that we have to store the IBO, so I store the
  * VBO as well. It also stores the primitive type and the vertex count.
  */
-class Geometry
+class OFL_DLL_PUBLIC Geometry
 {
 protected:
 	GLuint m_vao;

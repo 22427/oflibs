@@ -1,10 +1,10 @@
 #pragma once
 #include <chrono>
 #include "ogl_win.h"
-
+#include "dll.h"
 namespace ofl
 {
-class OpenGLApplication : public WinListener, public UserIOListeners
+class OFL_DLL_PUBLIC OpenGLApplication : public WinListener, public UserIOListeners
 {
 protected:
 	Win m_window;

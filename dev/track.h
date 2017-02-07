@@ -8,10 +8,10 @@
 #include "vmath.h"
 #include "socket.h"
 #include "stru.h"
-
+#include "dll.h"
 namespace ofl {
 
-class Target
+class OFL_DLL_PUBLIC Target
 {
 protected:
 	unsigned int m_id;
@@ -28,7 +28,7 @@ public:
 
 
 
-class Target3DOF : public Target
+class OFL_DLL_PUBLIC Target3DOF : public Target
 {
 protected:
 	vec4 m_position;
@@ -43,7 +43,7 @@ public:
 };
 
 
-class Target6DOF : public Target3DOF
+class OFL_DLL_PUBLIC Target6DOF : public Target3DOF
 {
 protected:
 	mat4 m_orientation;
@@ -57,7 +57,7 @@ public:
 	const mat4& orientation() const;
 };
 
-class TargetFlystick : public Target6DOF
+class OFL_DLL_PUBLIC TargetFlystick : public Target6DOF
 {
 protected:
 	std::vector<unsigned char> m_button_state;
@@ -77,7 +77,7 @@ public:
 };
 
 
-class TrackingData
+class OFL_DLL_PUBLIC TrackingData
 {
 	std::vector<Target3DOF> m_t3d;
 	std::mutex m_t3d_mtx;

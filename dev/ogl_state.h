@@ -6,7 +6,7 @@
 #include OFL_GL_HEADER
 // OFL_IB
 
-
+#include "dll.h"
 #include "vmath.h"
 
 #include <fstream>
@@ -128,7 +128,7 @@ uniform Light light[8];
 
 
 
-class Light
+class OFL_DLL_PUBLIC Light
 {
 public:
 	/** Ambient color of this light source.*/
@@ -204,7 +204,7 @@ public:
 
 
 
-class ShaderWrap
+class OFL_DLL_PUBLIC ShaderWrap
 {
 	GLuint m_handle;
 	std::map<int, int> m_uniformID2location;
@@ -220,7 +220,7 @@ public:
 
 
 //#define ___currMat m_matrix[m_matrixMode].top()
-class StateSimulator
+class OFL_DLL_PUBLIC StateSimulator
 {
 protected:
 	std::stack<glm::mat4> m_matrix[MATRIXMODE_COUNT];

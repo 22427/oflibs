@@ -10,7 +10,6 @@
 #endif
 #include OFL_GL_HEADER
 // OFL_IB
-
 // OFL_IB GLX
 #define GL_GLEXT_PROTOTYPES
 #define GLX_GLXEXT_PROTOTYPES
@@ -19,12 +18,13 @@
 
 #include "vmath.h"
 #include "user_io.h"
+#include "dll.h"
 
 namespace ofl {
 
-class WinListener;
+class OFL_DLL_PUBLIC WinListener;
 
-class Win
+class OFL_DLL_PUBLIC Win
 {
 public:
 	enum WindowEvent
@@ -138,7 +138,7 @@ public:
 
 
 };
-class WinListener
+class OFL_DLL_PUBLIC WinListener
 {
 public:
 	virtual ~WinListener(){}
@@ -150,7 +150,7 @@ public:
 
 
 
-class GLContext
+class OFL_DLL_PUBLIC GLContext
 {
 public:
 	enum OpenGLProfile
@@ -188,7 +188,7 @@ public:
 
 
 
-class WinIO : public UserIODevice
+class OFL_DLL_PUBLIC WinIO : public UserIODevice
 {
 	Win* m_window;
 	std::vector<UserIOListeners*> m_listeners;

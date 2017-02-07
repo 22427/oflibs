@@ -5,10 +5,11 @@
 #endif
 #include OFL_GL_HEADER
 // OFL_IB
+
 #include <map>
 #include <vector>
 #include "vmath.h"
-
+#include "dll.h"
 
 
 namespace ofl
@@ -36,7 +37,7 @@ inline std::string get_gl_error_string(const GLenum err)
 }
 
 
-class Shader
+class OFL_DLL_PUBLIC Shader
 {
 	GLuint m_handle;
 public:
@@ -84,7 +85,7 @@ public:
 	const GLuint& handle()const {return m_handle;}
 };
 
-class ShaderProgram
+class OFL_DLL_PUBLIC ShaderProgram
 {
 	GLuint m_handle;
 	std::map<int, int> m_uniformID2location;

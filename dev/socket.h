@@ -15,14 +15,14 @@
 //OFL_IB
 
 #include <iostream>
-
+#include "dll.h"
 namespace ofl
 {
 /**
  * @brief The Socket class is a simple socket abstraction layer, providing
  * socket functionality for Windows and Unix-Systems alike.
  */
-class Socket
+class OFL_DLL_PUBLIC Socket
 {
 	struct addrinfo * a_info;
 #ifdef _WIN32

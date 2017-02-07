@@ -4,6 +4,7 @@
 #include <vector>
 #include <set>
 #include <algorithm>
+#include "dll.h"
 namespace ofl
 {
 
@@ -108,7 +109,7 @@ public:
  * @brief The kDTree class is a simple kDTree
  */
 template<typename A=int,unsigned int D =3,typename T=float>
-class kDTree
+class OFL_DLL_PUBLIC kDTree
 {
 protected:
 	kdNode<D,T>* m_root;

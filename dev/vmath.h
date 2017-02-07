@@ -1,9 +1,8 @@
-
-
 #pragma once
 #include <vector>
 // OFL_IB GLM
 #define GLM_FORCE_RADIANS
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
@@ -34,14 +33,23 @@ inline bool eq(const double& a,const double& b)
 }
 
 
+
+
 typedef glm::vec2 vec2;
 typedef glm::vec3 vec3;
 typedef glm::vec4 vec4;
 
+typedef glm::dvec2 dvec2;
+typedef glm::dvec3 dvec3;
+typedef glm::dvec4 dvec4;
 
 typedef glm::ivec2 ivec2;
 typedef glm::ivec3 ivec3;
 typedef glm::ivec4 ivec4;
+
+typedef glm::uvec2 uvec2;
+typedef glm::uvec3 uvec3;
+typedef glm::uvec4 uvec4;
 
 typedef glm::mat2 mat2;
 typedef glm::mat3 mat3;

@@ -1,18 +1,19 @@
 #pragma once
-
 // OFL_IB GL
 #ifndef OFL_GL_HEADER
 #define OFL_GL_HEADER <glad/glad.h>
 #endif
 #include OFL_GL_HEADER
 // OFL_IB
+
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
 #include "vmath.h"
+#include "dll.h"
 namespace ofl
 {
-class StereoCompositor
+class OFL_DLL_PUBLIC StereoCompositor
 {
 
 public:
