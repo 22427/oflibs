@@ -176,7 +176,7 @@ std::string read_value(const char** code)
 }
 
 
-TNVB *read_from_string(const char *code, const char **end, const std::string &type, const std::string &name)
+TNVB * TNVBOperations::read_from_string(const char *code, const char **end, const std::string &type, const std::string &name)
 {
 	TNVB* res;
 
@@ -255,39 +255,38 @@ TNVB *read_from_string(const char *code, const char **end, const std::string &ty
 	return res;
 }
 
-std::string write_to_string(const TNVB &v)
+std::string TNVBOperations::write_to_string(const TNVB &v)
 {
 	std::string res = v.type()+" "+v.name()+" =\n{\n";
 	for(const auto& i : v.get_ints())
-		res+="int "+i.first+" = "+write_to_string(i.second)+";\n";
+		res+="int "+i.first+" = "+ofl::write_to_string(i.second)+";\n";
 
 	for(const auto& i : v.get_uints())
-		res+="uint "+i.first+" = "+write_to_string(i.second)+";\n";
+		res+="uint "+i.first+" = "+ofl::write_to_string(i.second)+";\n";
 
 	for(const auto& i : v.get_floats())
-		res+="float "+i.first+" = "+write_to_string(i.second)+";\n";
+		res+="float "+i.first+" = "+ofl::write_to_string(i.second)+";\n";
 
 	for(const auto& i : v.get_doubles())
-		res+="double "+i.first+" = "+write_to_string(i.second)+";\n";
+		res+="double "+i.first+" = "+ofl::write_to_string(i.second)+";\n";
 
 	for(const auto& i : v.get_vec2s())
-		res+="vec2 "+i.first+" = "+write_to_string(i.second)+";\n";
+		res+="vec2 "+i.first+" = "+ofl::write_to_string(i.second)+";\n";
 
 	for(const auto& i : v.get_vec3s())
-		res+="vec3 "+i.first+" = "+write_to_string(i.second)+";\n";
+		res+="vec3 "+i.first+" = "+ofl::write_to_string(i.second)+";\n";
 
 	for(const auto& i : v.get_vec4s())
-		res+="vec4 "+i.first+" = "+write_to_string(i.second)+";\n";
+		res+="vec4 "+i.first+" = "+ofl::write_to_string(i.second)+";\n";
 
 	for(const auto& i : v.get_mat3s())
-		res+="mat3 "+i.first+" = "+write_to_string(i.second)+";\n";
-
+		res+="mat3 "+i.first+" = "+ofl::write_to_string(i.second)+";\n";
 
 	for(const auto& i : v.get_mat4s())
-		res+="mat4 "+i.first+" = "+write_to_string(i.second)+";\n";
+		res+="mat4 "+i.first+" = "+ofl::write_to_string(i.second)+";\n";
 
 	for(const auto& i : v.get_strings())
-		res+="string "+i.first+" = "+write_to_string(i.second)+";\n";
+		res+="string "+i.first+" = "+ofl::write_to_string(i.second)+";\n";
 
 	for(const auto& i : v.get_blocks())
 		for(const auto& b : i.second)
@@ -299,6 +298,47 @@ std::string write_to_string(const TNVB &v)
 	return res;
 }
 
+TNVB *TNVBOperations::read_from_file(const std::string &path)
+{
+	char * buffer = nullptr;
+	long length;
 
+	FILE * f = fopen (path.c_str(), "r");
+	if(!f)
+		return nullptr;
+
+	fseek (f, 0, SEEK_END);
+	length = ftell (f);
+	fseek (f, 0, SEEK_SET);
+	buffer = static_cast<char*>(malloc (length));
+
+	if (buffer)
+	{
+		fread (buffer, 1, length, f);
+	}
+	fclose (f);
+
+	if (!buffer)
+	{
+		return nullptr;
+	}
+
+	const char* end;
+
+	auto res = read_from_string(buffer,&end);
+	free(buffer);
+	return res;
+}
+
+bool TNVBOperations::write_to_file(const TNVB *tnvb, const std::string &path)
+{
+	FILE * f = fopen (path.c_str(), "w");
+	if(!f)
+		return false;
+	auto str = write_to_string(*tnvb);
+	fwrite(str.c_str(),1,str.size(),f);
+	fclose(f);
+	return true;
+}
 
 }

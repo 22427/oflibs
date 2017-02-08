@@ -36,6 +36,14 @@ protected:
 	std::string m_name;
 public:
 	TNVB(const std::string& type="", const std::string& name="");
+	~TNVB()
+	{
+		// Destroy all child blocks
+		for(auto& t: m_blocks)
+			for(auto& n : t.second)
+				delete n.second;
+		m_blocks.clear();
+	}
 
 	/**
 	 * @brief get_type gives access to this blocks type.
@@ -126,6 +134,16 @@ public:
 	template<typename T>
 	std::vector<T>& get_array(const std::string& name);
 
+
+	/**
+	 * @brief get_array Gives access to an array with a given name.
+	 * If the array with this name does not exist one is created.
+	 * @param name name of the array.
+	 * @return Reference to the array.
+	 */
+	template<typename T>
+	const std::vector<T>& get_array(const std::string& name) const;
+
 	/**
 	 * @brief get_blocks Gives access to all blocks of a given type
 	 * @param type of the blocks you wish to access.
@@ -157,6 +175,19 @@ public:
 	 */
 	bool has_blocks_of_type(const std::string& type);
 
+	bool has_ints(const std::string& name) const {return m_ints.find(name) != m_ints.end();}
+	bool has_uints(const std::string& name) const {return m_uints.find(name) != m_uints.end();}
+	bool has_floats(const std::string& name) const {return m_floats.find(name) != m_floats.end();}
+	bool has_doubles(const std::string& name) const {return m_doubles.find(name) != m_doubles.end();}
+	bool has_vec2s(const std::string& name) const {return m_vec2s.find(name) != m_vec2s.end();}
+	bool has_vec3s(const std::string& name) const {return m_vec3s.find(name) != m_vec3s.end();}
+	bool has_vec4s(const std::string& name) const {return m_vec4s.find(name) != m_vec4s.end();}
+	bool has_mat3s(const std::string& name) const {return m_mat3s.find(name) != m_mat3s.end();}
+	bool has_mat4s(const std::string& name) const {return m_mat4s.find(name) != m_mat4s.end();}
+	bool has_strings(const std::string& name) const {return m_strings.find(name) != m_strings.end();}
+
+
+
 
 	const std::map<std::string,std::vector<int32_t>>& get_ints() const;
 	const std::map<std::string,std::vector<uint32_t>>& get_uints() const;
@@ -173,17 +204,19 @@ public:
 
 };
 
+class TNVBOperations
+{
+public:
+	static OFL_DLL_PUBLIC TNVB *read_from_string(const char* code,
+												 const char** end,
+												 const std::string& type ="",
+												 const std::string& name ="" );
+	static OFL_DLL_PUBLIC  std::string write_to_string(const TNVB& v);
 
-OFL_DLL_PUBLIC TNVB *read_from_string(const char* code,
-											const char** end,
-											const std::string& type ="",
-											const std::string& name ="" );
 
-OFL_DLL_PUBLIC  std::string write_to_string(const TNVB& v);
-
-
-
-
+	static OFL_DLL_PUBLIC TNVB *read_from_file(const std::string& path);
+	static OFL_DLL_PUBLIC bool write_to_file(const TNVB* tnvb ,const std::string& path);
+};
 template<>
 inline std::vector<int32_t>& TNVB::get_array(const std::string& name)
 {
@@ -235,6 +268,61 @@ template<>
 inline std::vector<std::string>& TNVB::get_array(const std::string& name)
 {
 	return m_strings[name];
+}
+
+
+
+template<>
+inline const std::vector<int32_t>& TNVB::get_array(const std::string& name) const
+{
+	return (*(m_ints.find(name))).second;
+}
+
+template<>
+inline const std::vector<uint32_t>& TNVB::get_array(const std::string& name) const
+{
+	return (*(m_uints.find(name))).second;
+}
+template<>
+inline const std::vector<float>& TNVB::get_array(const std::string& name) const
+{
+	return (*(m_floats.find(name))).second;
+}
+template<>
+inline const std::vector<double>& TNVB::get_array(const std::string& name) const
+{
+	return (*(m_doubles.find(name))).second;
+}
+template<>
+inline const std::vector<vec2>& TNVB::get_array(const std::string& name) const
+{
+	return (*(m_vec2s.find(name))).second;
+}
+template<>
+inline const std::vector<vec3>& TNVB::get_array(const std::string& name) const
+{
+	return (*(m_vec3s.find(name))).second;
+}
+template<>
+inline const std::vector<vec4>& TNVB::get_array(const std::string& name) const
+{
+	return (*(m_vec4s.find(name))).second;
+}
+template<>
+inline const std::vector<mat4>& TNVB::get_array(const std::string& name) const
+{
+	return (*(m_mat4s.find(name))).second;
+}
+
+template<>
+inline const std::vector<mat3>& TNVB::get_array(const std::string& name) const
+{
+	return (*(m_mat3s.find(name))).second;
+}
+template<>
+inline const std::vector<std::string>& TNVB::get_array(const std::string& name) const
+{
+	return (*(m_strings.find(name))).second;
 }
 
 

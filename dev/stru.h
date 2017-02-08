@@ -339,6 +339,11 @@ static inline std::string file(const std::string& p)
 	return p.substr(p.find_last_of('/')+1);
 }
 
+/**
+ * @brief filename returns the filename without extension
+ * @param p
+ * @return
+ */
 static inline std::string filename(const std::string& p)
 {
 	if(is_directory(p))
