@@ -158,7 +158,7 @@ public:
 	 * @return The requested block. If it did not exist one will be created and
 	 * returned.
 	 */
-	TNVB*& get_block(const std::string& type, const std::string& name);
+	TNVB* get_block(const std::string& type, const std::string& name);
 
 	/**
 	 * @brief has_block check if a block with a given type and name exists.
