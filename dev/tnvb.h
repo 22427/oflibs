@@ -158,7 +158,7 @@ public:
 	 * @return The requested block. If it did not exist one will be created and
 	 * returned.
 	 */
-	TNVB* get_block(const std::string& type, const std::string& name);
+	TNVB *&get_block(const std::string& type, const std::string& name);
 
 	/**
 	 * @brief has_block check if a block with a given type and name exists.
@@ -217,6 +217,9 @@ public:
 	static OFL_DLL_PUBLIC TNVB *read_from_file(const std::string& path);
 	static OFL_DLL_PUBLIC bool write_to_file(const TNVB* tnvb ,const std::string& path);
 };
+
+
+
 template<>
 inline std::vector<int32_t>& TNVB::get_array(const std::string& name)
 {

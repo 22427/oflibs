@@ -14,7 +14,7 @@ std::map<std::string, TNVB *> &TNVB::get_blocks(const std::string &type)
 	return m_blocks[type];
 }
 
-TNVB *TNVB::get_block(const std::string &type, const std::string &name)
+TNVB*& TNVB::get_block(const std::string &type, const std::string &name)
 {
 	if(m_blocks[type].find(name) == m_blocks[type].end())
 		m_blocks[type][name] = new TNVB(type,name);
@@ -195,7 +195,7 @@ TNVB * TNVBOperations::read_from_string(const char *code, const char **end, cons
 	std::string n;
 	std::string v;
 
-	while(*code != '}')
+	while(*code != '}' && *code)
 	{
 		t = read_type(&code);
 		n = read_name(&code);
