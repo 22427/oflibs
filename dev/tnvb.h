@@ -82,7 +82,7 @@ public:
 	void set(const std::string& name, const T v, const uint32_t id =0)
 	{
 		auto& a =get_array<T>(name);
-		if(id<= a.size())
+		if(id >= a.size())
 			a.resize(id+1);
 		a[id] = v;
 	}
@@ -100,7 +100,7 @@ public:
 	T& get(const std::string& name, const uint32_t id =0)
 	{
 		auto& a =get_array<T>(name);
-		if(id<= a.size())
+		if(id >= a.size())
 			a.resize(id+1);
 		return a[id];
 	}
