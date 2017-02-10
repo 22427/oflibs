@@ -301,7 +301,6 @@ std::string TNVBOperations::write_to_string(const TNVB &v)
 std::string read_whole_file(const std::string& path);
 std::string resolve_includes(const std::string& str)
 {
-	printf("str: %s\n\n",str.c_str());
 	std::string r;
 	bool in_include = false;
 	std::string include_path;
@@ -320,7 +319,6 @@ std::string resolve_includes(const std::string& str)
 		else
 			r+=str[i];
 	}
-	printf("r: %s\n\n",r.c_str());
 	return r;
 }
 
