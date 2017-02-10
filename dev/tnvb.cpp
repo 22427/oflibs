@@ -111,15 +111,21 @@ std::string read_values(const char** code)
 {
 	std::string value;
 	const char*r = skip_ws(*code);
+	bool in_string = false;
 	while(*r)
 	{
-		if(*r==';')
+		if(*r == '\\')
+			r++;
+		else if(*r==';' && !in_string)
 		{
 			r++;
 			break;
 		}
-		if(*r == '\\')
-			r++;
+		else if(*r=='"' )
+		{
+			in_string = !in_string;
+		}
+
 		value += *r;
 		r++;
 	}
@@ -335,7 +341,6 @@ TNVB *TNVBOperations::read_from_file(const std::string &path)
 {
 	auto buffer = read_whole_file(path);
 	const char* end;
-
 	auto res = read_from_string(buffer.c_str(),&end);
 	return res;
 }
