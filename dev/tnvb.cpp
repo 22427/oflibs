@@ -298,35 +298,47 @@ std::string TNVBOperations::write_to_string(const TNVB &v)
 	return res;
 }
 
+std::string read_whole_file(const std::string& path);
+std::string resolve_includes(const std::string& str)
+{
+	printf("str: %s\n\n",str.c_str());
+	std::string r;
+	bool in_include = false;
+	std::string include_path;
+	for(unsigned int i = 0 ; i <str.length();i++)
+	{
+		if(!in_include && str[i]=='~' && str[++i]=='>' && str[++i]=='[')
+			in_include = true;
+		else if(in_include && str[i]==']')
+		{
+			in_include = false;
+			r+=read_whole_file(include_path);
+			include_path = "";
+		}
+		else if(in_include)
+			include_path+=str[i];
+		else
+			r+=str[i];
+	}
+	printf("r: %s\n\n",r.c_str());
+	return r;
+}
+
+std::string read_whole_file(const std::string& path)
+{
+	std::ifstream t(path);
+	return resolve_includes(
+				std::string((std::istreambuf_iterator<char>(t)),
+				std::istreambuf_iterator<char>()));
+
+}
+
 TNVB *TNVBOperations::read_from_file(const std::string &path)
 {
-	char * buffer = nullptr;
-	long length;
-
-	FILE * f = fopen (path.c_str(), "r");
-	if(!f)
-		return nullptr;
-
-	fseek (f, 0, SEEK_END);
-	length = ftell (f);
-	fseek (f, 0, SEEK_SET);
-	buffer = static_cast<char*>(malloc (length));
-
-	if (buffer)
-	{
-		fread (buffer, 1, length, f);
-	}
-	fclose (f);
-
-	if (!buffer)
-	{
-		return nullptr;
-	}
-
+	auto buffer = read_whole_file(path);
 	const char* end;
 
-	auto res = read_from_string(buffer,&end);
-	free(buffer);
+	auto res = read_from_string(buffer.c_str(),&end);
 	return res;
 }
 
