@@ -17,7 +17,7 @@ CONFIG += c++11
 
 CONFIG += link_pkgconfig
 PKGCONFIG += glfw3
-LIBS += -ldl -lGL -lm -lpthread
+LIBS += -ldl -lGL -lm -lpthread -lX11
 
 INCLUDEPATH += ../../libs
 INCLUDEPATH += ../../dev/dep

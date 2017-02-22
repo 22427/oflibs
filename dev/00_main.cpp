@@ -4,35 +4,37 @@
 #include "ogl_geo.h"
 #include "vd.h"
 #include "vdman.h"
+#include "vmath.h"
+#include "tnvb.h"
 using namespace  ofl;
-
+#include "ogl_textfield.h"
 
 std::string vs =R"code(#version 430
-layout(location = 0) uniform mat4 model_matrix;
-layout(location = 1) uniform mat4 view_matrix;
-layout(location = 2) uniform mat4 projection_matrix;
-layout(location = 0) in vec3 a_pos;
-layout(location = 1) in vec3 a_nrm;
-layout(location = 2) in vec2 a_tex;
-layout(location = 3) in vec4 a_color;
-layout(location = 4) in vec3 a_tan;
-out vec4 v_color;
-void main()
-{
-	gl_Position = projection_matrix*view_matrix*model_matrix * vec4(a_pos,1.0);
-	v_color = a_color;
-}
-)code";
+				layout(location = 0) uniform mat4 model_matrix;
+				layout(location = 1) uniform mat4 view_matrix;
+				layout(location = 2) uniform mat4 projection_matrix;
+				layout(location = 0) in vec3 a_pos;
+				layout(location = 1) in vec3 a_nrm;
+				layout(location = 2) in vec2 a_tex;
+				layout(location = 3) in vec4 a_color;
+				layout(location = 4) in vec3 a_tan;
+				out vec4 v_color;
+				void main()
+				{
+				gl_Position = projection_matrix*view_matrix*model_matrix * vec4(a_pos,1.0);
+				v_color = a_color;
+				}
+				)code";
 
 
 std::string fs =R"code(#version 430
-in vec4 v_color;
-out vec4 f_color;
-void main()
-{
-	f_color = v_color;
-}
-)code";
+				in vec4 v_color;
+				out vec4 f_color;
+				void main()
+				{
+				f_color = v_color;
+				}
+				)code";
 
 class Application : public OpenGLApplication
 {
@@ -43,14 +45,19 @@ class Application : public OpenGLApplication
 	mat4 vm;
 	mat4 pm;
 	Geometry* geo;
+	OpenGLTextFieldRenderer* tfr;
+	OpenGLTextField* tf;
 
 public:
 	Application()
 	{
 		init();
+		tfr=new OpenGLTextFieldRenderer(nullptr,96,208,0);
+		tf =tfr->create_text_field(3,2);
 		m_sp = new ShaderProgram();
 		m_goon = true;
 		glClearColor(1.0f,0.2f,0.2f,1.0f);
+		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 		auto shader = Shader(GL_VERTEX_SHADER,vs);
 		if(!shader.compile())
 			printf("Compiling VS failed:\n%s\n",shader.read_log().c_str());
@@ -87,9 +94,9 @@ public:
 	bool render_one_frame(double tslf_s)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		printf("tslf : %f\n",tslf_s);
-		fflush(stdout);
-		geo->draw();
+
+
+		tfr->render();
 
 		this->m_context.swapBuffers();
 		return m_goon;
@@ -109,9 +116,25 @@ public:
 		setUniform(2,pm);
 	}
 };
-int main()
+
+void print(const mat4& m)
 {
+	auto f = glm::value_ptr(m);
+	for(int i = 0 ; i <16;i++)
+	{
+
+		if(i%4==0)
+			printf(" | ");
+		printf("%f,",f[i]);
+
+	}
+}
+
+int main(int argc, char** argv)
+{
+
 	Application app;
 	app.start_rendering();
+
 	return 0;
 }
