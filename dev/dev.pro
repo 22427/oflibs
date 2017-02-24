@@ -5,9 +5,9 @@ CONFIG   -= app_bundle
 
 
 
-INCLUDEPATH += dep/
+INCLUDEPATH += dep/ dep/stb
 SOURCES += dep/glad/glad.c \
-    ogl_textfield.cpp
+    ogl_text.cpp
 
 
 DISTFILES += \
@@ -45,7 +45,8 @@ HEADERS += \
     user_io.h \
     ogl_utils.h \
     ring.h \
-    ogl_textfield.h
+    font.h \
+    ogl_text.h
 
 SOURCES += \
 	ogl_geo.cpp \

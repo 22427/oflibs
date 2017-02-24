@@ -18,7 +18,7 @@ namespace ofl
 #ifdef NDEBUG
 #define OFL_DBG_ERROR_CHECK do{}while(0)
 #else
-#define OFL_DBG_ERROR_CHECK do {const auto err = glGetError();if(err != GL_NO_ERROR) printf("[ERR] %s - %d: %s\n",__FILE__,__LINE__,get_gl_error_string(err));}while(0)
+#define OFL_DBG_ERROR_CHECK do {const auto err = glGetError();if(err != GL_NO_ERROR) printf("[ERR] %s - %d: %s\n",__FILE__,__LINE__,get_gl_error_string(err).c_str());}while(0)
 #endif
 
 

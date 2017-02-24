@@ -2,13 +2,14 @@
 #include "ogl_app.h"
 #include "ogl_utils.h"
 #include "ogl_geo.h"
+#include "font.h"
 #include "vd.h"
 #include "vdman.h"
 #include "vmath.h"
 #include "tnvb.h"
 using namespace  ofl;
-#include "ogl_textfield.h"
-
+#include "ogl_text.h"
+#include <stb_image.h>
 std::string vs =R"code(#version 430
 				layout(location = 0) uniform mat4 model_matrix;
 				layout(location = 1) uniform mat4 view_matrix;
@@ -52,12 +53,30 @@ public:
 	Application()
 	{
 		init();
-		tfr=new OpenGLTextFieldRenderer(nullptr,96,208,0);
-		tf =tfr->create_text_field(3,2);
+		glEnable (GL_BLEND);
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+		int w, h, c;
+		auto fnt = stbi_load("../../resources/fonts/whitrabt_df.png",&w,&h,&c,1);
+
+		tfr=new OpenGLTextFieldRenderer(fnt,w,h);
+
+		free(fnt);
+
+		tf =tfr->create_text_field(6,1);
+		tf->set_model_matrix(glm::translate(mat4(1),glm::vec3(0.0f,1.0f,0.0f)));
+		tf->set_anchor(vec2(0.5,1));
+		tf->set_bg_color(vec4(0,0,0,0.5));
+
+		auto t = tfr->create_text_field(80,30);
+		t->write_text("Franz jagt im komplett verwahrlosten Taxi quer durch Bayern! FRANZ JAGT IM KOMPLETT VERWAHRLOSTEN TAXI QUER DURCH BAYERN!");
+		t->set_anchor(vec2(0.5,0.5));
+
+
 		m_sp = new ShaderProgram();
 		m_goon = true;
 		glClearColor(1.0f,0.2f,0.2f,1.0f);
-		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 		auto shader = Shader(GL_VERTEX_SHADER,vs);
 		if(!shader.compile())
 			printf("Compiling VS failed:\n%s\n",shader.read_log().c_str());
@@ -95,7 +114,7 @@ public:
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
+		tf->write_text(std::to_string(1.0/tslf_s),0);
 		tfr->render();
 
 		this->m_context.swapBuffers();
@@ -138,3 +157,6 @@ int main(int argc, char** argv)
 
 	return 0;
 }
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
