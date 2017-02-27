@@ -8,7 +8,6 @@ ogl_stereo_compositor
 ogl_utils
 ogl_win
 processing_graph
-protocol
 sem_queue
 socket
 stru

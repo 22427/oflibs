@@ -2,7 +2,6 @@ dll
 kd_tree
 mesh
 processing_graph
-protocol
 sem_queue
 socket
 stru
