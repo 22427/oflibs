@@ -19,8 +19,10 @@ Type::Type(const std::string &str)
 		id = UNSIGNED_SHORT;
 	else if(str == "char" || str == "byte"|| str == "BYTE")
 		id = BYTE;
-	else
+	else if(str == "uchar" || str == "ubyte"|| str == "uBYTE")
 		id = UNSIGNED_BYTE;
+	else
+		id = INVALID;
 }
 
 std::string Type::to_string()

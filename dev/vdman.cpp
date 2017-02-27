@@ -585,21 +585,22 @@ void VertexDataManufactory::add_vertex(vec3 p, vec2 t, vec3 n, vec4 c)
 	vertex(p);
 }
 
-
-#define vecIsNaN(v) (!(v.x==v.x))
+#ifndef OFL_VEC_IS_NAN
+#define OFL_VEC_IS_NAN(v) (!(v.x==v.x))
+#endif
 
 void VertexDataManufactory::add_triangle(vec3 p1, vec3 p2, vec3 p3, vec2 t1, vec2 t2, vec2 t3, vec3 n1, vec3 n2, vec3 n3, vec4 c1, vec4 c2, vec4 c3)
 {
 	vec3 n = glm::normalize(glm::cross(p2 - p1, p3 - p1));
-	if (vecIsNaN(n1))
+	if (OFL_VEC_IS_NAN(n1))
 	{
 		n1 = n;
 	}
-	if (vecIsNaN(n2))
+	if (OFL_VEC_IS_NAN(n2))
 	{
 		n2 = n;
 	}
-	if (vecIsNaN(n3))
+	if (OFL_VEC_IS_NAN(n3))
 	{
 		n3 = n;
 	}
@@ -640,19 +641,19 @@ void VertexDataManufactory::add_triangle(vec3 p1, vec3 p2, vec3 p3, vec2 t1, vec
 void VertexDataManufactory::addQuad(vec3 p1, vec3 p2, vec3 p3, vec3 p4, vec2 t1, vec2 t2, vec2 t3, vec2 t4, vec3 n1, vec3 n2, vec3 n3, vec3 n4, vec4 c1, vec4 c2, vec4 c3, vec4 c4)
 {
 	vec3 n = glm::normalize(glm::cross(p2 - p1, p3 - p1));
-	if (vecIsNaN(n1))
+	if (OFL_VEC_IS_NAN(n1))
 	{
 		n1 = n;
 	}
-	if (vecIsNaN(n2))
+	if (OFL_VEC_IS_NAN(n2))
 	{
 		n2 = n;
 	}
-	if (vecIsNaN(n3))
+	if (OFL_VEC_IS_NAN(n3))
 	{
 		n3 = n;
 	}
-	if (vecIsNaN(n4))
+	if (OFL_VEC_IS_NAN(n4))
 	{
 		n4 = n;
 	}
@@ -710,7 +711,7 @@ void VertexDataManufactory::addQuad(vec3 p1, vec3 p2, vec3 p3, vec3 p4, vec2 t1,
 	}
 
 }
-#undef vecIsNaN
+#undef OFL_VEC_IS_NAN
 
 
 

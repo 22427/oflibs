@@ -5,6 +5,7 @@
 namespace ofl {
 
 
+
 uint32_t Attribute::size() const
 {
 	return  (type.size())*elements;
@@ -1208,16 +1209,20 @@ void handle_v(VertexData* vd, std::map<Vertex,uint32_t>& v_loc, const Vertex& v)
 	vd->push_back(static_cast<const uint32_t>(v_id));
 }
 
-#define atoff(s) static_cast<float>(atof(s))
-#define atoiu(s) static_cast<uint32_t>(atoi(s))
 
+
+
+#ifndef OFL_ATOFF
+#define OFL_ATOFF(s) static_cast<float>(atof(s))
+#endif
+
+#ifndef OFL_ATOIU
+#define OFL_ATOIU(s) static_cast<uint32_t>(atoi(s))
+#endif
 VertexData *VertexDataOperations::read_obj(FILE* f)
 {
 
 	// mesh loader the 10000ths ^^
-
-
-
 	std::vector<vec3> positions;
 	std::vector<vec3> normals;
 	std::vector<vec2> tex_coords;
@@ -1265,18 +1270,18 @@ VertexData *VertexDataOperations::read_obj(FILE* f)
 
 		if (type == "v")
 		{
-			positions.push_back(vec3(atoff(arg[0]),atoff(arg[1]),
-					atoff(arg[2])));
+			positions.push_back(vec3(OFL_ATOFF(arg[0]),OFL_ATOFF(arg[1]),
+					OFL_ATOFF(arg[2])));
 		}
 		else if (type == "vn")
 		{
-			normals.push_back(vec3(atoff(arg[0]), atoff(arg[1]),
-					atoff(arg[2])));
+			normals.push_back(vec3(OFL_ATOFF(arg[0]), OFL_ATOFF(arg[1]),
+					OFL_ATOFF(arg[2])));
 		}
 		else if (type == "vt")
 		{
-			tex_coords.push_back(vec2(atoff(arg[0]),
-								 atoff(arg[1])));
+			tex_coords.push_back(vec2(OFL_ATOFF(arg[0]),
+								 OFL_ATOFF(arg[1])));
 		}
 		else if (type == "f")
 		{
@@ -1311,7 +1316,7 @@ VertexData *VertexDataOperations::read_obj(FILE* f)
 					for (int i = 0; i < 3; i++)
 					{
 
-						p_id  = atoiu(arg[i]) - 1;
+						p_id  = OFL_ATOIU(arg[i]) - 1;
 						v.set_value(AttributeID::ATTRIB_POSITION,positions[p_id]);
 						handle_v(vd,v_loc,v);
 					}
@@ -1372,6 +1377,9 @@ VertexData *VertexDataOperations::read_obj(FILE* f)
 
 	return vd;
 }
+
+#undef OFL_ATOFF
+#undef OFL_ATOIU
 
 VertexData *VertexDataOperations::read_vd(FILE *f)
 {
@@ -2172,7 +2180,7 @@ bool VertexDataOperations::recalculate_normals(VertexData *vd, AttributeID to_at
 				{
 					const uint idx = j==0? 1 : j==1? 0:j;
 					vd->get_vertex(vd->get_index(i+idx)).get_value(AttributeID::ATTRIB_POSITION,v[j]);
-					//					v[j] = &(verts.at(indices[i+idx]).pos());
+					//v[j] = &(verts.at(indices[i+idx]).pos());
 				}
 			}
 

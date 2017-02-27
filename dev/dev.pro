@@ -37,7 +37,6 @@ HEADERS += \
 	processing_graph.h \
 	mesh.h \
 	kd_tree.h \
-	protocol.h \
 	tnvb.h \
 	types.h \
 	dll.h \
