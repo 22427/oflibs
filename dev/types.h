@@ -6,15 +6,17 @@
 #include "dll.h"
 #include "vmath.h"
 
-typedef  uint32_t uint;
-typedef  uint8_t ubyte;
-typedef  int8_t byte;
 
 /**
  * The type toolset is used to manage data types and their properties.
  */
 namespace ofl
 {
+
+typedef  uint32_t uint;
+typedef  uint8_t ubyte;
+typedef  int8_t byte;
+
 
 inline OFL_DLL_LOCAL const char* skip_comment(const char* code);
 inline OFL_DLL_PUBLIC const char* skip_ws(const char* code);
