@@ -152,6 +152,14 @@ public:
 	std::map<std::string, TNVB*>& get_blocks(const std::string& type);
 
 	/**
+	 * @brief get_block Gives acces to the first block of a given type.
+	 * @param type of the block
+	 * @return The requested first block. If it did not exist one will be
+	 * created and returned.
+	 */
+	TNVB*& get_block(const std::string& type);
+
+	/**
 	 * @brief get_block Gives access to the block with the type and name
 	 * @param type of the block.
 	 * @param name of the block.
@@ -200,7 +208,6 @@ public:
 	const std::map<std::string,std::vector<mat3>>& get_mat3s() const;
 	const std::map<std::string,std::vector<std::string>>& get_strings ()const;
 	const std::map<std::string, std::map<std::string, TNVB*> >& get_blocks ()const;
-
 
 };
 
